@@ -90,7 +90,8 @@ Element providing solution to no problem in particular. As a simple, increments 
             },
             value: {
                 type: Number,
-                reflect: true
+                reflect: true,
+                observer: '_valueChanged'
             },
             startValue: {
                 type: Number,
@@ -98,7 +99,8 @@ Element providing solution to no problem in particular. As a simple, increments 
             },
             endValue: {
                 type: Number,
-                reflect: true
+                reflect: true,
+                observer: '_endValueChanged'
             },
             min: {
                 type: Number,
@@ -122,129 +124,176 @@ Element providing solution to no problem in particular. As a simple, increments 
             }
         },
 
-        updateHandle: function(handle, value) {
-            var inPercent = this.translateValueToPercent(value);
-            if (handle) {
-                handle.style.left = inPercent;
+        /**
+         * Watchers (creepy)
+         *
+         * Not working, though ... 
+         *
+         */
+        _valueChanged: function(newValue, oldValue) {
+            var clean = this.cleanValue(newValue);
+
+            // For ranges, update the start value so the user can refer to it too
+            this.startValue = newValue;
+            //return newValue;
+        },
+
+        _endValueChanged: function(newValue, oldValue) {
+            this.endValue = this.cleanValue(newValue);
+            //return this.cleanValue(newValue);
+        },
+
+        cleanValue: function(dirty) {
+            var clean = dirty;
+
+            // Account for 'steps'
+            var stepchange = dirty % this.step;
+            clean -= stepchange;
+            if ( stepchange > (this.step / 2) ) {
+                clean += this.step;
             }
+
+            // Check against min and max values
+            if ( dirty > this.max ) {
+                clean = this.max;
+            } else if ( dirty < this.min ) {
+                clean = this.min;
+            }
+
+            return clean;
+        },
+
+        translateValueToPosition: function(myvalue) {
+            var cW = this.$.sliderContainer.offsetWidth;
+
+            // What is the ratio of the value to the max?
+            var ratio = myvalue / this.max;
+
+            // Multiple by the width of the container
+            var position = ratio * cW;
+
+            return position + 'px';
+        },
+
+        translatePositionToValue: function(mypos) {
+            var cW = this.$.sliderContainer.offsetWidth;
+
+            // What is the ratio of my position to the container?
+            var ratio = mypos / cW;
+
+            // Convert to value; have to account min values other than 0
+            var value = ratio * (this.max - this.min);
+
+            return this.cleanValue(value);
+        },
+
+        updateHandle: function(handle, value) {
+            // Determine new x position form value
+            var newPos = this.translateValueToPosition(value);
+
+            // Set px value of left position
+            handle.style.left = newPos;
 
             // Update the progress bar, too
             this.updateProgressBar();
         },
 
+        /** 
+         * Update the progress bar based on change in values
+         *
+         * @method handleChange
+         */
         updateProgressBar: function() {
             // Am I a range or a single value?
             var progressValue = (this.range) ? this.endValue - this.value: this.value;
             var progressPosition = (this.range) ? this.value: 0;
 
             // Set the width and the position (for ranges)
-            this.$.sliderSelected.style.width = this.translateValueToPercent(progressValue);
-            this.$.sliderSelected.style.left = this.translateValueToPercent(progressPosition);
-        },
-
-        translatePercentToValue: function(percent) {
-            return percent * (this.max - this.min);
-        },
-
-        translateValueToPercent: function(myvalue) {
-            return (myvalue/ this.max) * 100 + '%';
-        },
-
-        cleanValue: function(myvalue) {
-            var clean = myvalue;
-
-            // Account for step increments
-            var stepchange = clean % this.step;
-            clean -= stepchange;
-            if ( stepchange > 0 && stepchange < (this.step / 2) ) {
-                clean += this.step;
-            }
-
-            // Don't let the user go above max, or below min
-            if ( clean > this.max) {
-                clean = this.max;
-            } else if ( clean < this.min) {
-                clean = this.min;
-            }
-
-            // Squeaky clean
-            return clean;
-        },
-
-        checkConstraints: function(value) {
-
-        },
-
-        findDelta: function(handle) {
-            var ddx = event.detail.ddx || 0;
-
-            // Are we still in the slider?
-            var cR = this.$.sliderContainer.getBoundingClientRect().right;
-            var cL = this.$.sliderContainer.getBoundingClientRect().left;
-            if (event.detail.x > cR || event.detail.x < cL) {
-                ddx = 0;
-            }
-
-            // Account for the working area
-            var barwidth = this.$.sliderContainer.offsetWidth;
-            var handlewidth = handle.offsetWidth;
-
-            // Calculate new value
-            var percentChange = ddx / (barwidth - handlewidth);
-            var valueChange = this.translatePercentToValue(percentChange);
-
-            return valueChange;
+            this.$.sliderSelected.style.width = this.translateValueToPosition(progressValue);
+            this.$.sliderSelected.style.left = this.translateValueToPosition(progressPosition);
         },
 
         /** 
-         * Handles updating the value when the handle is moved
+         * Where is the mouse in relation to the slider? Keep it in bounds.
+         *
+         * @method handleChange
+         */
+        findPosition: function(event) {
+            var mX = event.detail.x;
+            var cL = this.$.sliderContainer.getBoundingClientRect().left;
+            var cR =  this.$.sliderContainer.getBoundingClientRect().right;
+            var cW = this.$.sliderContainer.offsetWidth;
+            var position = 0;
+
+            if (mX > cR) {
+                // Is the mouse passed the right of our container?
+                // If so, set the position to the width of the container
+                position = cW;
+            } else if (mX < cL) {
+                // Is the mouse passed the left of our container?
+                // If so, set the position to zero
+                position = 0;
+            } else {
+                // Otherwise, position is based on the mouseX minus the offset
+                position = mX - cL;
+            }
+
+            return position;
+        },
+
+        /** 
+         * Handles updating the value when the START handle is moved
          *
          * @method handleChange
          */
         handleTrackStart: function(event, detail, sender) {
-            // Set new value
-            // We know this is a range
-            this.value = this.cleanValue(this.value + this.findDelta(this.$.startHandle));
+            var newPos = this.findPosition(event);
 
-            // If this is a range, check for going beyond end value
-            if (this.range && this.value > this.endValue) {
-                this.value = this.endValue;
+            // Update the value for the new position
+            var newValue = this.translatePositionToValue(newPos);
+
+            // We know this is range
+            if (newValue > this.endValue) {
+                newValue = this.endValue;
             }
+            this.value = newValue;
 
-            // Update knob, progress, etc.
-            this.updateHandle( this.$.startHandle, this.value);
+            // Move the handle to the mouse
+            this.updateHandle( this.$.startHandle, newValue );
         },
 
+        /** 
+         * Handles updating the value when the END handle is moved
+         *
+         * @method handleEndChange
+         */
         handleTrackEnd: function(event, detail, sender) {
-            // Set new value
-            var newValue = 0;
-            // If this is a range, update the endValue
-            // Otherwise update the value
-            if ( this.range ) {
-                newValue = this.cleanValue(this.endValue + this.findDelta(this.$.endHandle));
-                // Check that we don't below the start value
+            var newPos = this.findPosition(event);
+
+            // Update the value based on the new position
+            var newValue = this.translatePositionToValue(newPos);
+            if (this.range) {
                 if (newValue < this.value) {
                     newValue = this.value;
                 }
-                this.endValue = newValue
+                this.endValue = newValue;
             } else {
-                newValue = this.cleanValue(this.value + this.findDelta(this.$.endHandle));
                 this.value = newValue;
             }
 
-            // Update knob, progress, etc.
-            this.updateHandle( this.$.endHandle, newValue);
+            // Move the handle to the mouse
+            this.updateHandle( this.$.endHandle, newValue );
         },
 
         /** 
          * Handles updating the value when the input textbox is changed
          *
-         * @method handleChange
+         * @method handleStartChange
          */
         handleStartChange: function(event, detail, sender) {
 
             // Two way data binding not working?
-            this.value = this.cleanValue(this.$.inputStart.value);
+            this.value = this.$.inputStart.value;
 
             // If this is a range, check for going beyond end value
             if (this.range && this.value > this.endValue) {
@@ -256,10 +305,15 @@ Element providing solution to no problem in particular. As a simple, increments 
             this.updateHandle( handle, this.value );
         },
 
+        /** 
+         * Handles updating the value when the END input textbox is changed
+         *
+         * @method handleEndChange
+         */
         handleEndChange: function(event, detail, sender) {
 
             // Two way data binding not working?
-            this.endValue = this.cleanValue(this.$.inputEnd.value);
+            this.endValue = this.$.inputEnd.value;
 
             // If this is a range, don't go below the start value
             if (this.range && this.endValue < this.value) {

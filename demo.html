@@ -10,20 +10,15 @@
         <!-- Import custom element. Note: see comment about relative paths to dependencies in the *.html file referenced below -->
         <link rel="import" href="px-slider.html"/>
     </head>
-
     <body>
-
         <h3>Demo</h3>
-
         <p>
             Although related, examples are /not/ the same as the test fixtures.
             Tests are tests, examples are examples.
         </p>
-
         <p>
             Also see the <a href="index.html">documentation</a> and the <a href="test/fixture.html">UI test fixture</a>.
         </p>
-
         <h4>Single Value</h4>
         <div style="width: 200px">
             <px-slider
@@ -40,5 +35,13 @@
               max="60">
         </px-slider>
         </div>
-    </body>
+        <h4>Step = 50</h4>
+        <div style="width: 400px">
+            <px-slider
+              value="150"
+              min="0"
+              max="500"
+              step="50">
+        </div>
+   </body>
 </html>
