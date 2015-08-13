@@ -1,0 +1,75 @@
+/*
+ * Copyright (c) 2014 GE Global Research. All rights reserved.
+ *
+ * The copyright to the computer software herein is the property of
+ * GE Global Research. The software may be used and/or copied only
+ * with the written permission of GE Global Research or in accordance
+ * with the terms and conditions stipulated in the agreement/contract
+ * under which the software has been supplied.
+ */
+/*
+THIS FILE SHOULD CONTAIN ONLY ABSTRACT/'SKETCH' THEME RULES, NOT SPECIFIC TO PREDIX BRANDING
+Predix branding rules go in px-slider-predix.scss, not in this file.
+*/
+/*------------------------------------*    #PX-COLORS-DESIGN
+\*------------------------------------*/
+/**
+ * Brand Colors
+ */
+/**
+     * Primary
+     */
+/**
+     * Light
+     */
+/**
+     * Dark
+     */
+/**
+ * Monochromatic (gray10 is darkest, gray1 is lightest)
+ */
+/**
+ * Buttons
+ */
+/**
+ * Selection
+ */
+/**
+ * Alerts
+ */
+/**
+ * Data Visualization
+ */
+/**
+     * Basic
+     */
+/**
+     * Light
+     */
+/**
+     * Dark
+     */
+:host {
+  display: inline-block;
+  margin-left: -10px;
+  position: absolute;
+  top: -6px; }
+
+.px-handle {
+  height: 19px;
+  width: 19px;
+  border: 1px solid #b1b1bc;
+  background-color: white;
+  border-radius: 3px; }
+
+.px-handle:hover {
+  border-color: #9999a3;
+  background-color: #b1b1bc; }
+
+.px-handle.tracking {
+  border-color: #7c7c84;
+  background-color: #9999a3; }
+
+.px-handle.disabled {
+  border-color: #d1d0d8;
+  background-color: white; }

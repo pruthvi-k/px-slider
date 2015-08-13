@@ -1,0 +1,273 @@
+
+<!--
+    Relative paths assume component is being run from inside an app or another component, where dependencies are flat
+    siblings. When this component is run from its own repo (e.g. ui tests, examples), we assume the server is started with
+    'grunt depserve' (or similar server setup) to enable correct finding of bower dependencies for local runs
+    See https://github.sw.ge.com/jreichenberg/grunt-dep-serve#why-do-we-need-this
+-->
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-handle.html"/>
+
+
+<!--
+Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+
+##### Usage
+
+    <px-slider counter-value="1">Hi</px-slider>
+
+@element px-slider
+@blurb Element providing solution to no problem in particular.
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-slider">
+    <link rel="import" type="css" href="css/px-slider.css"/>
+    <template>
+        <div class="flex">
+        <input id="inputStart" 
+          type="text" 
+          class="slider-value start-value" 
+          value="{{value}}" 
+          on-change="handleStartChange" />
+        <div id="sliderContainer" 
+          class="slider flex__item">
+            <div id="sliderSelected"
+              class="slider-selected"></div>
+            <px-handle id="startHandle" 
+              style="visibility:hidden;"
+              handle-track-event-name="handleTrackStart"
+              on-track="handleTrackStart"></px-handle>
+            <px-handle id="endHandle" 
+              handle-track-event-name="handleTrackEnd"
+              on-track="handleTrackEnd"></px-handle>
+        </div>
+        <input id="inputEnd" 
+          type="text" 
+          style="visibility:hidden;"
+          class="slider-value end-value" 
+          value="{{endValue}}" 
+          on-change="handleEndChange" />
+    </div>
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+
+        is: 'px-slider',
+
+        ready: function() {
+            // Do we have a start value and end value?
+            if (this.startValue && this.endValue) {
+                // If so, this is a range.
+                this._setRange(true);
+                this.value = this.startValue;
+                this.$.startHandle.style.visibility = 'visible';
+                this.$.inputEnd.style.visibility = 'visible';
+
+                // Update the handles with starting values
+                this.updateHandle(this.$.startHandle, this.value);
+                this.updateHandle(this.$.endHandle, this.endValue);
+
+            } else {
+                // Otherwise, it's just a single value.
+                this.updateHandle(this.$.endHandle, this.value);
+            }
+        },
+
+        /**
+         * Properties block, expose attribute values to the DOM via 'reflect'
+         *
+         * @property properties
+         * @type Object
+         */
+        properties: {
+            range: {
+                type: Boolean,
+                value: false,
+                readOnly: true
+            },
+            value: {
+                type: Number,
+                reflect: true
+            },
+            startValue: {
+                type: Number,
+                reflect: true
+            },
+            endValue: {
+                type: Number,
+                reflect: true
+            },
+            min: {
+                type: Number,
+                value: 1,
+                reflect: true
+            },
+            max: {
+                type: Number,
+                value: 100,
+                reflect: true
+            },
+            step: {
+                type: Number,
+                value: 1,
+                reflect: true
+            },
+            disabled: {
+                type: Boolean,
+                value: false,
+                reflect: true
+            }
+        },
+
+        updateHandle: function(handle, value) {
+            var inPercent = this.translateValueToPercent(value);
+            if (handle) {
+                handle.style.left = inPercent;
+            }
+
+            // Update the progress bar, too
+            this.updateProgressBar();
+        },
+
+        updateProgressBar: function() {
+            // Am I a range or a single value?
+            var progressValue = (this.range) ? this.endValue - this.value: this.value;
+            var progressPosition = (this.range) ? this.value: 0;
+
+            // Set the width and the position (for ranges)
+            this.$.sliderSelected.style.width = this.translateValueToPercent(progressValue);
+            this.$.sliderSelected.style.left = this.translateValueToPercent(progressPosition);
+        },
+
+        translatePercentToValue: function(percent) {
+            return percent * (this.max - this.min);
+        },
+
+        translateValueToPercent: function(myvalue) {
+            return (myvalue/ this.max) * 100 + '%';
+        },
+
+        cleanValue: function(myvalue) {
+            var clean = myvalue;
+
+            // Account for step increments
+            var stepchange = clean % this.step;
+            clean -= stepchange;
+            if ( stepchange > 0 && stepchange < (this.step / 2) ) {
+                clean += this.step;
+            }
+
+            // Don't let the user go above max, or below min
+            if ( clean > this.max) {
+                clean = this.max;
+            } else if ( clean < this.min) {
+                clean = this.min;
+            }
+
+            // Squeaky clean
+            return clean;
+        },
+
+        checkConstraints: function(value) {
+
+        },
+
+        findDelta: function(handle) {
+            var ddx = event.detail.ddx || 0;
+
+            // Are we still in the slider?
+            var cR = this.$.sliderContainer.getBoundingClientRect().right;
+            var cL = this.$.sliderContainer.getBoundingClientRect().left;
+            if (event.detail.x > cR || event.detail.x < cL) {
+                ddx = 0;
+            }
+
+            // Account for the working area
+            var barwidth = this.$.sliderContainer.offsetWidth;
+            var handlewidth = handle.offsetWidth;
+
+            // Calculate new value
+            var percentChange = ddx / (barwidth - handlewidth);
+            var valueChange = this.translatePercentToValue(percentChange);
+
+            return valueChange;
+        },
+
+        /** 
+         * Handles updating the value when the handle is moved
+         *
+         * @method handleChange
+         */
+        handleTrackStart: function(event, detail, sender) {
+            // Set new value
+            // We know this is a range
+            this.value = this.cleanValue(this.value + this.findDelta(this.$.startHandle));
+
+            // If this is a range, check for going beyond end value
+            if (this.range && this.value > this.endValue) {
+                this.value = this.endValue;
+            }
+
+            // Update knob, progress, etc.
+            this.updateHandle( this.$.startHandle, this.value);
+        },
+
+        handleTrackEnd: function(event, detail, sender) {
+            // Set new value
+            var newValue = 0;
+            // If this is a range, update the endValue
+            // Otherwise update the value
+            if ( this.range ) {
+                newValue = this.cleanValue(this.endValue + this.findDelta(this.$.endHandle));
+                // Check that we don't below the start value
+                if (newValue < this.value) {
+                    newValue = this.value;
+                }
+                this.endValue = newValue
+            } else {
+                newValue = this.cleanValue(this.value + this.findDelta(this.$.endHandle));
+                this.value = newValue;
+            }
+
+            // Update knob, progress, etc.
+            this.updateHandle( this.$.endHandle, newValue);
+        },
+
+        /** 
+         * Handles updating the value when the input textbox is changed
+         *
+         * @method handleChange
+         */
+        handleStartChange: function(event, detail, sender) {
+
+            // Two way data binding not working?
+            this.value = this.cleanValue(this.$.inputStart.value);
+
+            // If this is a range, check for going beyond end value
+            if (this.range && this.value > this.endValue) {
+                this.value = this.endValue;
+            }
+
+            // If it's a range, we update the start handle; otherwise update the end handle
+            var handle = (this.range) ? this.$.startHandle : this.$.endHandle;
+            this.updateHandle( handle, this.value );
+        },
+
+        handleEndChange: function(event, detail, sender) {
+
+            // Two way data binding not working?
+            this.endValue = this.cleanValue(this.$.inputEnd.value);
+
+            // If this is a range, don't go below the start value
+            if (this.range && this.endValue < this.value) {
+                this.endValue = this.value;
+            }
+
+            // Update the end handle
+            this.updateHandle( this.$.endHandle, this.endValue );
+        }
+    });
+</script>

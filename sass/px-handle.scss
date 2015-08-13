@@ -1,0 +1,52 @@
+/*
+ * Copyright (c) 2014 GE Global Research. All rights reserved.
+ *
+ * The copyright to the computer software herein is the property of
+ * GE Global Research. The software may be used and/or copied only
+ * with the written permission of GE Global Research or in accordance
+ * with the terms and conditions stipulated in the agreement/contract
+ * under which the software has been supplied.
+ */
+
+//
+// Sass for the "sketch" notion of the px-slider component
+//
+// @author
+//
+
+/*
+THIS FILE SHOULD CONTAIN ONLY ABSTRACT/'SKETCH' THEME RULES, NOT SPECIFIC TO PREDIX BRANDING
+Predix branding rules go in px-slider-predix.scss, not in this file.
+*/
+
+@import "px-colors-design/_settings.colors.scss";
+
+:host {
+  display: inline-block;
+  margin-left: -10px;
+  position: absolute;
+  top: -6px;
+}
+
+.px-handle {
+  height: 19px;
+  width: 19px;
+  border: 1px solid $gray5;
+  background-color: $white;
+  border-radius: 3px;
+}
+
+.px-handle:hover {
+  border-color: $gray6;
+  background-color: $gray5;
+}
+
+.px-handle.tracking {
+  border-color: $gray7;
+  background-color: $gray6;
+}
+
+.px-handle.disabled {
+  border-color: $gray4;
+  background-color: $white;
+}

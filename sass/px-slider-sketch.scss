@@ -1,0 +1,74 @@
+/*
+ * Copyright (c) 2014 GE Global Research. All rights reserved.
+ *
+ * The copyright to the computer software herein is the property of
+ * GE Global Research. The software may be used and/or copied only
+ * with the written permission of GE Global Research or in accordance
+ * with the terms and conditions stipulated in the agreement/contract
+ * under which the software has been supplied.
+ */
+
+//
+// Sass for the "sketch" notion of the px-slider component
+//
+// @author
+//
+
+/*
+THIS FILE SHOULD CONTAIN ONLY ABSTRACT/'SKETCH' THEME RULES, NOT SPECIFIC TO PREDIX BRANDING
+Predix branding rules go in px-slider-predix.scss, not in this file.
+*/
+
+
+
+// Generic
+@import "px-normalize-design/_generic.normalize.scss";
+@import "px-box-sizing-design/_generic.box-sizing.scss";
+@import "px-helpers-design/_generic.helpers.scss";
+
+// Base
+@import "px-flexbox-design/_base.flexbox.scss";
+@import "px-viewport-design/_base.viewport.scss";
+@import "px-typography-design/_base.typography.scss";
+
+
+
+
+
+@import "px-meta-buttons-design/_meta.buttons.scss";
+
+
+// Component
+.slider {
+  margin: 10px 15px;
+  position: relative;
+  height: 8px;
+  border: 1px solid $gray5;
+  background-color: $gray1;
+  border-radius: 2px;
+}
+
+.slider-selected {
+  height: 8px;
+  position: absolute;
+  left: 0;
+  top: -1px;
+  border: 1px solid $select-blue-pressed;
+  background-color: $select-blue-default;
+  border-radius: 2px;
+}
+
+
+.slider-value {
+  width: 50px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid $gray5;
+  background-color: $gray1;
+  line-height: 28px;
+}
+
+// Trumps
+@import "inuit-clearfix/_trumps.clearfix.scss";
+@import "px-spacing-responsive-design/_trumps.spacing-responsive.scss";
+@import "px-widths-responsive-design/_trumps.widths-responsive.scss";
