@@ -243,7 +243,8 @@ Element providing solution to no problem in particular. As a simple, increments 
          */
         _updateProgressBar: function() {
             // Value is coming up as undefined, for some reason
-            if (!this.value) {
+            // 0 value is ok, though.
+            if (!this.value && this.value !== 0) {
                 return;
             }
 
