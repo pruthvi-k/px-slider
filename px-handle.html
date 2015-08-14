@@ -50,7 +50,8 @@ Element providing solution to no problem in particular. As a simple, increments 
             tracking: {
                 type: Boolean,
                 value: false, 
-                readOnly: true
+                readOnly: true,
+                observer: '_trackingChanged'
             },
 
             /**
@@ -84,15 +85,17 @@ Element providing solution to no problem in particular. As a simple, increments 
             }
         },
 
+        _trackingChanged: function(newValue, oldValue) {
+            this.toggleClass('tracking', newValue, this.$.handleTarget);
+        },
+
         handleDown: function(event) {
             this._setTracking(true);
-            this.$.handleTarget.classList.add('tracking');
             this.fire(this.handleDownEventName);
         },
 
         handleUp: function(event) {
             this._setTracking(false);
-            this.$.handleTarget.classList.remove('tracking');
             this.fire(this.handleUpEventName);
         },
 
