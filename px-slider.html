@@ -211,6 +211,11 @@ Element providing solution to no problem in particular. As a simple, increments 
         _translatePositionToValue: function(mypos) {
             var cW = this.$.sliderContainer.offsetWidth;
 
+            // Have we loaded the container?
+            if (cW === 0) {
+                return;
+            }
+
             // What is the ratio of my position to the container?
             var ratio = mypos / cW;
 
@@ -239,7 +244,7 @@ Element providing solution to no problem in particular. As a simple, increments 
         _updateProgressBar: function() {
             // Value is coming up as undefined, for some reason
             if (!this.value) {
-                console.log( "Value is undefined" );
+                return;
             }
 
             // Am I a range or a single value?

@@ -28,25 +28,32 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
   top: -6px;
 }
 
-.px-handle {
+#handleTarget {
   height: 19px;
   width: 19px;
   border: 1px solid $gray5;
   background-color: $white;
   border-radius: 3px;
+  box-shadow: 0 1px 1px #D9D9D9;
+  fill: $gray5;
 }
 
-.px-handle:hover {
+#handleTarget:hover {
   border-color: $gray6;
   background-color: $gray5;
+  fill: $gray6;
 }
 
-.px-handle.tracking {
+#handleTarget.tracking {
   border-color: $gray7;
   background-color: $gray6;
+  box-shadow: none;
+  fill: $gray7;
 }
 
-.px-handle.disabled {
+#handleTarget.disabled {
   border-color: $gray4;
   background-color: $white;
+  box-shadow: none;
+  fill: $gray4;
 }
