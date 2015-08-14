@@ -63,16 +63,21 @@ Element providing solution to no problem in particular. As a simple, increments 
                 // If so, this is a range.
                 this._setRange(true);
                 this.value = this.startValue;
+
+                // Show the start handle and the end input
                 this.$.startHandle.style.visibility = 'visible';
                 this.$.inputEnd.style.visibility = 'visible';
 
-                // Update the handles with starting values
-                this.updateHandle(this.$.startHandle, this.value);
-                this.updateHandle(this.$.endHandle, this.endValue);
-
+                // Have to wait for the DOM to finish loading
+                // And then refire these
+                this.async(function() {
+                    this._updateHandle(this.$.startHandle, this.value);
+                    this._updateHandle(this.$.endHandle, this.endValue);
+                }, 1);
             } else {
-                // Otherwise, it's just a single value.
-                this.updateHandle(this.$.endHandle, this.value);
+                this.async(function() {
+                    this._updateHandle(this.$.endHandle, this.value);
+                }, 1);
             }
         },
 
@@ -91,15 +96,19 @@ Element providing solution to no problem in particular. As a simple, increments 
             value: {
                 type: Number,
                 reflect: true,
+                notify: true,
                 observer: '_valueChanged'
             },
             startValue: {
                 type: Number,
-                reflect: true
+                reflect: true,
+                notify: true,
+                observer: '_startValueChanged'
             },
             endValue: {
                 type: Number,
                 reflect: true,
+                notify: true,
                 observer: '_endValueChanged'
             },
             min: {
@@ -131,19 +140,43 @@ Element providing solution to no problem in particular. As a simple, increments 
          *
          */
         _valueChanged: function(newValue, oldValue) {
-            var clean = this.cleanValue(newValue);
+            var clean = this._cleanValue(newValue);
 
-            // For ranges, update the start value so the user can refer to it too
-            this.startValue = newValue;
-            //return newValue;
+            // If this is a range, don't go higher than the end value
+            if (this.range && clean > this.endValue) {
+                clean = this.endValue;
+            }
+
+            // If it's a range, we update the start handle; otherwise update the end handle
+            var handle = (this.range) ? this.$.startHandle : this.$.endHandle;
+            this._updateHandle( handle, this.value );
+
+            // For the sake of ranges, we keep start value and value in sync
+            this.startValue = clean;
+            this.value = clean;
+        },
+
+        _startValueChanged: function(newValue, oldValue) {
+            // This is just really here in case a dev changes this value programmatically
+            //this.value = newValue; // Should call value watcher for cleanup
         },
 
         _endValueChanged: function(newValue, oldValue) {
-            this.endValue = this.cleanValue(newValue);
-            //return this.cleanValue(newValue);
+            var clean = this._cleanValue(newValue);
+
+            // If this is a range, don't go below the start value
+            if (this.range && clean < this.value) {
+                clean = this.value;
+            }
+
+            // Update the end handle
+            this._updateHandle( this.$.endHandle, clean );
+
+            // Update endValue with the cleaned value
+            this.endValue = clean;
         },
 
-        cleanValue: function(dirty) {
+        _cleanValue: function(dirty) {
             var clean = dirty;
 
             // Account for 'steps'
@@ -163,7 +196,7 @@ Element providing solution to no problem in particular. As a simple, increments 
             return clean;
         },
 
-        translateValueToPosition: function(myvalue) {
+        _translateValueToPosition: function(myvalue) {
             var cW = this.$.sliderContainer.offsetWidth;
 
             // What is the ratio of the value to the max?
@@ -175,7 +208,7 @@ Element providing solution to no problem in particular. As a simple, increments 
             return position + 'px';
         },
 
-        translatePositionToValue: function(mypos) {
+        _translatePositionToValue: function(mypos) {
             var cW = this.$.sliderContainer.offsetWidth;
 
             // What is the ratio of my position to the container?
@@ -184,18 +217,18 @@ Element providing solution to no problem in particular. As a simple, increments 
             // Convert to value; have to account min values other than 0
             var value = ratio * (this.max - this.min);
 
-            return this.cleanValue(value);
+            return this._cleanValue(value);
         },
 
-        updateHandle: function(handle, value) {
+        _updateHandle: function(handle, value) {
             // Determine new x position form value
-            var newPos = this.translateValueToPosition(value);
+            var newPos = this._translateValueToPosition(value);
 
             // Set px value of left position
             handle.style.left = newPos;
 
             // Update the progress bar, too
-            this.updateProgressBar();
+            this._updateProgressBar();
         },
 
         /** 
@@ -203,14 +236,19 @@ Element providing solution to no problem in particular. As a simple, increments 
          *
          * @method handleChange
          */
-        updateProgressBar: function() {
+        _updateProgressBar: function() {
+            // Value is coming up as undefined, for some reason
+            if (!this.value) {
+                console.log( "Value is undefined" );
+            }
+
             // Am I a range or a single value?
             var progressValue = (this.range) ? this.endValue - this.value: this.value;
             var progressPosition = (this.range) ? this.value: 0;
 
             // Set the width and the position (for ranges)
-            this.$.sliderSelected.style.width = this.translateValueToPosition(progressValue);
-            this.$.sliderSelected.style.left = this.translateValueToPosition(progressPosition);
+            this.$.sliderSelected.style.width = this._translateValueToPosition(progressValue);
+            this.$.sliderSelected.style.left = this._translateValueToPosition(progressPosition);
         },
 
         /** 
@@ -218,7 +256,7 @@ Element providing solution to no problem in particular. As a simple, increments 
          *
          * @method handleChange
          */
-        findPosition: function(event) {
+        _findPosition: function(event) {
             var mX = event.detail.x;
             var cL = this.$.sliderContainer.getBoundingClientRect().left;
             var cR =  this.$.sliderContainer.getBoundingClientRect().right;
@@ -246,20 +284,17 @@ Element providing solution to no problem in particular. As a simple, increments 
          *
          * @method handleChange
          */
-        handleTrackStart: function(event, detail, sender) {
-            var newPos = this.findPosition(event);
+        handleTrackStart: function(event) {
+            var newPos = this._findPosition(event);
 
             // Update the value for the new position
-            var newValue = this.translatePositionToValue(newPos);
+            var newValue = this._translatePositionToValue(newPos);
 
             // We know this is range
             if (newValue > this.endValue) {
                 newValue = this.endValue;
             }
             this.value = newValue;
-
-            // Move the handle to the mouse
-            this.updateHandle( this.$.startHandle, newValue );
         },
 
         /** 
@@ -267,11 +302,11 @@ Element providing solution to no problem in particular. As a simple, increments 
          *
          * @method handleEndChange
          */
-        handleTrackEnd: function(event, detail, sender) {
-            var newPos = this.findPosition(event);
+        handleTrackEnd: function(event) {
+            var newPos = this._findPosition(event);
 
             // Update the value based on the new position
-            var newValue = this.translatePositionToValue(newPos);
+            var newValue = this._translatePositionToValue(newPos);
             if (this.range) {
                 if (newValue < this.value) {
                     newValue = this.value;
@@ -280,29 +315,16 @@ Element providing solution to no problem in particular. As a simple, increments 
             } else {
                 this.value = newValue;
             }
-
-            // Move the handle to the mouse
-            this.updateHandle( this.$.endHandle, newValue );
         },
 
         /** 
-         * Handles updating the value when the input textbox is changed
+         * Handles updating the value when the START input textbox is changed
          *
          * @method handleStartChange
          */
-        handleStartChange: function(event, detail, sender) {
-
+        handleStartChange: function(event) {
             // Two way data binding not working?
             this.value = this.$.inputStart.value;
-
-            // If this is a range, check for going beyond end value
-            if (this.range && this.value > this.endValue) {
-                this.value = this.endValue;
-            }
-
-            // If it's a range, we update the start handle; otherwise update the end handle
-            var handle = (this.range) ? this.$.startHandle : this.$.endHandle;
-            this.updateHandle( handle, this.value );
         },
 
         /** 
@@ -310,18 +332,9 @@ Element providing solution to no problem in particular. As a simple, increments 
          *
          * @method handleEndChange
          */
-        handleEndChange: function(event, detail, sender) {
-
+        handleEndChange: function(event) {
             // Two way data binding not working?
             this.endValue = this.$.inputEnd.value;
-
-            // If this is a range, don't go below the start value
-            if (this.range && this.endValue < this.value) {
-                this.endValue = this.value;
-            }
-
-            // Update the end handle
-            this.updateHandle( this.$.endHandle, this.endValue );
         }
     });
 </script>
