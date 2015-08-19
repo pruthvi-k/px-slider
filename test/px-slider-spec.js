@@ -46,7 +46,7 @@ describe('Instancing component from provided DOM data attribute', function () {
         return driver.wait(webdriver.until.elementLocated(webdriver.By.css("px-slider .circle")), 3000);
     });
 
-    it('should instance a px-app-nav from the expected DOM', function () {
+    it('should instance a px-slider from the expected DOM', function () {
         return chai.expect(
             driver.findElement(webdriver.By.css("px-slider"))
         ).to.eventually.exist;
