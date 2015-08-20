@@ -3,51 +3,63 @@ Px-Slider
 
 ## Overview
 
-Px-Slider is a Predix Experience ('Px') component
+The px-Slider is a Predix Experience ('Px') component for defining a value in a range or a range of values within set boundaries.
 
-## Getting Started
+### Attributes
 
-Read https://github.sw.ge.com/pages/PX/technical-principles/
+**min**
+The smallest value in the range (minimum)
 
-From the component's directory...
+**max**
+The largest value in the range (maximum)
 
+**value**
+The starting value for the slider's handle.
+
+**start-value**
+For multi-handled/ranged sliders, the value of the left handle or start of the selected range.
+
+**end-value**
+For multi-handled/ranged sliders, the value of the right handle or end of the selected range.
+
+**step**
+All allowed values will be a multiple of the step. So if you want the user only to be able to select 10, 20, 30, 40, etc. you would set the step to 10.
+The default is 1, which ensures that you only get integers for your value.
+
+### Examples
+
+Single handled slider
 ```
-$ npm install
-$ bower install
-$ grunt sass
+<px-slider 
+  value="50" 
+  min="1" 
+  max="100">
+</px-slider>
 ```
 
-### API and examples
-
-From the component's directory
-
+Multi-handled slider
 ```
-$ grunt depserve
+<px-slider 
+  start-value="20" 
+  end-value="40"
+  min="1" 
+  max="60">
+</px-slider>
 ```
 
-Starts a local server. Navigate to the root of that server (e.g. http://localhost:8080/) in a browser to open the API documentation page, with link to the "Demo" / working examples.
+Single-handled slider with step
+```
+<px-slider 
+  value="250" 
+  step="50"
+  min="0" 
+  max="500">
+</px-slider>
+```
 
-### Options
+### Layout
 
-Does this component have runtime configuration options?  If so, they should be able to be passed as attributes on the element with examples shown below.
-
-### Function calls
-
-What is the public API of this component?
-
-### Extending styles
-
-Documented CSS extension points?
-
-### Extending behavior
-
-See Polymer composition patterns
-
-GE Coding Style Guide
----------------------
-
-[GE JS Developer's Guide](https://github.com/GeneralElectric/javascript)
-
+The slider will always take the full-width of whatever container it is in.
 
 ### Known Issues
 
