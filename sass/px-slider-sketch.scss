@@ -39,12 +39,21 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
 
 
 // Component
+
+:host {
+  user-select: none;
+  cursor: default;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+:host(:focus) {
+  outline: none;
+}
+
 .slider {
   margin: 10px 15px;
   position: relative;
   height: 8px;
-  border: 1px solid $gray5;
-  background-color: $gray1;
   border-radius: 2px;
 }
 
@@ -53,8 +62,6 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
   position: absolute;
   left: 0;
   top: -1px;
-  border: 1px solid $select-blue-pressed;
-  background-color: $select-blue-default;
   border-radius: 2px;
 }
 
@@ -63,8 +70,6 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
   width: 50px;
   height: 28px;
   padding: 0 10px;
-  border: 1px solid $gray5;
-  background-color: $gray1;
   line-height: 28px;
 }
 

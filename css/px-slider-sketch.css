@@ -945,12 +945,21 @@ button.btn {
       color: white;
       background: #086e87; }
 
+:host {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  cursor: default;
+  -webkit-tap-highlight-color: transparent; }
+
+:host(:focus) {
+  outline: none; }
+
 .slider {
   margin: 10px 15px;
   position: relative;
   height: 8px;
-  border: 1px solid #b1b1bc;
-  background-color: #f7f7fc;
   border-radius: 2px; }
 
 .slider-selected {
@@ -958,16 +967,12 @@ button.btn {
   position: absolute;
   left: 0;
   top: -1px;
-  border: 1px solid #086e87;
-  background-color: #0a9ec1;
   border-radius: 2px; }
 
 .slider-value {
   width: 50px;
   height: 28px;
   padding: 0 10px;
-  border: 1px solid #b1b1bc;
-  background-color: #f7f7fc;
   line-height: 28px; }
 
 /*------------------------------------*    #CLEARFIX

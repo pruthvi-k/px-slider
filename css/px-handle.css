@@ -64,6 +64,9 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
   box-shadow: 0 1px 1px #D9D9D9;
   fill: #b1b1bc; }
 
+#handleTarget:focus {
+  outline: 0; }
+
 #handleTarget:hover {
   border-color: #9999a3;
   background-color: #b1b1bc;
