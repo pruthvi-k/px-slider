@@ -10,14 +10,14 @@
 
 
 <!--
-Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+Allow the user to select a value or range of values within a specified min and max.
 
 ##### Usage
 
-    <px-slider counter-value="1">Hi</px-slider>
+    <px-slider value="50" min="1" max="100"></px-slider>
 
 @element px-slider
-@blurb Element providing solution to no problem in particular.
+@blurb Allow the user to select a value or range of values within a specified min and max.
 @homepage index.html
 @demo demo.html
 -->
@@ -31,7 +31,8 @@ Element providing solution to no problem in particular. As a simple, increments 
           value="{{value}}" 
           on-change="handleStartChange" />
         <div id="sliderContainer" 
-          class="slider flex__item">
+          class="slider flex__item"
+          on-click="jumpToValue">
             <div id="sliderSelected"
               class="slider-selected"></div>
             <px-handle id="startHandle" 
@@ -260,10 +261,11 @@ Element providing solution to no problem in particular. As a simple, increments 
         /** 
          * Where is the mouse in relation to the slider? Keep it in bounds.
          *
-         * @method handleChange
+         * @method _findPosition
          */
         _findPosition: function(event) {
-            var mX = event.detail.x;
+            // Is this a drag or a click?
+            var mX = (event.detail.x) ? event.detail.x : event.clientX;
             var cL = this.$.sliderContainer.getBoundingClientRect().left;
             var cR =  this.$.sliderContainer.getBoundingClientRect().right;
             var cW = this.$.sliderContainer.offsetWidth;
@@ -288,7 +290,7 @@ Element providing solution to no problem in particular. As a simple, increments 
         /** 
          * Handles updating the value when the START handle is moved
          *
-         * @method handleChange
+         * @method handleTrackStart
          */
         handleTrackStart: function(event) {
             var newPos = this._findPosition(event);
@@ -341,6 +343,36 @@ Element providing solution to no problem in particular. As a simple, increments 
         handleEndChange: function(event) {
             // Two way data binding not working?
             this.endValue = this.$.inputEnd.value;
+        },
+
+        /** 
+         * When the user clicks on the slider itself, jump to the corresponding value.
+         *
+         * @method jumpToValue
+         */
+        jumpToValue: function(event) {
+            var newPos = this._findPosition(event);
+
+            // Update the value based on the new position
+            var newValue = this._translatePositionToValue(newPos);
+
+            if (this.range) {
+                // Which handle do you move?
+                if (newValue < this.value) {
+                    // If it's less than the start value, move the left slider
+                    this.value = newValue;
+
+                } else if (newValue > this.endValue) {
+                    // If it's greater than the start value, move the right slider
+                    this.endValue = newValue;
+                } else {
+                    // We are somewhere in the middle - which handle do we move?!
+                }
+
+            } else {
+                // Move the only handle
+                this.value = newValue;
+            }
         }
     });
 </script>
