@@ -19,8 +19,6 @@ THIS FILE SHOULD CONTAIN ONLY ABSTRACT/'SKETCH' THEME RULES, NOT SPECIFIC TO PRE
 Predix branding rules go in px-slider-predix.scss, not in this file.
 */
 
-
-
 // Generic
 @import "px-normalize-design/_generic.normalize.scss";
 @import "px-box-sizing-design/_generic.box-sizing.scss";
@@ -31,12 +29,7 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
 @import "px-viewport-design/_base.viewport.scss";
 @import "px-typography-design/_base.typography.scss";
 
-
-
-
-
 @import "px-meta-buttons-design/_meta.buttons.scss";
-
 
 // Component
 
@@ -64,7 +57,6 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
   top: -1px;
   border-radius: 2px;
 }
-
 
 .slider-value {
   width: 50px;

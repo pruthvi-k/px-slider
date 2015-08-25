@@ -1,12 +1,11 @@
-
 <!--
     Relative paths assume component is being run from inside an app or another component, where dependencies are flat
     siblings. When this component is run from its own repo (e.g. ui tests, examples), we assume the server is started with
     'grunt depserve' (or similar server setup) to enable correct finding of bower dependencies for local runs
     See https://github.sw.ge.com/jreichenberg/grunt-dep-serve#why-do-we-need-this
 -->
-<link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="px-handle.html"/>
+<link rel="import" href="../polymer/polymer.html" />
+<link rel="import" href="px-handle.html" />
 
 
 <!--
@@ -22,357 +21,340 @@ Allow the user to select a value or range of values within a specified min and m
 @demo demo.html
 -->
 <dom-module id="px-slider">
-    <link rel="import" type="css" href="css/px-slider.css"/>
-    <template>
-        <div class="flex">
-        <input id="inputStart" 
-          type="text" 
-          class="slider-value start-value" 
-          value="{{value}}" 
-          on-change="handleStartChange" />
-        <div id="sliderContainer" 
-          class="slider flex__item"
-          on-click="jumpToValue">
-            <div id="sliderSelected"
-              class="slider-selected"></div>
-            <px-handle id="startHandle" 
-              style="visibility:hidden;"
-              handle-track-event-name="handleTrackStart"
-              on-track="handleTrackStart"></px-handle>
-            <px-handle id="endHandle" 
-              handle-track-event-name="handleTrackEnd"
-              on-track="handleTrackEnd"></px-handle>
-        </div>
-        <input id="inputEnd" 
-          type="text" 
-          style="visibility:hidden;"
-          class="slider-value end-value" 
-          value="{{endValue}}" 
-          on-change="handleEndChange" />
+  <link rel="import" type="css" href="css/px-slider.css" />
+  <template>
+    <div class="flex">
+      <input id="inputStart" type="text" class="slider-value start-value" value="{{value}}" on-change="handleStartChange" />
+      <div id="sliderContainer" class="slider flex__item" on-click="jumpToValue">
+        <div id="sliderSelected" class="slider-selected"></div>
+        <px-handle id="startHandle" style="visibility:hidden;" handle-track-event-name="handleTrackStart" on-track="handleTrackStart"></px-handle>
+        <px-handle id="endHandle" handle-track-event-name="handleTrackEnd" on-track="handleTrackEnd"></px-handle>
+      </div>
+      <input id="inputEnd" type="text" style="visibility:hidden;" class="slider-value end-value" value="{{endValue}}" on-change="handleEndChange" />
     </div>
-    </template>
+  </template>
 </dom-module>
 
 <script>
-    Polymer({
+  Polymer({
 
-        is: 'px-slider',
+    is: 'px-slider',
 
-        ready: function() {
-            // Do we have a start value and end value?
-            if (this.startValue && this.endValue) {
-                // If so, this is a range.
-                this._setRange(true);
-                this.value = this.startValue;
+    ready: function() {
+      // Do we have a start value and end value?
+      if (this.startValue && this.endValue) {
+        // If so, this is a range.
+        this._setRange(true);
+        this.value = this.startValue;
 
-                // Show the start handle and the end input
-                this.$.startHandle.style.visibility = 'visible';
-                this.$.inputEnd.style.visibility = 'visible';
+        // Show the start handle and the end input
+        this.$.startHandle.style.visibility = 'visible';
+        this.$.inputEnd.style.visibility = 'visible';
 
-                // Have to wait for the DOM to finish loading
-                // And then refire these
-                this.async(function() {
-                    this._updateHandle(this.$.startHandle, this.value);
-                    this._updateHandle(this.$.endHandle, this.endValue);
-                }, 1);
-            } else {
-                this.async(function() {
-                    this._updateHandle(this.$.endHandle, this.value);
-                }, 1);
-            }
-        },
+        // Have to wait for the DOM to finish loading
+        // And then refire these
+        this.async(function() {
+          this._updateHandle(this.$.startHandle, this.value);
+          this._updateHandle(this.$.endHandle, this.endValue);
+        }, 1);
+      } else {
+        this.async(function() {
+          this._updateHandle(this.$.endHandle, this.value);
+        }, 1);
+      }
+    },
 
-        /**
-         * Properties block, expose attribute values to the DOM via 'reflect'
-         *
-         * @property properties
-         * @type Object
-         */
-        properties: {
-            range: {
-                type: Boolean,
-                value: false,
-                readOnly: true
-            },
-            value: {
-                type: Number,
-                reflect: true,
-                notify: true,
-                observer: '_valueChanged'
-            },
-            startValue: {
-                type: Number,
-                reflect: true,
-                notify: true,
-                observer: '_startValueChanged'
-            },
-            endValue: {
-                type: Number,
-                reflect: true,
-                notify: true,
-                observer: '_endValueChanged'
-            },
-            min: {
-                type: Number,
-                value: 1,
-                reflect: true
-            },
-            max: {
-                type: Number,
-                value: 100,
-                reflect: true
-            },
-            step: {
-                type: Number,
-                value: 1,
-                reflect: true
-            },
-            disabled: {
-                type: Boolean,
-                value: false,
-                reflect: true
-            }
-        },
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      range: {
+        type: Boolean,
+        value: false,
+        readOnly: true
+      },
+      value: {
+        type: Number,
+        reflect: true,
+        notify: true,
+        observer: '_valueChanged'
+      },
+      startValue: {
+        type: Number,
+        reflect: true,
+        notify: true,
+        observer: '_startValueChanged'
+      },
+      endValue: {
+        type: Number,
+        reflect: true,
+        notify: true,
+        observer: '_endValueChanged'
+      },
+      min: {
+        type: Number,
+        value: 1,
+        reflect: true
+      },
+      max: {
+        type: Number,
+        value: 100,
+        reflect: true
+      },
+      step: {
+        type: Number,
+        value: 1,
+        reflect: true
+      },
+      disabled: {
+        type: Boolean,
+        value: false,
+        reflect: true
+      }
+    },
 
-        /**
-         * Watchers (creepy)
-         *
-         * Not working, though ... 
-         *
-         */
-        _valueChanged: function(newValue, oldValue) {
-            var clean = this._cleanValue(newValue);
+    /**
+     * Watchers (creepy)
+     *
+     * Not working, though ...
+     *
+     */
+    _valueChanged: function(newValue, oldValue) {
+      var clean = this._cleanValue(newValue);
 
-            // If this is a range, don't go higher than the end value
-            if (this.range && clean > this.endValue) {
-                clean = this.endValue;
-            }
+      // If this is a range, don't go higher than the end value
+      if (this.range && clean > this.endValue) {
+        clean = this.endValue;
+      }
 
-            // If it's a range, we update the start handle; otherwise update the end handle
-            var handle = (this.range) ? this.$.startHandle : this.$.endHandle;
-            this._updateHandle( handle, this.value );
+      // If it's a range, we update the start handle; otherwise update the end handle
+      var handle = (this.range) ? this.$.startHandle : this.$.endHandle;
+      this._updateHandle(handle, this.value);
 
-            // For the sake of ranges, we keep start value and value in sync
-            this.startValue = clean;
-            this.value = clean;
-        },
+      // For the sake of ranges, we keep start value and value in sync
+      this.startValue = clean;
+      this.value = clean;
+    },
 
-        _startValueChanged: function(newValue, oldValue) {
-            // This is just really here in case a dev changes this value programmatically
-            //this.value = newValue; // Should call value watcher for cleanup
-        },
+    _startValueChanged: function(newValue, oldValue) {
+      // This is just really here in case a dev changes this value programmatically
+      //this.value = newValue; // Should call value watcher for cleanup
+    },
 
-        _endValueChanged: function(newValue, oldValue) {
-            var clean = this._cleanValue(newValue);
+    _endValueChanged: function(newValue, oldValue) {
+      var clean = this._cleanValue(newValue);
 
-            // If this is a range, don't go below the start value
-            if (this.range && clean < this.value) {
-                clean = this.value;
-            }
+      // If this is a range, don't go below the start value
+      if (this.range && clean < this.value) {
+        clean = this.value;
+      }
 
-            // Update the end handle
-            this._updateHandle( this.$.endHandle, clean );
+      // Update the end handle
+      this._updateHandle(this.$.endHandle, clean);
 
-            // Update endValue with the cleaned value
-            this.endValue = clean;
-        },
+      // Update endValue with the cleaned value
+      this.endValue = clean;
+    },
 
-        _cleanValue: function(dirty) {
-            var clean = dirty;
+    _cleanValue: function(dirty) {
+      var clean = dirty;
 
-            // Account for 'steps'
-            var stepchange = dirty % this.step;
-            clean -= stepchange;
-            if ( stepchange > (this.step / 2) ) {
-                clean += this.step;
-            }
+      // Account for 'steps'
+      var stepchange = dirty % this.step;
+      clean -= stepchange;
+      if (stepchange > (this.step / 2)) {
+        clean += this.step;
+      }
 
-            // Check against min and max values
-            if ( dirty > this.max ) {
-                clean = this.max;
-            } else if ( dirty < this.min ) {
-                clean = this.min;
-            }
+      // Check against min and max values
+      if (dirty > this.max) {
+        clean = this.max;
+      } else if (dirty < this.min) {
+        clean = this.min;
+      }
 
-            return clean;
-        },
+      return clean;
+    },
 
-        _translateValueToPosition: function(myvalue) {
-            var cW = this.$.sliderContainer.offsetWidth;
+    _translateValueToPosition: function(myvalue) {
+      var cW = this.$.sliderContainer.offsetWidth;
 
-            // What is the ratio of the value to the max?
-            var ratio = myvalue / this.max;
+      // What is the ratio of the value to the max?
+      var ratio = myvalue / this.max;
 
-            // Multiple by the width of the container
-            var position = ratio * cW;
+      // Multiple by the width of the container
+      var position = ratio * cW;
 
-            return position + 'px';
-        },
+      return position + 'px';
+    },
 
-        _translatePositionToValue: function(mypos) {
-            var cW = this.$.sliderContainer.offsetWidth;
+    _translatePositionToValue: function(mypos) {
+      var cW = this.$.sliderContainer.offsetWidth;
 
-            // Have we loaded the container?
-            if (cW === 0) {
-                return;
-            }
+      // Have we loaded the container?
+      if (cW === 0) {
+        return;
+      }
 
-            // What is the ratio of my position to the container?
-            var ratio = mypos / cW;
+      // What is the ratio of my position to the container?
+      var ratio = mypos / cW;
 
-            // Convert to value; have to account min values other than 0
-            var value = ratio * (this.max - this.min);
+      // Convert to value; have to account min values other than 0
+      var value = ratio * (this.max - this.min);
 
-            return this._cleanValue(value);
-        },
+      return this._cleanValue(value);
+    },
 
-        _updateHandle: function(handle, value) {
-            // Determine new x position form value
-            var newPos = this._translateValueToPosition(value);
+    _updateHandle: function(handle, value) {
+      // Determine new x position form value
+      var newPos = this._translateValueToPosition(value);
 
-            // Set px value of left position
-            handle.style.left = newPos;
+      // Set px value of left position
+      handle.style.left = newPos;
 
-            // Update the progress bar, too
-            this._updateProgressBar();
-        },
+      // Update the progress bar, too
+      this._updateProgressBar();
+    },
 
-        /** 
-         * Update the progress bar based on change in values
-         *
-         * @method handleChange
-         */
-        _updateProgressBar: function() {
-            // Value is coming up as undefined, for some reason
-            // 0 value is ok, though.
-            if (!this.value && this.value !== 0) {
-                return;
-            }
+    /**
+     * Update the progress bar based on change in values
+     *
+     * @method handleChange
+     */
+    _updateProgressBar: function() {
+      // Value is coming up as undefined, for some reason
+      // 0 value is ok, though.
+      if (!this.value && this.value !== 0) {
+        return;
+      }
 
-            // Am I a range or a single value?
-            var progressValue = (this.range) ? this.endValue - this.value: this.value;
-            var progressPosition = (this.range) ? this.value: 0;
+      // Am I a range or a single value?
+      var progressValue = (this.range) ? this.endValue - this.value : this.value;
+      var progressPosition = (this.range) ? this.value : 0;
 
-            // Set the width and the position (for ranges)
-            this.$.sliderSelected.style.width = this._translateValueToPosition(progressValue);
-            this.$.sliderSelected.style.left = this._translateValueToPosition(progressPosition);
-        },
+      // Set the width and the position (for ranges)
+      this.$.sliderSelected.style.width = this._translateValueToPosition(progressValue);
+      this.$.sliderSelected.style.left = this._translateValueToPosition(progressPosition);
+    },
 
-        /** 
-         * Where is the mouse in relation to the slider? Keep it in bounds.
-         *
-         * @method _findPosition
-         */
-        _findPosition: function(event) {
-            // Is this a drag or a click?
-            var mX = (event.detail.x) ? event.detail.x : event.clientX;
-            var cL = this.$.sliderContainer.getBoundingClientRect().left;
-            var cR =  this.$.sliderContainer.getBoundingClientRect().right;
-            var cW = this.$.sliderContainer.offsetWidth;
-            var position = 0;
+    /**
+     * Where is the mouse in relation to the slider? Keep it in bounds.
+     *
+     * @method _findPosition
+     */
+    _findPosition: function(event) {
+      // Is this a drag or a click?
+      var mX = (event.detail.x) ? event.detail.x : event.clientX;
+      var cL = this.$.sliderContainer.getBoundingClientRect().left;
+      var cR = this.$.sliderContainer.getBoundingClientRect().right;
+      var cW = this.$.sliderContainer.offsetWidth;
+      var position = 0;
 
-            if (mX > cR) {
-                // Is the mouse passed the right of our container?
-                // If so, set the position to the width of the container
-                position = cW;
-            } else if (mX < cL) {
-                // Is the mouse passed the left of our container?
-                // If so, set the position to zero
-                position = 0;
-            } else {
-                // Otherwise, position is based on the mouseX minus the offset
-                position = mX - cL;
-            }
+      if (mX > cR) {
+        // Is the mouse passed the right of our container?
+        // If so, set the position to the width of the container
+        position = cW;
+      } else if (mX < cL) {
+        // Is the mouse passed the left of our container?
+        // If so, set the position to zero
+        position = 0;
+      } else {
+        // Otherwise, position is based on the mouseX minus the offset
+        position = mX - cL;
+      }
 
-            return position;
-        },
+      return position;
+    },
 
-        /** 
-         * Handles updating the value when the START handle is moved
-         *
-         * @method handleTrackStart
-         */
-        handleTrackStart: function(event) {
-            var newPos = this._findPosition(event);
+    /**
+     * Handles updating the value when the START handle is moved
+     *
+     * @method handleTrackStart
+     */
+    handleTrackStart: function(event) {
+      var newPos = this._findPosition(event);
 
-            // Update the value for the new position
-            var newValue = this._translatePositionToValue(newPos);
+      // Update the value for the new position
+      var newValue = this._translatePositionToValue(newPos);
 
-            // We know this is range
-            if (newValue > this.endValue) {
-                newValue = this.endValue;
-            }
-            this.value = newValue;
-        },
+      // We know this is range
+      if (newValue > this.endValue) {
+        newValue = this.endValue;
+      }
+      this.value = newValue;
+    },
 
-        /** 
-         * Handles updating the value when the END handle is moved
-         *
-         * @method handleEndChange
-         */
-        handleTrackEnd: function(event) {
-            var newPos = this._findPosition(event);
+    /**
+     * Handles updating the value when the END handle is moved
+     *
+     * @method handleEndChange
+     */
+    handleTrackEnd: function(event) {
+      var newPos = this._findPosition(event);
 
-            // Update the value based on the new position
-            var newValue = this._translatePositionToValue(newPos);
-            if (this.range) {
-                if (newValue < this.value) {
-                    newValue = this.value;
-                }
-                this.endValue = newValue;
-            } else {
-                this.value = newValue;
-            }
-        },
-
-        /** 
-         * Handles updating the value when the START input textbox is changed
-         *
-         * @method handleStartChange
-         */
-        handleStartChange: function(event) {
-            // Two way data binding not working?
-            this.value = this.$.inputStart.value;
-        },
-
-        /** 
-         * Handles updating the value when the END input textbox is changed
-         *
-         * @method handleEndChange
-         */
-        handleEndChange: function(event) {
-            // Two way data binding not working?
-            this.endValue = this.$.inputEnd.value;
-        },
-
-        /** 
-         * When the user clicks on the slider itself, jump to the corresponding value.
-         *
-         * @method jumpToValue
-         */
-        jumpToValue: function(event) {
-            var newPos = this._findPosition(event);
-
-            // Update the value based on the new position
-            var newValue = this._translatePositionToValue(newPos);
-
-            if (this.range) {
-                // Which handle do you move?
-                if (newValue < this.value) {
-                    // If it's less than the start value, move the left slider
-                    this.value = newValue;
-
-                } else if (newValue > this.endValue) {
-                    // If it's greater than the start value, move the right slider
-                    this.endValue = newValue;
-                } else {
-                    // We are somewhere in the middle - which handle do we move?!
-                }
-
-            } else {
-                // Move the only handle
-                this.value = newValue;
-            }
+      // Update the value based on the new position
+      var newValue = this._translatePositionToValue(newPos);
+      if (this.range) {
+        if (newValue < this.value) {
+          newValue = this.value;
         }
-    });
+        this.endValue = newValue;
+      } else {
+        this.value = newValue;
+      }
+    },
+
+    /**
+     * Handles updating the value when the START input textbox is changed
+     *
+     * @method handleStartChange
+     */
+    handleStartChange: function(event) {
+      // Two way data binding not working?
+      this.value = this.$.inputStart.value;
+    },
+
+    /**
+     * Handles updating the value when the END input textbox is changed
+     *
+     * @method handleEndChange
+     */
+    handleEndChange: function(event) {
+      // Two way data binding not working?
+      this.endValue = this.$.inputEnd.value;
+    },
+
+    /**
+     * When the user clicks on the slider itself, jump to the corresponding value.
+     *
+     * @method jumpToValue
+     */
+    jumpToValue: function(event) {
+      var newPos = this._findPosition(event);
+
+      // Update the value based on the new position
+      var newValue = this._translatePositionToValue(newPos);
+
+      if (this.range) {
+        // Which handle do you move?
+        if (newValue < this.value) {
+          // If it's less than the start value, move the left slider
+          this.value = newValue;
+
+        } else if (newValue > this.endValue) {
+          // If it's greater than the start value, move the right slider
+          this.endValue = newValue;
+        } else {
+          // We are somewhere in the middle - which handle do we move?!
+        }
+
+      } else {
+        // Move the only handle
+        this.value = newValue;
+      }
+    }
+  });
 </script>
