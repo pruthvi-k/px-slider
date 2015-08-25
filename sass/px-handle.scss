@@ -19,6 +19,10 @@ THIS FILE SHOULD CONTAIN ONLY ABSTRACT/'SKETCH' THEME RULES, NOT SPECIFIC TO PRE
 Predix branding rules go in px-slider-predix.scss, not in this file.
 */
 
+@import "px-normalize-design/_generic.normalize.scss";
+@import "px-box-sizing-design/_generic.box-sizing.scss";
+@import "px-helpers-design/_generic.helpers.scss";
+
 @import "px-colors-design/_settings.colors.scss";
 
 :host {
@@ -61,3 +65,11 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
   box-shadow: none;
   fill: $gray4;
 }
+
+.u--ml-1{
+  margin-left: -1px;
+}
+
+@import "inuit-clearfix/_trumps.clearfix.scss";
+@import "px-spacing-responsive-design/_trumps.spacing-responsive.scss";
+@import "px-widths-responsive-design/_trumps.widths-responsive.scss";
