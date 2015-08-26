@@ -61,5 +61,12 @@ Single-handled slider with step
 
 The slider will always take the full-width of whatever container it is in.
 
+### Latest Release
+- not released yet!
+
+### Active Development (master branch)
+- <a href="http://pxc-demos.grc-apps.svc.ice.ge.com/bower_components/px-slider/demo.html" target="_blank">Demo</a>
+- <a href="http://pxc-demos.grc-apps.svc.ice.ge.com/bower_components/px-slider/index.html" target="_blank">API Docs</a>
+
 ### Known Issues
 
