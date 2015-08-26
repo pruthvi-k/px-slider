@@ -24,13 +24,13 @@ Allow the user to select a value or range of values within a specified min and m
   <link rel="import" type="css" href="css/px-slider.css" />
   <template>
     <div class="flex">
-      <input id="inputStart" type="text" class="slider-value start-value" value="{{value}}" on-change="handleStartChange" />
+      <input id="inputStart" type="text" class="text-input" value="{{value}}" on-change="handleStartChange" />
       <div id="sliderContainer" class="slider flex__item" on-click="jumpToValue">
-        <div id="sliderSelected" class="slider-selected"></div>
+        <div id="sliderSelected" class="slider__selected"></div>
         <px-handle id="startHandle" style="visibility:hidden;" handle-track-event-name="handleTrackStart" on-track="handleTrackStart"></px-handle>
         <px-handle id="endHandle" handle-track-event-name="handleTrackEnd" on-track="handleTrackEnd"></px-handle>
       </div>
-      <input id="inputEnd" type="text" style="visibility:hidden;" class="slider-value end-value" value="{{endValue}}" on-change="handleEndChange" />
+      <input id="inputEnd" type="text" style="visibility:hidden;" class="text-input" value="{{endValue}}" on-change="handleEndChange" />
     </div>
   </template>
 </dom-module>
@@ -180,7 +180,9 @@ Allow the user to select a value or range of values within a specified min and m
     },
 
     _translateValueToPosition: function(myvalue) {
-      var cW = this.$.sliderContainer.offsetWidth;
+      // add offset so end handle stops at end of tracking
+      var cO = 22;
+      var cW = this.$.sliderContainer.offsetWidth - cO;
 
       // What is the ratio of the value to the max?
       var ratio = myvalue / this.max;
@@ -192,7 +194,9 @@ Allow the user to select a value or range of values within a specified min and m
     },
 
     _translatePositionToValue: function(mypos) {
-      var cW = this.$.sliderContainer.offsetWidth;
+      // add offset so end handle stops at end of tracking
+      var cO = 22;
+      var cW = this.$.sliderContainer.offsetWidth - cO;
 
       // Have we loaded the container?
       if (cW === 0) {
@@ -248,9 +252,11 @@ Allow the user to select a value or range of values within a specified min and m
     _findPosition: function(event) {
       // Is this a drag or a click?
       var mX = (event.detail.x) ? event.detail.x : event.clientX;
+      // add offset so end handle stops at end of tracking
+      var cO = 22;
       var cL = this.$.sliderContainer.getBoundingClientRect().left;
       var cR = this.$.sliderContainer.getBoundingClientRect().right;
-      var cW = this.$.sliderContainer.offsetWidth;
+      var cW = this.$.sliderContainer.offsetWidth - cO;
       var position = 0;
 
       if (mX > cR) {
