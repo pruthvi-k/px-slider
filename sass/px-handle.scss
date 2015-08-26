@@ -19,57 +19,53 @@ THIS FILE SHOULD CONTAIN ONLY ABSTRACT/'SKETCH' THEME RULES, NOT SPECIFIC TO PRE
 Predix branding rules go in px-slider-predix.scss, not in this file.
 */
 
-@import "px-normalize-design/_generic.normalize.scss";
-@import "px-box-sizing-design/_generic.box-sizing.scss";
-@import "px-helpers-design/_generic.helpers.scss";
-
+// Settings
 @import "px-colors-design/_settings.colors.scss";
 
+// Generic
+@import "px-normalize-design/_generic.normalize.scss";
+@import "px-box-sizing-design/_generic.box-sizing.scss";
+
+// Component
 :host {
-  display: inline-block;
-  margin-left: -10px;
   position: absolute;
-  top: -6px;
+  top: -#{calculateRem(6px)};
+  display: inline-block;
 }
 
 #handleTarget {
-  height: 19px;
-  width: 19px;
+  height: $inuit-base-spacing-unit--large;
+  width: $inuit-base-spacing-unit--large;
   border: 1px solid $gray5;
-  background-color: $white;
   border-radius: 3px;
-  box-shadow: 0 1px 1px #D9D9D9;
-  fill: $gray5;
-}
-
-#handleTarget:focus{
-  outline:0;
-}
-
-#handleTarget:hover {
-  border-color: $gray6;
-  background-color: $gray5;
-  fill: $gray6;
-}
-
-#handleTarget.tracking {
-  border-color: $gray7;
-  background-color: $gray6;
-  box-shadow: none;
-  fill: $gray7;
-}
-
-#handleTarget.disabled {
-  border-color: $gray4;
+  box-shadow: 0 1px 1px rgba($black, .15);
   background-color: $white;
-  box-shadow: none;
-  fill: $gray4;
+  fill: $gray5;
+  cursor: pointer;
+  &:focus {
+    outline: 0;
+  }
+  &:hover {
+    border-color: $gray6;
+    background-color: $gray5;
+    svg {
+      stroke: $gray6;
+    }
+  }
+  &.tracking {
+    border-color: $gray7;
+    background-color: $gray6;
+    box-shadow: none;
+    svg {
+      stroke: $gray7;
+    }
+  }
+  &.disabled {
+    border-color: $gray4;
+    background-color: $white;
+    box-shadow: none;
+    svg {
+      stroke: $gray4;
+    }
+  }
 }
-
-.u--ml-1{
-  margin-left: -1px;
-}
-
-@import "inuit-clearfix/_trumps.clearfix.scss";
-@import "px-spacing-responsive-design/_trumps.spacing-responsive.scss";
-@import "px-widths-responsive-design/_trumps.widths-responsive.scss";

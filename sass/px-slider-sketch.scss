@@ -22,21 +22,19 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
 // Generic
 @import "px-normalize-design/_generic.normalize.scss";
 @import "px-box-sizing-design/_generic.box-sizing.scss";
-@import "px-helpers-design/_generic.helpers.scss";
 
 // Base
 @import "px-flexbox-design/_base.flexbox.scss";
 @import "px-viewport-design/_base.viewport.scss";
 @import "px-typography-design/_base.typography.scss";
-
-@import "px-meta-buttons-design/_meta.buttons.scss";
+@import "px-forms-design/_base.forms.scss";
 
 // Component
 
 :host {
   user-select: none;
   cursor: default;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
 }
 
 :host(:focus) {
@@ -44,28 +42,23 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
 }
 
 .slider {
-  margin: 10px 15px;
+  margin: $inuit-base-spacing-unit--small $inuit-base-spacing-unit--tiny;
   position: relative;
-  height: 8px;
+  height: $inuit-base-spacing-unit--small;
+  border: 1px solid;
   border-radius: 2px;
 }
 
-.slider-selected {
-  height: 8px;
+.slider__selected {
   position: absolute;
-  left: 0;
   top: -1px;
-  border-radius: 2px;
+  left: 0;
+  height: $inuit-base-spacing-unit--small;
+  border-width: 1px 0 1px 1px;
+  border-style: solid;
+  border-radius: 2px 0 0 2px;
 }
 
-.slider-value {
-  width: 50px;
-  height: 28px;
-  padding: 0 10px;
-  line-height: 28px;
+.text-input {
+  width: calculateRem(50px);
 }
-
-// Trumps
-@import "inuit-clearfix/_trumps.clearfix.scss";
-@import "px-spacing-responsive-design/_trumps.spacing-responsive.scss";
-@import "px-widths-responsive-design/_trumps.widths-responsive.scss";

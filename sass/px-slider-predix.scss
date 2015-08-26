@@ -25,16 +25,11 @@ common/abstract rules go in px-slider-sketch.scss, not in this file.
 @import 'px-slider-sketch.scss';
 
 .slider {
-  border: 1px solid $gray5;
+  border-color: $gray5;
   background-color: $gray1;
 }
 
-.slider-selected {
-  border: 1px solid $select-blue-pressed;
+.slider__selected {
+  border-color: $select-blue-pressed;
   background-color: $select-blue-default;
-}
-
-.slider-value {
-  border: 1px solid $gray5;
-  background-color: $gray1;
 }
