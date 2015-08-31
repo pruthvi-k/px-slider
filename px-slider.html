@@ -259,6 +259,11 @@ Allow the user to select a value or range of values within a specified min and m
       var cW = this.$.sliderContainer.offsetWidth - cO;
       var position = 0;
 
+      // Check to make sure Mouse is on the screen.
+      if (isNaN(mX)) {
+        mX = 0;
+      }
+
       if (mX > cR) {
         // Is the mouse passed the right of our container?
         // If so, set the position to the width of the container
