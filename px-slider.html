@@ -41,6 +41,13 @@ Allow the user to select a value or range of values within a specified min and m
     is: 'px-slider',
 
     ready: function() {
+      // Must have min and max values
+      if (!this.min && this.min !== 0) {
+        throw "Missing a minimum value (min).";
+      } else if (!this.max && this.max !== 0) {
+        throw "Missing a maximum value (max)."
+      }
+
       // Do we have a start value and end value?
       if (this.startValue && this.endValue) {
         // If so, this is a range.
@@ -51,6 +58,19 @@ Allow the user to select a value or range of values within a specified min and m
         this.$.startHandle.style.visibility = 'visible';
         this.$.inputEnd.style.visibility = 'visible';
 
+        // Let's do some extra error checking to protect developers from themselves
+        if (this.value < this.min || this.value > this.max) {
+          throw "Oops, your starting value is out of range.";
+        } else if (this.endValue < this.min || this.value > this.max) {
+          throw "Oops, your ending value is out of range.";
+        } else if ( this.value > this.endvalue) {
+          throw "Your starting value can't be greater than your ending value!";
+        } else if (this.value % this.step !== 0 ) {
+          throw "Your value doesn't match your step: the value needs to be evenly divisible by the step attribute."
+        } else if (this.endValue % this.step !== 0 ) {
+          throw "Your end value doesn't match your step: the end value needs to be evenly divisible by the step attribute."
+        }
+
         // Have to wait for the DOM to finish loading
         // And then refire these
         this.async(function() {
@@ -58,6 +78,10 @@ Allow the user to select a value or range of values within a specified min and m
           this._updateHandle(this.$.endHandle, this.endValue);
         }, 1);
       } else {
+
+        if (!this.value || this.value !== 0) {
+          throw "Oops, I need a starting value. Did you set the 'value' attribute?"
+        }
         this.async(function() {
           this._updateHandle(this.$.endHandle, this.value);
         }, 1);
@@ -170,9 +194,9 @@ Allow the user to select a value or range of values within a specified min and m
       }
 
       // Check against min and max values
-      if (dirty > this.max) {
+      if (clean > this.max) {
         clean = this.max;
-      } else if (dirty < this.min) {
+      } else if (clean < this.min) {
         clean = this.min;
       }
 
