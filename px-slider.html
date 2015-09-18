@@ -42,6 +42,7 @@ Allow the user to select a value or range of values within a specified min and m
 
     ready: function() {
       // Must have min and max values
+      // FATAL
       if (!this.min && this.min !== 0) {
         throw "Missing a minimum value (min).";
       } else if (!this.max && this.max !== 0) {
@@ -49,7 +50,9 @@ Allow the user to select a value or range of values within a specified min and m
       }
 
       // Do we have a start value and end value?
-      if (this.startValue && this.endValue) {
+      if ( (this.startValue || this.startValue === 0) &&
+           (this.endValue || this.endValue === 0) ) {
+
         // If so, this is a range.
         this._setRange(true);
         this.value = this.startValue;
@@ -59,17 +62,19 @@ Allow the user to select a value or range of values within a specified min and m
         this.$.inputEnd.style.visibility = 'visible';
 
         // Let's do some extra error checking to protect developers from themselves
-        if (this.value < this.min || this.value > this.max) {
-          throw "Oops, your starting value is out of range.";
-        } else if (this.endValue < this.min || this.value > this.max) {
-          throw "Oops, your ending value is out of range.";
-        } else if ( this.value > this.endvalue) {
-          throw "Your starting value can't be greater than your ending value!";
+        // Not fatal, but probably not intentional.
+        if ( this.value > this.endvalue) {
+          console.warn("Your starting value can't be greater than your ending value.");
+          this.value = this.endValue;
         } else if (this.value % this.step !== 0 ) {
-          throw "Your value doesn't match your step: the value needs to be evenly divisible by the step attribute."
+          console.warn("Your value doesn't match your step: the value needs to be evenly divisible by the step attribute.");
         } else if (this.endValue % this.step !== 0 ) {
-          throw "Your end value doesn't match your step: the end value needs to be evenly divisible by the step attribute."
+          console.warn("Your end value doesn't match your step: the end value needs to be evenly divisible by the step attribute.");
         }
+
+        // Cleanup values, just in case
+        this.value = this._cleanValue(this.value);
+        this.endValue = this._cleanValue(this.endValue);
 
         // Have to wait for the DOM to finish loading
         // And then refire these
@@ -121,17 +126,20 @@ Allow the user to select a value or range of values within a specified min and m
       min: {
         type: Number,
         value: 1,
-        reflect: true
+        reflect: true,
+        observer: '_minChanged'
       },
       max: {
         type: Number,
         value: 100,
-        reflect: true
+        reflect: true,
+        observer: '_maxChanged'
       },
       step: {
         type: Number,
         value: 1,
-        reflect: true
+        reflect: true,
+        observer: '_stepChanged'
       },
       disabled: {
         type: Boolean,
@@ -183,21 +191,86 @@ Allow the user to select a value or range of values within a specified min and m
       this.endValue = clean;
     },
 
+    _minChanged: function(newValue, oldValue) {
+      // Step not always defined at load?
+      if (!this.step) {
+        return;
+      }
+
+      // Do the values match the step size?
+      // Just warn, don't throw an exception
+      if (this.min % this.step !== 0) {
+        console.warn("WARNING: min value does not match step size.")
+        this.min = this.min - (this.min % this.step);
+      }
+
+      // Since we are changing the min, let's go ahead and recheck the start value
+      this.value = this._cleanValue(this.value);
+    },
+
+    _maxChanged: function(newValue, oldValue) {
+      // Step not always defined at load?
+      if (!this.step) {
+        return;
+      }
+
+      // Do the values match the step size?
+      // Just warn, don't throw an exception
+      if (this.max % this.step !== 0) {
+        console.warn("WARNING: max value does not match step size.")
+        this.max = this.max - (this.max % this.step);
+      }
+
+      // Since we are changing the max, let's go ahead and recheck the end value
+      if (this.range) {
+        this.endValue = this._cleanValue(this.endValue);
+      } else {
+        this.value = this._cleanValue(this.value);
+      }
+    },
+
+    _stepChanged: function(newValue, oldValue) {
+      // When the step changes, recheck EVERYTHING!
+      this.value = this._checkStep(this.value);
+      this.min = this._checkStep(this.min);
+      this.max = this._checkStep(this.max);
+      if (this.range) {
+        this.endValue = this._checkStep(this.endValue);
+      }
+    },
+
     _cleanValue: function(dirty) {
       var clean = dirty;
 
       // Account for 'steps'
-      var stepchange = dirty % this.step;
-      clean -= stepchange;
-      if (stepchange > (this.step / 2)) {
-        clean += this.step;
-      }
+      clean = this._checkStep(clean);
 
       // Check against min and max values
       if (clean > this.max) {
         clean = this.max;
       } else if (clean < this.min) {
         clean = this.min;
+      }
+
+      return clean;
+    },
+
+    _checkStep: function(dirty) {
+      // Bad values on start
+      if (!dirty && dirty !== 0) {
+        return;
+      }
+
+      var clean = dirty;
+
+      // Does the value match our step size?
+      // Round down by default (we add back later)
+      var stepchange = dirty % this.step;
+      clean -= stepchange;
+
+      // If we are more than half way to the next step, add the step.
+      if (stepchange > (this.step / 2)) {
+        clean += this.step;
       }
 
       return clean;
