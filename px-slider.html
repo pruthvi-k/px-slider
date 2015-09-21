@@ -84,7 +84,7 @@ Allow the user to select a value or range of values within a specified min and m
         }, 1);
       } else {
 
-        if (!this.value || this.value !== 0) {
+        if (!this.value && this.value !== 0) {
           throw "Oops, I need a starting value. Did you set the 'value' attribute?"
         }
         this.async(function() {
