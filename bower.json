@@ -1,0 +1,25 @@
+{
+  "name": "px-slider",
+  "version": "0.0.7",
+  "main": [
+    "px-slider.html"
+  ],
+  "ignore": [
+    ".*",
+    "npm-debug.log",
+    "Gruntfile.js",
+    "sass",
+    "bower_components",
+    "node_modules",
+    "test"
+  ],
+  "dependencies": {
+    "polymer": "~1.0.0",
+    "px-theme": "git://github.com/PredixDev/px-theme.git#~0.3.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#~v1.0.0",
+    "px-forms-design": "git://github.com/PredixDev/px-forms-design.git#~0.3.0",
+    "px-starter-kit-design": "git://github.com/PredixDev/px-starter-kit-design.git#~0.4.0"
+  }
+}

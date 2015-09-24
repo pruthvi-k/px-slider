@@ -1,0 +1,104 @@
+<!--
+    Relative paths assume component is being run from inside an app or another component, where dependencies are flat
+    siblings. When this component is run from its own repo (e.g. ui tests, examples), we assume the server is started with
+    'grunt depserve' (or similar server setup) to enable correct finding of bower dependencies for local runs
+    See https://github.com/jreichenberg/grunt-dep-serve#why-do-we-need-this
+-->
+<link rel="import" href="../polymer/polymer.html" />
+
+
+<!--
+Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+
+##### Usage
+
+    <px-slider counter-value="1">Hi</px-slider>
+
+@element px-slider
+@blurb Element providing solution to no problem in particular.
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-handle">
+  <link rel="import" type="css" href="css/px-handle.css" />
+  <template>
+    <button id="handleTarget" on-down="handleDown" on-up="handleUp" on-track="handleTrack">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+        <rect x="0" y="3" width="1" height="7" />
+        <rect x="3" y="3" width="1" height="7" />
+        <rect x="6" y="3" width="1" height="7" />
+      </svg>
+    </button>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-handle',
+
+    properties: {
+      /**
+       *
+       *
+       *
+       */
+      tracking: {
+        type: Boolean,
+        value: false,
+        readOnly: true,
+        observer: '_trackingChanged'
+      },
+
+      /**
+       * Name of the event that will be raised when a DOWN event is fired on the handle.
+       *
+       * @type {String}
+       */
+      handleDownEventName: {
+        type: String,
+        reflect: true
+      },
+
+      /**
+       * Name of the event that will be raised when an UP event is fired on the handle.
+       *
+       * @type {String}
+       */
+      handleUpEventName: {
+        type: String,
+        reflect: true
+      },
+
+      /**
+       * Name of the event that will be raised when a TRACK event is fired on the handle.
+       *
+       * @type {String}
+       */
+      handleTrackEventName: {
+        type: String,
+        reflect: true
+      }
+    },
+
+    _trackingChanged: function(newValue, oldValue) {
+      this.toggleClass('tracking', newValue, this.$.handleTarget);
+    },
+
+    handleDown: function(event) {
+      this._setTracking(true);
+      this.fire(this.handleDownEventName);
+    },
+
+    handleUp: function(event) {
+      this._setTracking(false);
+      this.fire(this.handleUpEventName);
+    },
+
+    handleTrack: function(event) {
+      if (this.tracking) {
+        this.fire(this.handleTrackEventName);
+      }
+    }
+  });
+</script>

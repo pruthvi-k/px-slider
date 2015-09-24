@@ -1,0 +1,63 @@
+/*
+ * Copyright (c) 2014 GE Global Research. All rights reserved.
+ *
+ * The copyright to the computer software herein is the property of
+ * GE Global Research. The software may be used and/or copied only
+ * with the written permission of GE Global Research or in accordance
+ * with the terms and conditions stipulated in the agreement/contract
+ * under which the software has been supplied.
+ */
+
+//
+// Sass for the "sketch" notion of the px-slider component
+//
+// @author
+//
+
+/*
+THIS FILE SHOULD CONTAIN ONLY ABSTRACT/'SKETCH' THEME RULES, NOT SPECIFIC TO PREDIX BRANDING
+Predix branding rules go in px-slider-predix.scss, not in this file.
+*/
+
+// Generic
+@import "px-normalize-design/_generic.normalize.scss";
+@import "px-box-sizing-design/_generic.box-sizing.scss";
+
+// Base
+@import "px-flexbox-design/_base.flexbox.scss";
+@import "px-viewport-design/_base.viewport.scss";
+@import "px-forms-design/_base.forms.scss";
+
+// Component
+
+:host {
+  user-select: none;
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:host(:focus) {
+  outline: none;
+}
+
+.slider {
+  margin: $inuit-base-spacing-unit--small $inuit-base-spacing-unit--tiny;
+  position: relative;
+  height: $inuit-base-spacing-unit--small;
+  border: 1px solid;
+  border-radius: 2px;
+}
+
+.slider__selected {
+  position: absolute;
+  top: -1px;
+  left: 0;
+  height: $inuit-base-spacing-unit--small;
+  border-width: 1px 0 1px 1px;
+  border-style: solid;
+  border-radius: 2px 0 0 2px;
+}
+
+.text-input {
+  width: calculateRem(62px);
+}
