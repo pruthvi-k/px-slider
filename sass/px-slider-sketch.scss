@@ -59,5 +59,6 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
 }
 
 .text-input {
-  width: calculateRem(62px);
+  width: calculateRem(65px);
 }
+#sliderContainer {cursor:pointer;}

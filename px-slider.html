@@ -155,20 +155,28 @@ Allow the user to select a value or range of values within a specified min and m
      *
      */
     _valueChanged: function(newValue, oldValue) {
-      var clean = this._cleanValue(newValue);
+        var slider = this;
+        //this is here to ensure that when we get many consecutive jumps, we debounce them, instead of calculating each one.
+        if (slider.debounce) {
+          slider.debounce(
+            'slider_move', function() {
+              var clean = this._cleanValue(newValue);
 
-      // If this is a range, don't go higher than the end value
-      if (this.range && clean > this.endValue) {
-        clean = this.endValue;
-      }
+              // If this is a range, don't go higher than the end value
+              if (this.range && clean > this.endValue) {
+                clean = this.endValue;
+              }
 
-      // If it's a range, we update the start handle; otherwise update the end handle
-      var handle = (this.range) ? this.$.startHandle : this.$.endHandle;
-      this._updateHandle(handle, this.value);
+              // If it's a range, we update the start handle; otherwise update the end handle
+              var handle = (this.range) ? this.$.startHandle : this.$.endHandle;
+              this._updateHandle(handle, this.value);
 
-      // For the sake of ranges, we keep start value and value in sync
-      this.startValue = clean;
-      this.value = clean;
+              // For the sake of ranges, we keep start value and value in sync
+              this.startValue = clean;
+              this.value = clean;
+            }, 1);
+        }
+
     },
 
     _startValueChanged: function(newValue, oldValue) {
@@ -445,27 +453,32 @@ Allow the user to select a value or range of values within a specified min and m
      * @method jumpToValue
      */
     jumpToValue: function(event) {
-      var newPos = this._findPosition(event);
+      var slider = this;
+      if (slider.debounce) {
+        slider.debounce(
+          'slider_jump', function() {
+            var newPos = this._findPosition(event);
+            // Update the value based on the new position
+            var newValue = this._translatePositionToValue(newPos);
 
-      // Update the value based on the new position
-      var newValue = this._translatePositionToValue(newPos);
+            if (this.range) {
+              // Which handle do you move?
+              if (newValue < this.value) {
+                // If it's less than the start value, move the left slider
+                this.value = newValue;
 
-      if (this.range) {
-        // Which handle do you move?
-        if (newValue < this.value) {
-          // If it's less than the start value, move the left slider
-          this.value = newValue;
-
-        } else if (newValue > this.endValue) {
-          // If it's greater than the start value, move the right slider
-          this.endValue = newValue;
-        } else {
-          // We are somewhere in the middle - which handle do we move?!
-        }
-
-      } else {
-        // Move the only handle
-        this.value = newValue;
+              } else if (newValue > this.endValue) {
+                // If it's greater than the start value, move the right slider
+                this.endValue = newValue;
+              } else {
+                // We are somewhere in the middle - which handle do we move?!
+              }
+            } else {
+              // Move the only handle
+              this.value = newValue;
+            }
+          }, 250
+        );
       }
     }
   });
