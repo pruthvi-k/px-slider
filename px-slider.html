@@ -24,13 +24,13 @@ Allow the user to select a value or range of values within a specified min and m
   <link rel="import" type="css" href="css/px-slider.css" />
   <template>
     <div class="flex">
-      <input id="inputStart" type="text" class="text-input" value="{{value}}" on-change="handleStartChange" />
+      <input id="inputStart" type="text" class="text-input" value="{{value}}" on-change="handleStartChange" tabindex="0"/>
       <div id="sliderContainer" class="slider flex__item" on-click="jumpToValue">
         <div id="sliderSelected" class="slider__selected"></div>
         <px-handle id="startHandle" style="visibility:hidden;" handle-track-event-name="handleTrackStart" on-track="handleTrackStart"></px-handle>
         <px-handle id="endHandle" handle-track-event-name="handleTrackEnd" on-track="handleTrackEnd"></px-handle>
       </div>
-      <input id="inputEnd" type="text" style="visibility:hidden;" class="text-input" value="{{endValue}}" on-change="handleEndChange" />
+      <input id="inputEnd" type="text" style="visibility:hidden;" class="text-input" value="{{endValue}}" on-change="handleEndChange" tabindex="0"/>
     </div>
   </template>
 </dom-module>
