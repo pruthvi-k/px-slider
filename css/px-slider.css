@@ -234,7 +234,9 @@ html {
   /*! Comment to prevent cssmin munging this rule with html above and borking Safari */
   box-sizing: border-box; }
 
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   box-sizing: inherit; }
 
 .flex {
@@ -391,44 +393,6 @@ html {
 .viewport--full-height {
   min-height: 100vh; }
 
-/*------------------------------------*    #PX-COLORS-DESIGN
-\*------------------------------------*/
-/**
- * Brand Colors
- */
-/**
-     * Primary
-     */
-/**
-     * Light
-     */
-/**
-     * Dark
-     */
-/**
- * Monochromatic (gray10 is darkest, gray1 is lightest)
- */
-/**
- * Buttons
- */
-/**
- * Selection
- */
-/**
- * Alerts
- */
-/**
- * Data Visualization
- */
-/**
-     * Basic
-     */
-/**
-     * Light
-     */
-/**
-     * Dark
-     */
 fieldset {
   margin: 0; }
   fieldset, fieldset legend {
@@ -475,9 +439,9 @@ textarea {
   box-shadow: inset 0 0 0 1px #e4e4ea;
   background-color: #efeff4;
   color: black; }
-  .text-input[readonly], .text-input[disabled],
-  textarea[readonly],
-  textarea[disabled] {
+  .text-input[readonly],
+  .text-input[disabled],
+  textarea[readonly], textarea[disabled] {
     box-shadow: none; }
   .text-input[readonly],
   textarea[readonly] {
@@ -532,10 +496,14 @@ select {
     cursor: pointer;
     background: #f7f7fc; }
 
+select::-ms-expand {
+  display: none; }
+
 .text-input {
   height: 2em;
   line-height: 1; }
-  .text-input + [type=checkbox], .text-input + [type=radio] {
+  .text-input + [type=checkbox],
+  .text-input + [type=radio] {
     margin-left: 1.3333333333rem; }
   .text-input + .label--inline {
     margin-left: 0.6666666667rem; }
@@ -547,7 +515,8 @@ select {
   .text-input:-moz-placeholder {
     padding-top: 1px; }
 
-.text-input + [type=submit], .text-input [type=cancel],
+.text-input + [type=submit],
+.text-input [type=cancel],
 .label--inline + [type=submit],
 .label--inline [type=cancel] {
   margin-left: 1.3333333333rem; }
@@ -565,7 +534,8 @@ textarea {
   cursor: pointer; }
   [type=checkbox][disabled], [type=radio][disabled] {
     cursor: not-allowed; }
-    [type=checkbox][disabled] + .label--inline, [type=radio][disabled] + .label--inline {
+    [type=checkbox][disabled] + .label--inline,
+    [type=radio][disabled] + .label--inline {
       cursor: not-allowed; }
 
 [type=checkbox] + .label--inline {
