@@ -6,6 +6,7 @@
 -->
 <link rel="import" href="../polymer/polymer.html" />
 <link rel="import" href="px-handle.html" />
+<link rel="import" href="px-handle-multi.html" />
 
 
 <!--
@@ -27,8 +28,9 @@ Allow the user to select a value or range of values within a specified min and m
       <input id="inputStart" type="text" class="text-input" value="{{value}}" on-change="handleStartChange"  tabindex="0"/>
       <div id="sliderContainer" class="slider flex__item" on-click="jumpToValue">
         <div id="sliderSelected" class="slider__selected"></div>
-        <px-handle id="startHandle" style="visibility:hidden;" handle-track-event-name="handleTrackStart" on-track="handleTrackStart"></px-handle>
-        <px-handle id="endHandle" handle-track-event-name="handleTrackEnd" on-track="handleTrackEnd"></px-handle>
+        <px-handle-multi id="startHandle" style="visibility:hidden;" handle-track-event-name="handleTrackStart" on-track="handleTrackStart" handle-rotate></px-handle-multi>
+        <px-handle-multi id="endHandle" style="visibility:hidden;" handle-track-event-name="handleTrackEnd" on-track="handleTrackEnd"></px-handle-multi>
+        <px-handle id="singleHandle" style="visibility:hidden;" handle-track-event-name="handleTrackEnd" on-track="handleTrackEnd"></px-handle>
       </div>
       <input id="inputEnd" type="text" style="visibility:hidden;" class="text-input" value="{{endValue}}" on-change="handleEndChange" tabindex="0"/>
     </div>
@@ -57,9 +59,11 @@ Allow the user to select a value or range of values within a specified min and m
         this._setRange(true);
         this.value = this.startValue;
 
-        // Show the start handle and the end input
+        // Show the start handle and the end input and end handle
         this.$.startHandle.style.visibility = 'visible';
         this.$.inputEnd.style.visibility = 'visible';
+        this.$.endHandle.style.visibility = 'visible';
+        this.toggleClass('slider__multi',true,this.$.sliderContainer);
 
         // Let's do some extra error checking to protect developers from themselves
         // Not fatal, but probably not intentional.
@@ -72,6 +76,8 @@ Allow the user to select a value or range of values within a specified min and m
           console.warn("Your end value doesn't match your step: the end value needs to be evenly divisible by the step attribute.");
         }
 
+
+
         // Cleanup values, just in case
         this.value = this._cleanValue(this.value);
         this.endValue = this._cleanValue(this.endValue);
@@ -79,6 +85,8 @@ Allow the user to select a value or range of values within a specified min and m
         // Have to wait for the DOM to finish loading
         // And then refire these
         this.async(function() {
+          // calculate the amount to offset the range on the right for handle width
+          this.offsetForHandleWidth = this._calcOffsetWidth(2);
           this._updateHandle(this.$.startHandle, this.value);
           this._updateHandle(this.$.endHandle, this.endValue);
         }, 1);
@@ -87,8 +95,14 @@ Allow the user to select a value or range of values within a specified min and m
         if (!this.value && this.value !== 0) {
           throw "Oops, I need a starting value. Did you set the 'value' attribute?"
         }
+
+        // Show the single handle
+        this.$.singleHandle.style.visibility = 'visible';
+
         this.async(function() {
-          this._updateHandle(this.$.endHandle, this.value);
+          // calculate the amount to offset the range on the right for handle width
+          this.offsetForHandleWidth = this._calcOffsetWidth(22);
+          this._updateHandle(this.$.singleHandle, this.value);
         }, 1);
       }
     },
@@ -167,8 +181,8 @@ Allow the user to select a value or range of values within a specified min and m
                 clean = this.endValue;
               }
 
-              // If it's a range, we update the start handle; otherwise update the end handle
-              var handle = (this.range) ? this.$.startHandle : this.$.endHandle;
+              // If it's a range, we update the start handle; otherwise update the single handle
+              var handle = (this.range) ? this.$.startHandle : this.$.singleHandle;
               this._updateHandle(handle, this.value);
 
               // For the sake of ranges, we keep start value and value in sync
@@ -192,8 +206,9 @@ Allow the user to select a value or range of values within a specified min and m
         clean = this.value;
       }
 
-      // Update the end handle
-      this._updateHandle(this.$.endHandle, clean);
+      // If it's a range, we update the end handle; otherwise update the single handle
+      var handle = (this.range) ? this.$.endHandle : this.$.singleHandle;
+      this._updateHandle(handle, clean);
 
       // Update endValue with the cleaned value
       this.endValue = clean;
@@ -289,9 +304,12 @@ Allow the user to select a value or range of values within a specified min and m
     },
 
     _translateValueToPosition: function(myvalue) {
+      return  this._translateValueToPositionRaw(myvalue) + 'px';
+    },
+
+    _translateValueToPositionRaw: function(myvalue){
       // add offset so end handle stops at end of tracking
-      var cO = 22;
-      var cW = this.$.sliderContainer.offsetWidth - cO;
+      var cW = this.offsetForHandleWidth;
 
       // What is the ratio of the value to the max?
       var ratio = myvalue / this.max;
@@ -299,13 +317,12 @@ Allow the user to select a value or range of values within a specified min and m
       // Multiple by the width of the container
       var position = ratio * cW;
 
-      return position + 'px';
+      return position
     },
 
     _translatePositionToValue: function(mypos) {
       // add offset so end handle stops at end of tracking
-      var cO = 22;
-      var cW = this.$.sliderContainer.offsetWidth - cO;
+      var cW = this.offsetForHandleWidth;
 
       // Have we loaded the container?
       if (cW === 0) {
@@ -345,12 +362,23 @@ Allow the user to select a value or range of values within a specified min and m
       }
 
       // Am I a range or a single value?
-      var progressValue = (this.range) ? this.endValue - this.value : this.value;
-      var progressPosition = (this.range) ? this.value : 0;
+      if(this.range){
+        // Am I a range or a single value?
+        var progressValue = this.endValue - this.value;
+        var progressPosition = this.value;
 
-      // Set the width and the position (for ranges)
-      this.$.sliderSelected.style.width = this._translateValueToPosition(progressValue);
-      this.$.sliderSelected.style.left = this._translateValueToPosition(progressPosition);
+        // Set the width and the position (for ranges)
+        this.$.sliderSelected.style.width = this._translateValueToPositionRaw(progressValue)+2+'px';
+        this.$.sliderSelected.style.left = this._translateValueToPositionRaw(progressPosition)-1+'px';
+      } else {
+        var progressValue = this.value;
+        var progressPosition = 0;
+
+        // Set the width and the position (for ranges)
+        this.$.sliderSelected.style.width = this._translateValueToPosition(progressValue);
+        this.$.sliderSelected.style.left = this._translateValueToPosition(progressPosition);
+      }
+
     },
 
     /**
@@ -362,10 +390,9 @@ Allow the user to select a value or range of values within a specified min and m
       // Is this a drag or a click?
       var mX = (event.detail.x) ? event.detail.x : event.clientX;
       // add offset so end handle stops at end of tracking
-      var cO = 22;
       var cL = this.$.sliderContainer.getBoundingClientRect().left;
       var cR = this.$.sliderContainer.getBoundingClientRect().right;
-      var cW = this.$.sliderContainer.offsetWidth - cO;
+      var cW = this.offsetForHandleWidth;
       var position = 0;
 
       // Check to make sure Mouse is on the screen.
@@ -480,6 +507,10 @@ Allow the user to select a value or range of values within a specified min and m
           }, 1
         );
       }
+    },
+
+    _calcOffsetWidth: function(cO){
+      return this.$.sliderContainer.offsetWidth - cO;
     }
   });
 </script>

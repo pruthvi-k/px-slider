@@ -1,0 +1,129 @@
+<!--
+    Relative paths assume component is being run from inside an app or another component, where dependencies are flat
+    siblings. When this component is run from its own repo (e.g. ui tests, examples), we assume the server is started with
+    'grunt depserve' (or similar server setup) to enable correct finding of bower dependencies for local runs
+    See https://github.com/jreichenberg/grunt-dep-serve#why-do-we-need-this
+-->
+<link rel="import" href="../polymer/polymer.html" />
+
+
+<!--
+Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+
+##### Usage
+
+    <px-slider counter-value="1">Hi</px-slider>
+
+@element px-slider
+@blurb Element providing solution to no problem in particular.
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-handle-multi">
+  <link rel="import" type="css" href="css/px-handle.css" />
+  <template>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23 21" id="multiHandleSVG">
+      <g id="handleTarget" on-down="handleDown" on-up="handleUp" on-track="handleTrack" tabindex="-1">
+        <path id="handleDropShadow" d="M0.76,12.26V4.67a3,3,0,0,1,3-3h15a3,3,0,0,1,3,3v7.59l-10,8.41h-1Z"/>
+        <!-- <path id="handleDropShadow" d="M1.5,14.09V6.5a3,3,0,0,1,3-3h15a3,3,0,0,1,3,3v7.59l-10,8.41h-1Z" transform="translate(-1 -2)"/> -->
+        <path id="handleBody" d="M0.76,11.26V3.67a3,3,0,0,1,3-3h15a3,3,0,0,1,3,3v7.59l-10,8.41h-1Z"/>
+        <!-- <path id="handleBody" d="M1.5,13.09V5.5a3,3,0,0,1,3-3h15a3,3,0,0,1,3,3v7.59l-10,8.41h-1Z" transform="translate(-1 -2)"/> -->
+        <line class="handleLines" x1="14.09" y1="11" x2="14.09" y2="4"/>
+        <line class="handleLines" x1="8.09" y1="11" x2="8.09" y2="4"/>
+        <line class="handleLines" x1="11.09" y1="11" x2="11.09" y2="4"/>
+      </g>
+    </span>
+  </template>
+</dom-module>
+
+
+<script>
+  Polymer({
+
+    is: 'px-handle-multi',
+
+    properties: {
+      /**
+       *
+       *
+       *
+       */
+      tracking: {
+        type: Boolean,
+        value: false,
+        readOnly: true,
+        observer: '_trackingChanged'
+      },
+
+      /**
+       * Name of the event that will be raised when a DOWN event is fired on the handle.
+       *
+       * @type {String}
+       */
+      handleDownEventName: {
+        type: String,
+        reflect: true
+      },
+
+      /**
+       * Name of the event that will be raised when an UP event is fired on the handle.
+       *
+       * @type {String}
+       */
+      handleUpEventName: {
+        type: String,
+        reflect: true
+      },
+
+      /**
+       * Name of the event that will be raised when a TRACK event is fired on the handle.
+       *
+       * @type {String}
+       */
+      handleTrackEventName: {
+        type: String,
+        reflect: true
+      },
+
+      /**
+       * Boolean to decide which handle to flip around and move down vs up.
+       *
+       * @type {String}
+       */
+      handleRotate:{
+        type:Boolean,
+        value:false,
+        observer: '_rotateHandle'
+      }
+    },
+
+    _trackingChanged: function(newValue, oldValue) {
+      this.toggleClass('tracking', newValue, this.$.handleTarget);
+    },
+
+    handleDown: function(event) {
+      this._setTracking(true);
+      this.fire(this.handleDownEventName);
+    },
+
+    handleUp: function(event) {
+      this._setTracking(false);
+      this.fire(this.handleUpEventName);
+    },
+
+    handleTrack: function(event) {
+      if (this.tracking) {
+        this.fire(this.handleTrackEventName);
+      }
+    },
+
+    _rotateHandle: function(bool){
+      this.toggleClass('start', bool, this.$.multiHandleSVG);
+      this.toggleClass('start', bool);
+      this.toggleClass('end', !bool);
+      if(bool){
+        this.$.handleDropShadow.setAttribute('transform',"translate(0 -2)");
+      }
+    }
+  });
+</script>

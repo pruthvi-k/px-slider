@@ -58,6 +58,16 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
   border-radius: 2px 0 0 2px;
 }
 
+.slider__multi {
+  margin: $inuit-base-spacing-unit--small $inuit-base-spacing-unit--small*1.5;
+
+  .slider__selected{
+    border-radius: 2px 2px 2px 2px;
+    border-width: 1px 1px 1px 1px;
+    // margin-left:-1px;
+  }
+}
+
 .text-input {
   width: calculateRem(65px);
 }
