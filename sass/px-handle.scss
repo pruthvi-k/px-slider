@@ -126,13 +126,7 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
     transform: rotate(180deg);
 
     #handleTarget{
-      // transform:translate(0,$inuit-base-spacing-unit--large*(0.1))
         transform:translate($inuit-base-spacing-unit--large*(0.03),$inuit-base-spacing-unit--large*(0.13))
-    }
-  }
-  &.end{
-    #handleTarget{
-        // transform:translate($inuit-base-spacing-unit--large*(0.1),0)
     }
   }
 }

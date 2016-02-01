@@ -8,14 +8,14 @@
 
 
 <!--
-Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+Handle element for the single handle for px-slider
 
 ##### Usage
 
-    <px-slider counter-value="1">Hi</px-slider>
+  <px-handle id="singleHandle" class="visuallyhidden" handle-track-event-name="handleTrackEnd" on-track="handleTrackEnd"></px-handle>
 
 @element px-slider
-@blurb Element providing solution to no problem in particular.
+@blurb Handle element for the single handle for px-slider
 @homepage index.html
 @demo demo.html
 -->
@@ -40,7 +40,7 @@ Element providing solution to no problem in particular. As a simple, increments 
     properties: {
       /**
        *
-       *
+       * Name of the event that will be raised when the handle DOWN and dragged.
        *
        */
       tracking: {
@@ -80,21 +80,33 @@ Element providing solution to no problem in particular. As a simple, increments 
         reflect: true
       }
     },
-
+    /**
+     * When the handle is clicked on for a drag, adds class for style
+     *
+     */
     _trackingChanged: function(newValue, oldValue) {
       this.toggleClass('tracking', newValue, this.$.handleTarget);
     },
-
+    /**
+     * When the handle is clicked on, fire event
+     *
+     */
     handleDown: function(event) {
       this._setTracking(true);
       this.fire(this.handleDownEventName);
     },
-
+    /**
+     * When the handle is let go (after being clicked on), fire event
+     *
+     */
     handleUp: function(event) {
       this._setTracking(false);
       this.fire(this.handleUpEventName);
     },
-
+    /**
+     * When the handle is moving, fire event
+     *
+     */
     handleTrack: function(event) {
       if (this.tracking) {
         this.fire(this.handleTrackEventName);

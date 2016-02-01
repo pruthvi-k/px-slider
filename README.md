@@ -30,29 +30,29 @@ The default is 1, which ensures that you only get integers for your value.
 
 Single handled slider
 ```
-<px-slider 
-  value="50" 
-  min="1" 
+<px-slider
+  value="50"
+  min="1"
   max="100">
 </px-slider>
 ```
 
 Multi-handled slider
 ```
-<px-slider 
-  start-value="20" 
+<px-slider
+  start-value="20"
   end-value="40"
-  min="1" 
+  min="1"
   max="60">
 </px-slider>
 ```
 
 Single-handled slider with step
 ```
-<px-slider 
-  value="250" 
+<px-slider
+  value="250"
   step="50"
-  min="0" 
+  min="0"
   max="500">
 </px-slider>
 ```
@@ -69,4 +69,4 @@ The slider will always take the full-width of whatever container it is in.
 - <a href="http://pxc-demos.grc-apps.svc.ice.ge.com/bower_components/px-slider/index.html" target="_blank">API Docs</a>
 
 ### Known Issues
-
+Sometimes, for multi-handled slider, when you drag one handle to meet the other, the other handle jumps. 

@@ -22,6 +22,7 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
 // Generic
 @import "px-normalize-design/_generic.normalize.scss";
 @import "px-box-sizing-design/_generic.box-sizing.scss";
+@import "px-helpers-design/_generic.helpers.scss";
 
 // Base
 @import "px-flexbox-design/_base.flexbox.scss";
@@ -64,7 +65,6 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
   .slider__selected{
     border-radius: 2px 2px 2px 2px;
     border-width: 1px 1px 1px 1px;
-    // margin-left:-1px;
   }
 }
 
