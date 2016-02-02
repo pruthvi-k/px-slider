@@ -295,7 +295,8 @@ html {
 
 #multiHandleSVG {
   height: 1.4666666667rem;
-  width: 1.3333333333rem; }
+  width: 1.3333333333rem;
+  -moz-user-select: none; }
   #multiHandleSVG.start {
     -webkit-transform: rotate(180deg);
             transform: rotate(180deg); }

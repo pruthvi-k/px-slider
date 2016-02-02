@@ -8,7 +8,7 @@
     <title>px-slider Demo</title>
     <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
     <script src="../webcomponentsjs/webcomponents-lite.min.js"></script>
-    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+
     <!-- Import custom element. Note: see comment about relative paths to dependencies in the *.html file referenced below -->
     <link rel="import" href="../px-theme/px-theme.html" />
     <link rel="import" href="px-slider.html" />
@@ -50,54 +50,27 @@
       </div>
       <h4>Step = 50</h4>
       <div style="width: 600px;">
-        <px-slider value="150" min="0" max="500" step="50">
+        <px-slider value="150" min="0" max="500" step="50"></px-slider>
       </div>
+    </div>
 
-    <div style="width: 600px; margin-bottom: 50px;">
+    <div  style="width: 600px; margin-bottom: 50px;">
 
-      <h4>Demonstrate px-slider bugs</h4>
-      <template id="my-slider" is="dom-bind">
+      <h4>Demonstrate px-slider bugs (or something)</h4>
 
-        <slider-container range-values="{{rangeValues}}">
-        </slider-container>
-        <br>
-
-        <slider-container range-values="{{infiniteLoopRangeValues}}">
-        </slider-container>
-
-        <!-- this part is fine
         <px-slider id="slider1"
           start-value="10"
-          end-value="40"
-          min="{{dataMin}}"
-          max="{{dataMax}}">
+          end-value="150"
+          min="0"
+          max="1000">
         </px-slider>
         <px-slider id="slider2"
                    start-value="10"
-                   end-value="60"
-                   min="{{dataMin}}"
-                   max="{{dataMax}}">
+                   end-value="252"
+                   min="0.25"
+                   max="251.35">
         </px-slider>
-        -->
-      </template>
     </div>
-      <script>
-        var tmpl = document.querySelector('#my-slider');
-        var slider1 = document.querySelector('#slider1')
-        var slider2 = document.querySelector('#slider2')
-        $(document).ready(function() {
-          tmpl.dataMin = 0;
-          tmpl.dataMax = 50;
-
-          tmpl.rangeValues = {
-            dataMin: 0, dataMax: 1000, startValue: 10, endValue: 150
-          };
-
-          tmpl.infiniteLoopRangeValues = {
-            dataMin: 0.25, dataMax: 251.35, startValue: 10, endValue: 252
-          };
-        });
-      </script>
   </body>
 
 </html>

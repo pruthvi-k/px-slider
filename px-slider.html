@@ -60,12 +60,12 @@ Allow the user to select a value or range of values within a specified min and m
         this.value = this.startValue;
 
         // Show the start handle and the end input and end handle
-        this.toggleClass('visuallyhidden',false,this.$.startHandle);
-        this.toggleClass('visuallyhidden',false,this.$.endHandle);
-        this.toggleClass('visuallyhidden',false,this.$.inputEnd);
+        this.toggleClass('visuallyhidden', false, this.$.startHandle);
+        this.toggleClass('visuallyhidden', false, this.$.endHandle);
+        this.toggleClass('visuallyhidden', false, this.$.inputEnd);
 
         // add class to make style adjustments specific to the multi handle version
-        this.toggleClass('slider__multi',true,this.$.sliderContainer);
+        this.toggleClass('slider__multi', true, this.$.sliderContainer);
 
         // Let's do some extra error checking to protect developers from themselves
         // Not fatal, but probably not intentional.
@@ -99,7 +99,7 @@ Allow the user to select a value or range of values within a specified min and m
         }
 
         // Show the single handle
-        this.$.singleHandle.toggleClass('visuallyhidden',false);
+        this.toggleClass('visuallyhidden', false,  this.$.singleHandle);
 
         this.async(function() {
           // calculate the amount to offset the range on the right for handle width
@@ -277,16 +277,31 @@ Allow the user to select a value or range of values within a specified min and m
      *
      */
     _maxChanged: function(newValue, oldValue) {
-      // Step not always defined at load?
+      // if no step attr, we dont need to check anything
       if (!this.step) {
         return;
       }
 
+      // make sure max is a number and not string
+      this.max = Number(this.max);
+
+      var tempMax,tempStep;
+      var decimalPlaces = 0;
+
+      //if step is a float, get the number of decimals
+      if(this.step.toString().indexOf(".") > -1) {
+        decimalPlaces = this.step.toString().split(".")[1].length;
+      }
+
+      // Convert floats to ints
+      tempMax = this.max * Math.pow(10,decimalPlaces);
+      tempStep = this.step * Math.pow(10,decimalPlaces);
+
       // Do the values match the step size?
       // Just warn, don't throw an exception
-      if (this.max % this.step !== 0) {
+      if (tempMax % tempStep !== 0) {
         console.warn("WARNING: max value does not match step size.")
-        this.max = this.max - (this.max % this.step);
+        this.max = (tempMax - (tempMax % tempStep))/Math.pow(10,decimalPlaces);
       }
 
       // Since we are changing the max, let's go ahead and recheck the end value
