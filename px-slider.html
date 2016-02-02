@@ -6,6 +6,7 @@
 -->
 <link rel="import" href="../polymer/polymer.html" />
 <link rel="import" href="px-handle.html" />
+<link rel="import" href="px-handle-multi.html" />
 
 
 <!--
@@ -27,10 +28,11 @@ Allow the user to select a value or range of values within a specified min and m
       <input id="inputStart" type="text" class="text-input" value="{{value}}" on-change="handleStartChange"  tabindex="0"/>
       <div id="sliderContainer" class="slider flex__item" on-click="jumpToValue">
         <div id="sliderSelected" class="slider__selected"></div>
-        <px-handle id="startHandle" style="visibility:hidden;" handle-track-event-name="handleTrackStart" on-track="handleTrackStart"></px-handle>
-        <px-handle id="endHandle" handle-track-event-name="handleTrackEnd" on-track="handleTrackEnd"></px-handle>
+        <px-handle-multi id="startHandle" class="visuallyhidden" handle-track-event-name="handleTrackStart" on-track="handleTrackStart" handle-rotate></px-handle-multi>
+        <px-handle-multi id="endHandle" class="visuallyhidden" handle-track-event-name="handleTrackEnd" on-track="handleTrackEnd"></px-handle-multi>
+        <px-handle id="singleHandle" class="visuallyhidden" handle-track-event-name="handleTrackEnd" on-track="handleTrackEnd"></px-handle>
       </div>
-      <input id="inputEnd" type="text" style="visibility:hidden;" class="text-input" value="{{endValue}}" on-change="handleEndChange" tabindex="0"/>
+      <input id="inputEnd" type="text" class="text-input visuallyhidden" value="{{endValue}}" on-change="handleEndChange" tabindex="0"/>
     </div>
   </template>
 </dom-module>
@@ -57,9 +59,13 @@ Allow the user to select a value or range of values within a specified min and m
         this._setRange(true);
         this.value = this.startValue;
 
-        // Show the start handle and the end input
-        this.$.startHandle.style.visibility = 'visible';
-        this.$.inputEnd.style.visibility = 'visible';
+        // Show the start handle and the end input and end handle
+        this.toggleClass('visuallyhidden', false, this.$.startHandle);
+        this.toggleClass('visuallyhidden', false, this.$.endHandle);
+        this.toggleClass('visuallyhidden', false, this.$.inputEnd);
+
+        // add class to make style adjustments specific to the multi handle version
+        this.toggleClass('slider__multi', true, this.$.sliderContainer);
 
         // Let's do some extra error checking to protect developers from themselves
         // Not fatal, but probably not intentional.
@@ -79,6 +85,10 @@ Allow the user to select a value or range of values within a specified min and m
         // Have to wait for the DOM to finish loading
         // And then refire these
         this.async(function() {
+          // calc the amount to offset the range on the right to account for handle width
+          this.offsetForHandleWidth = this._calcOffsetWidth(2);
+
+          // move handles into starting position
           this._updateHandle(this.$.startHandle, this.value);
           this._updateHandle(this.$.endHandle, this.endValue);
         }, 1);
@@ -87,8 +97,16 @@ Allow the user to select a value or range of values within a specified min and m
         if (!this.value && this.value !== 0) {
           throw "Oops, I need a starting value. Did you set the 'value' attribute?"
         }
+
+        // Show the single handle
+        this.toggleClass('visuallyhidden', false,  this.$.singleHandle);
+
         this.async(function() {
-          this._updateHandle(this.$.endHandle, this.value);
+          // calculate the amount to offset the range on the right for handle width
+          this.offsetForHandleWidth = this._calcOffsetWidth(22);
+
+          // move handle into initial position
+          this._updateHandle(this.$.singleHandle, this.value);
         }, 1);
       }
     },
@@ -105,36 +123,53 @@ Allow the user to select a value or range of values within a specified min and m
         value: false,
         readOnly: true
       },
+      /**
+       * Value of the slider
+       */
       value: {
         type: Number,
         reflect: true,
         notify: true,
         observer: '_valueChanged'
       },
+      /**
+       * For multi-sliders, the lower value of the range
+       */
       startValue: {
         type: Number,
         reflect: true,
-        notify: true,
-        observer: '_startValueChanged'
+        notify: true
       },
+      /**
+       * For multi-sliders, the upper value of the range
+       */
       endValue: {
         type: Number,
         reflect: true,
         notify: true,
         observer: '_endValueChanged'
       },
+      /**
+       * A min value for the slider. The user cannot choose less than the min
+       */
       min: {
         type: Number,
         value: 1,
         reflect: true,
         observer: '_minChanged'
       },
+      /**
+       * A max value for the slider. The user cannot choose greater than the max
+       */
       max: {
         type: Number,
         value: 100,
         reflect: true,
         observer: '_maxChanged'
       },
+      /**
+       * Sets the step size that can be choosen
+       */
       step: {
         type: Number,
         value: 1,
@@ -147,11 +182,18 @@ Allow the user to select a value or range of values within a specified min and m
         reflect: true
       }
     },
+    /**
+     * As an overview, there are functions for:
+     * -when the value of the slider changes (which then moves the handle)
+     * -when the handle is moved (which then changes the value)
+     * -when the initial attributes on px-slider are changed
+     * -helper functions to calc stuff for all cases
+     */
 
     /**
-     * Watchers (creepy)
-     *
-     * Not working, though ...
+     * Function called when a value changes
+     * --Ensures the value is valid, matches step size, etc
+     * --Moves single or start handle into position
      *
      */
     _valueChanged: function(newValue, oldValue) {
@@ -167,8 +209,8 @@ Allow the user to select a value or range of values within a specified min and m
                 clean = this.endValue;
               }
 
-              // If it's a range, we update the start handle; otherwise update the end handle
-              var handle = (this.range) ? this.$.startHandle : this.$.endHandle;
+              // If it's a range, we update the start handle; otherwise update the single handle
+              var handle = (this.range) ? this.$.startHandle : this.$.singleHandle;
               this._updateHandle(handle, this.value);
 
               // For the sake of ranges, we keep start value and value in sync
@@ -178,27 +220,40 @@ Allow the user to select a value or range of values within a specified min and m
         }
 
     },
-
-    _startValueChanged: function(newValue, oldValue) {
-      // This is just really here in case a dev changes this value programmatically
-      //this.value = newValue; // Should call value watcher for cleanup
-    },
-
+    /**
+     * Similar to _valueChanged but affects end handle:
+     * --Ensures the value is valid, matches step size, etc
+     * --Moves single or end handle into position
+     *
+     */
     _endValueChanged: function(newValue, oldValue) {
-      var clean = this._cleanValue(newValue);
+      var slider = this;
+      //this is here to ensure that when we get many consecutive jumps, we debounce them, instead of calculating each one.
+      if (slider.debounce) {
+        slider.debounce(
+          'slider_move_end', function() {
+            var clean = this._cleanValue(newValue);
 
-      // If this is a range, don't go below the start value
-      if (this.range && clean < this.value) {
-        clean = this.value;
-      }
+            // If this is a range, don't go below the start value
+            if (this.range && clean < this.value) {
+              clean = this.value;
+            }
 
-      // Update the end handle
-      this._updateHandle(this.$.endHandle, clean);
+            // If it's a range, we update the end handle; otherwise update the single handle
+            var handle = (this.range) ? this.$.endHandle : this.$.singleHandle;
+            this._updateHandle(handle, clean);
 
-      // Update endValue with the cleaned value
-      this.endValue = clean;
+            // Update endValue with the cleaned value
+            this.endValue = clean;
+          }, 1);
+        }
     },
-
+    /**
+     * Function that is called if the min attribute on px-slider is changed
+     * --Ensures the value is valid, matches step size, etc
+     *
+     *
+     */
     _minChanged: function(newValue, oldValue) {
       // Step not always defined at load?
       if (!this.step) {
@@ -215,18 +270,38 @@ Allow the user to select a value or range of values within a specified min and m
       // Since we are changing the min, let's go ahead and recheck the start value
       this.value = this._cleanValue(this.value);
     },
-
+    /**
+     * Function that is called if the max attr on px-slider is changed
+     * --Ensures the value is valid, matches step size, etc
+     *
+     *
+     */
     _maxChanged: function(newValue, oldValue) {
-      // Step not always defined at load?
+      // if no step attr, we dont need to check anything
       if (!this.step) {
         return;
       }
 
+      // make sure max is a number and not string
+      this.max = Number(this.max);
+
+      var tempMax,tempStep;
+      var decimalPlaces = 0;
+
+      //if step is a float, get the number of decimals
+      if(this.step.toString().indexOf(".") > -1) {
+        decimalPlaces = this.step.toString().split(".")[1].length;
+      }
+
+      // Convert floats to ints
+      tempMax = this.max * Math.pow(10,decimalPlaces);
+      tempStep = this.step * Math.pow(10,decimalPlaces);
+
       // Do the values match the step size?
       // Just warn, don't throw an exception
-      if (this.max % this.step !== 0) {
+      if (tempMax % tempStep !== 0) {
         console.warn("WARNING: max value does not match step size.")
-        this.max = this.max - (this.max % this.step);
+        this.max = (tempMax - (tempMax % tempStep))/Math.pow(10,decimalPlaces);
       }
 
       // Since we are changing the max, let's go ahead and recheck the end value
@@ -236,7 +311,12 @@ Allow the user to select a value or range of values within a specified min and m
         this.value = this._cleanValue(this.value);
       }
     },
-
+    /**
+     * Function that is called if the step size attr on px-slider is changed
+     * --Ensures the value is valid, matches step size, etc
+     *
+     *
+     */
     _stepChanged: function(newValue, oldValue) {
       // When the step changes, recheck EVERYTHING!
       this.value = this._checkStep(this.value);
@@ -246,7 +326,12 @@ Allow the user to select a value or range of values within a specified min and m
         this.endValue = this._checkStep(this.endValue);
       }
     },
-
+    /**
+     * Helper function that calls checkStep and makes sure the new value
+     * is within bounds.
+     * - Sets to max or min if not.
+     *
+     */
     _cleanValue: function(dirty) {
       var clean = dirty;
 
@@ -262,7 +347,12 @@ Allow the user to select a value or range of values within a specified min and m
 
       return clean;
     },
-
+    /**
+     * Helper function that makes sure the new value matches the
+     * specified step size.
+     *  - Rounds value if not
+     *  - Also sets val to number of decimal places as step size
+     */
     _checkStep: function(dirty) {
       // Bad values on start
       if (!dirty && dirty !== 0) {
@@ -270,28 +360,27 @@ Allow the user to select a value or range of values within a specified min and m
       }
 
       var clean = dirty;
+      var decimalPlaces = 0;
 
-      // Does the value match our step size?
-      // Round down by default (we add back later)
-      var stepchange = dirty % this.step;
-      clean -= stepchange;
+      clean = (Math.round(dirty/this.step) * this.step);
 
-      // If we are more than half way to the next step, add the step.
-      if (stepchange > (this.step / 2)) {
-        clean += this.step;
+      if(this.step.toString().indexOf(".") > -1) {
+        decimalPlaces = this.step.toString().split(".")[1].length;
+        clean = clean.toFixed(decimalPlaces);
       }
 
-      // If decimal is involved, deal with floating point precision
-      if(clean.toString().indexOf(".") > -1) {
-        clean.toFixed(clean.toString().split(".")[1].length);
-      }
       return clean;
     },
+    /**
+     * Helper func to calc the "left:Xpx" style used to moving the handle and progress bar
+     * - Progress bar for multi-handle needs add a bit to make minor alignment adjustments.
+     */
+    _translateValueToPosition: function(myvalue,extra) {
+      // if extra was passed in, use it, otherwise it is 0.
+      extra = extra || 0;
 
-    _translateValueToPosition: function(myvalue) {
       // add offset so end handle stops at end of tracking
-      var cO = 22;
-      var cW = this.$.sliderContainer.offsetWidth - cO;
+      var cW = this.offsetForHandleWidth;
 
       // What is the ratio of the value to the max?
       var ratio = myvalue / this.max;
@@ -299,13 +388,17 @@ Allow the user to select a value or range of values within a specified min and m
       // Multiple by the width of the container
       var position = ratio * cW;
 
-      return position + 'px';
+      return position + extra + 'px'
     },
-
+    /**
+     * Helper function to calc a value from a handle position
+     *
+     *
+     *
+     */
     _translatePositionToValue: function(mypos) {
       // add offset so end handle stops at end of tracking
-      var cO = 22;
-      var cW = this.$.sliderContainer.offsetWidth - cO;
+      var cW = this.offsetForHandleWidth;
 
       // Have we loaded the container?
       if (cW === 0) {
@@ -320,7 +413,12 @@ Allow the user to select a value or range of values within a specified min and m
 
       return this._cleanValue(value);
     },
-
+    /**
+     * Function updates the position of a handle by setting it's left style
+     * - calls function to update progress bar
+     *
+     *
+     */
     _updateHandle: function(handle, value) {
       // Determine new x position form value
       var newPos = this._translateValueToPosition(value);
@@ -345,12 +443,23 @@ Allow the user to select a value or range of values within a specified min and m
       }
 
       // Am I a range or a single value?
-      var progressValue = (this.range) ? this.endValue - this.value : this.value;
-      var progressPosition = (this.range) ? this.value : 0;
+      if(this.range){
+        // Am I a range or a single value?
+        var progressValue = this.endValue - this.value;
+        var progressPosition = this.value;
 
-      // Set the width and the position (for ranges)
-      this.$.sliderSelected.style.width = this._translateValueToPosition(progressValue);
-      this.$.sliderSelected.style.left = this._translateValueToPosition(progressPosition);
+        // Set the width and the position (for ranges)
+        this.$.sliderSelected.style.width = this._translateValueToPosition(progressValue,2);
+        this.$.sliderSelected.style.left = this._translateValueToPosition(progressPosition,-1);
+      } else {
+        var progressValue = this.value;
+        var progressPosition = 0;
+
+        // Set the width and the position (for ranges)
+        this.$.sliderSelected.style.width = this._translateValueToPosition(progressValue);
+        this.$.sliderSelected.style.left = this._translateValueToPosition(progressPosition);
+      }
+
     },
 
     /**
@@ -362,10 +471,9 @@ Allow the user to select a value or range of values within a specified min and m
       // Is this a drag or a click?
       var mX = (event.detail.x) ? event.detail.x : event.clientX;
       // add offset so end handle stops at end of tracking
-      var cO = 22;
       var cL = this.$.sliderContainer.getBoundingClientRect().left;
       var cR = this.$.sliderContainer.getBoundingClientRect().right;
-      var cW = this.$.sliderContainer.offsetWidth - cO;
+      var cW = this.offsetForHandleWidth;
       var position = 0;
 
       // Check to make sure Mouse is on the screen.
@@ -395,16 +503,24 @@ Allow the user to select a value or range of values within a specified min and m
      * @method handleTrackStart
      */
     handleTrackStart: function(event) {
-      var newPos = this._findPosition(event);
+      var slider = this;
 
-      // Update the value for the new position
-      var newValue = this._translatePositionToValue(newPos);
+      if (slider.debounce) {
+        slider.debounce(
+          'slider_track_end', function() {
+            var newPos = this._findPosition(event);
 
-      // We know this is range
-      if (newValue > this.endValue) {
-        newValue = this.endValue;
+            // Update the value for the new position
+            var newValue = this._translatePositionToValue(newPos);
+
+            // We know this is range
+            if (newValue > this.endValue) {
+              newValue = this.endValue;
+            }
+            this.value = newValue;
+          }, 1
+        );
       }
-      this.value = newValue;
     },
 
     /**
@@ -413,17 +529,24 @@ Allow the user to select a value or range of values within a specified min and m
      * @method handleEndChange
      */
     handleTrackEnd: function(event) {
-      var newPos = this._findPosition(event);
+      var slider = this;
 
-      // Update the value based on the new position
-      var newValue = this._translatePositionToValue(newPos);
-      if (this.range) {
-        if (newValue < this.value) {
-          newValue = this.value;
-        }
-        this.endValue = newValue;
-      } else {
-        this.value = newValue;
+      if (slider.debounce) {
+        slider.debounce(
+          'slider_track_end', function() {
+            var newPos = this._findPosition(event);
+
+            // Update the value based on the new position
+            var newValue = this._translatePositionToValue(newPos);
+            if (this.range) {
+              if (newValue < this.value) {
+                newValue = this.value;
+              }
+              this.endValue = newValue;
+            } else {
+              this.value = newValue;
+            }
+          }, 1 );
       }
     },
 
@@ -480,6 +603,15 @@ Allow the user to select a value or range of values within a specified min and m
           }, 1
         );
       }
+    },
+    /**
+     * Helper function to calculate the amount of space tha is left on the slider
+     * to accomodate the handle width.
+     *
+     *
+     */
+    _calcOffsetWidth: function(cO){
+      return this.$.sliderContainer.offsetWidth - cO;
     }
   });
 </script>

@@ -1,6 +1,6 @@
 {
   "name": "px-slider",
-  "version": "0.1.0",
+  "version": "0.2.2",
   "main": [
     "px-slider.html"
   ],
@@ -20,6 +20,7 @@
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#~v1.1.0",
     "px-forms-design": "https://github.com/PredixDev/px-forms-design.git#~0.3.0",
-    "px-starter-kit-design": "https://github.com/PredixDev/px-starter-kit-design.git#~0.4.0"
+    "px-starter-kit-design": "https://github.com/PredixDev/px-starter-kit-design.git#~0.4.0",
+    "px-helpers-design":"https://github.com/PredixDev/px-helpers-design.git#~0.3.2"
   }
 }
