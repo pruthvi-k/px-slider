@@ -580,25 +580,28 @@ Allow the user to select a value or range of values within a specified min and m
       if (slider.debounce) {
         slider.debounce(
           'slider_jump', function() {
-            var newPos = this._findPosition(event);
-            // Update the value based on the new position
-            var newValue = this._translatePositionToValue(newPos);
+            // if the user clicks on the slider bar (not just clicking the handles), jump the value
+            if(event.target.id == 'sliderContainer' || event.target.id == 'sliderSelected' ){
+              var newPos = this._findPosition(event);
+              // Update the value based on the new position
+              var newValue = this._translatePositionToValue(newPos);
 
-            if (this.range) {
-              // Which handle do you move?
-              if (newValue < this.value) {
-                // If it's less than the start value, move the left slider
-                this.value = newValue;
+              if (this.range) {
+                // Which handle do you move?
+                if (newValue < this.value) {
+                  // If it's less than the start value, move the left slider
+                  this.value = newValue;
 
-              } else if (newValue > this.endValue) {
-                // If it's greater than the start value, move the right slider
-                this.endValue = newValue;
+                } else if (newValue > this.endValue) {
+                  // If it's greater than the start value, move the right slider
+                  this.endValue = newValue;
+                } else {
+                  // We are somewhere in the middle - which handle do we move?!
+                }
               } else {
-                // We are somewhere in the middle - which handle do we move?!
+                // Move the only handle
+                this.value = newValue;
               }
-            } else {
-              // Move the only handle
-              this.value = newValue;
             }
           }, 1
         );

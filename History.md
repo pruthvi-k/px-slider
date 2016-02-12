@@ -1,7 +1,12 @@
 v0.2.2
 ==================
+* fixed a bug where sometimes, moving a multihandle to match the value of the other handle caused the other handle to jump
+* removed obsolete "demo bugs" from the demo page.
+==================
+v0.2.2
+==================
 * fixed a bug in Firefox which allowed the user to drag the image of the handle instead of the handle
-* fixed a bug in IE where ClassList (which is called by Polymer in toggleClass) cannot be used on an SVG element. 
+* fixed a bug in IE where ClassList (which is called by Polymer in toggleClass) cannot be used on an SVG element.
 ==================
 v0.2.1
 ==================
