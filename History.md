@@ -1,3 +1,7 @@
+v0.2.4
+==================
+* Updated License
+
 v0.2.3
 ==================
 * fixed a bug where sometimes, moving a multihandle to match the value of the other handle caused the other handle to jump
