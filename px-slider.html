@@ -5,6 +5,7 @@
     See https://github.com/jreichenberg/grunt-dep-serve#why-do-we-need-this
 -->
 <link rel="import" href="../polymer/polymer.html" />
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html"/>
 <link rel="import" href="px-handle.html" />
 <link rel="import" href="px-handle-multi.html" />
 
@@ -41,6 +42,10 @@ Allow the user to select a value or range of values within a specified min and m
   Polymer({
 
     is: 'px-slider',
+
+    behaviors: [
+      Polymer.IronResizableBehavior
+    ],
 
     ready: function() {
       // Must have min and max values
@@ -85,8 +90,6 @@ Allow the user to select a value or range of values within a specified min and m
         // Have to wait for the DOM to finish loading
         // And then refire these
         this.async(function() {
-          // calc the amount to offset the range on the right to account for handle width
-          this.offsetForHandleWidth = this._calcOffsetWidth(2);
 
           // move handles into starting position
           this._updateHandle(this.$.startHandle, this.value);
@@ -102,8 +105,6 @@ Allow the user to select a value or range of values within a specified min and m
         this.toggleClass('visuallyhidden', false,  this.$.singleHandle);
 
         this.async(function() {
-          // calculate the amount to offset the range on the right for handle width
-          this.offsetForHandleWidth = this._calcOffsetWidth(22);
 
           // move handle into initial position
           this._updateHandle(this.$.singleHandle, this.value);
@@ -181,6 +182,32 @@ Allow the user to select a value or range of values within a specified min and m
         value: false,
         reflect: true
       }
+    },
+
+    listeners: {
+      'iron-resize': '_onIronResize'
+    },
+
+    /**
+     * This will be called by the parents through the iron-resizable-behavior
+     * when they know the slider has been resized or made visible.
+     */
+    _onIronResize: function() {
+
+      //debounce resize events
+      if (slider.debounce) {
+        slider.debounce(
+          'slider_resize', function() {
+            console.log('resize');
+            if(this.range) {
+              this._updateHandle(this.$.startHandle, this.value);
+              this._updateHandle(this.$.endHandle, this.endValue);
+            }
+            else {
+              this._updateHandle(this.$.singleHandle, this.value);
+            }
+          }, 50);
+        }
     },
     /**
      * As an overview, there are functions for:
@@ -420,6 +447,10 @@ Allow the user to select a value or range of values within a specified min and m
      *
      */
     _updateHandle: function(handle, value) {
+      // we need to recalc the container size every time in case its width has changed
+      var handleSize = this.range ? 2 : 22;
+      this.offsetForHandleWidth = this._calcOffsetWidth(handleSize);
+
       // Determine new x position form value
       var newPos = this._translateValueToPosition(value);
 

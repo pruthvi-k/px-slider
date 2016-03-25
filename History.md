@@ -1,3 +1,7 @@
+v0.3.0
+=================
+* implemented the iron-resizable-behavior behavior
+
 v0.2.4
 ==================
 * Updated License
