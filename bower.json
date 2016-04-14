@@ -1,6 +1,6 @@
 {
   "name": "px-slider",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "main": [
     "px-slider.html"
   ],
@@ -15,7 +15,8 @@
   ],
   "dependencies": {
     "polymer": "~v1.2.3",
-    "px-theme": "https://github.com/PredixDev/px-theme.git#~0.4.0"
+    "px-theme": "https://github.com/PredixDev/px-theme.git#~0.4.0",
+    "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#~v1.0.3"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#~v1.1.0",

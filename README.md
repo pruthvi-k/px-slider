@@ -60,6 +60,7 @@ Single-handled slider with step
 ### Layout
 
 The slider will always take the full-width of whatever container it is in.
+If resized or made visible for the first time (if the slider was in a modal for example) then the slider will need to be notified through the iron-resizable-behavior, by manually calling notifyResize() on it for example.  See https://elements.polymer-project.org/elements/iron-resizable-behavior?active=Polymer.IronResizableBehavior
 
 ### Latest Release
 - not released yet!
@@ -69,4 +70,4 @@ The slider will always take the full-width of whatever container it is in.
 - <a href="http://pxc-demos.grc-apps.svc.ice.ge.com/bower_components/px-slider/index.html" target="_blank">API Docs</a>
 
 ### Known Issues
-Sometimes, for multi-handled slider, when you drag one handle to meet the other, the other handle jumps. 
+Sometimes, for multi-handled slider, when you drag one handle to meet the other, the other handle jumps.
