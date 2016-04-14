@@ -68,6 +68,3 @@ If resized or made visible for the first time (if the slider was in a modal for 
 ### Active Development (master branch)
 - <a href="http://pxc-demos.grc-apps.svc.ice.ge.com/bower_components/px-slider/demo.html" target="_blank">Demo</a>
 - <a href="http://pxc-demos.grc-apps.svc.ice.ge.com/bower_components/px-slider/index.html" target="_blank">API Docs</a>
-
-### Known Issues
-Sometimes, for multi-handled slider, when you drag one handle to meet the other, the other handle jumps.
