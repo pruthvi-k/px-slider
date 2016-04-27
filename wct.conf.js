@@ -26,5 +26,8 @@ module.exports = {
         }
       ]
     }
-  }
+  },
+  suites: [
+      'test/fixture.html'
+  ]
 };
