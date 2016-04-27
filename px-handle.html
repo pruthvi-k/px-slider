@@ -14,7 +14,7 @@ Handle element for the single handle for px-slider
 
   <px-handle id="singleHandle" class="visuallyhidden" handle-track-event-name="handleTrackEnd" on-track="handleTrackEnd"></px-handle>
 
-@element px-slider
+@element px-handle
 @blurb Handle element for the single handle for px-slider
 @homepage index.html
 @demo demo.html
@@ -40,7 +40,7 @@ Handle element for the single handle for px-slider
     properties: {
       /**
        *
-       * Name of the event that will be raised when the handle DOWN and dragged.
+       * Name of the event that will be raised when the handle is DOWN and dragged.
        *
        */
       tracking: {
@@ -81,15 +81,18 @@ Handle element for the single handle for px-slider
       }
     },
     /**
-     * When the handle is clicked on for a drag, adds class for style
-     *
+     * When the handle is clicked on for a drag, toggles "tracking" class
+     * @method {_trackingChanged}
+     * @param {newValue}
+     * @param {oldValue}
      */
     _trackingChanged: function(newValue, oldValue) {
       this.toggleClass('tracking', newValue, this.$.handleTarget);
     },
     /**
      * When the handle is clicked on, fire event
-     *
+     * @method {handleDown}
+     * @param {event}
      */
     handleDown: function(event) {
       this._setTracking(true);
@@ -97,7 +100,8 @@ Handle element for the single handle for px-slider
     },
     /**
      * When the handle is let go (after being clicked on), fire event
-     *
+     * @method {handleUp}
+     * @param  {event}
      */
     handleUp: function(event) {
       this._setTracking(false);
@@ -105,7 +109,8 @@ Handle element for the single handle for px-slider
     },
     /**
      * When the handle is moving, fire event
-     *
+     * @method {handleTrack}
+     * @param {event}
      */
     handleTrack: function(event) {
       if (this.tracking) {

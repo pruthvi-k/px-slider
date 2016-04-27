@@ -1,3 +1,7 @@
+v0.3.2
+=================
+* updated README and put a link to full API on the GH-pages.
+
 v0.3.1
 =================
 * edited readme
