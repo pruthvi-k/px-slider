@@ -1,4 +1,4 @@
-# Px-Slider
+# Px-Slider [![Build Status](https://travis-ci.org/PredixDev/px-slider.svg?branch=master)](https://travis-ci.org/PredixDev/px-slider)
 
 ## Overview
 
