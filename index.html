@@ -34,6 +34,12 @@
   		<p>
   			The	<code>px-slider</code> component provides a progress bar, which can optionally include stripes and an animation effect.
   		</p>
+      <p class="description-text">
+        The Slider component allows a user to select a numeric value from a range of acceptable values. The minimum and maximum values,
+        step, and default value can all be specified in configuration. When the endValue property is enabled, a second input box appears
+        on the right hand side of the slider, and two thumb controls appear on the slider bar. Note that the slider bar is blue between
+        the two thumb controls to indicate the selected range.
+      </p>
   		<div class="flex">
   			<img class="u-mr--" src="https://img.shields.io/travis/PredixDev/px-slider.svg?style=flat-square" alt="Travis"/>
   			<img class="u-mr--" src="https://img.shields.io/bower/v/px-slider.svg?style=flat-square" alt="Bower"/>
@@ -59,13 +65,12 @@
             <!-- Properties -->
             <div class="properties u-ph+ u-pb+ u-mt++ u-mh++">
               <p class="epsilon">Properties</p>
-              <!-- <div class="u-mb-">Value: <input id="value{{indexPlusOne(index)}}" class="text-input" type="numeric" placeholder="0" value="{{item.value::input}}" /></div> -->
-              <!-- <div class="u-mb-">Value: <input id="value{{indexPlusOne(index)}}" class="text-input" type="numeric" placeholder="0" value="{{item.value::input}}" /></div> -->
-              <div class="flex u-mb-">
-                <input id="disabled{{indexPlusOne(index)}}" class="toggle__input toggle__input--small" type="checkbox" checked="{{item.disabled::change}}">
-                <label for$="disabled{{indexPlusOne(index)}}" class="toggle__label toggle__label--small"></label>
-                <div class="u-ml-">disabled</div>
-              </div>
+              <div class="u-mb-">Value: <input id="value{{indexPlusOne(index)}}" class="text-input" type="numeric" placeholder="0" value="{{item.value::input}}" /></div>
+              <div class="u-mb-">min: <input id="min{{indexPlusOne(index)}}" class="text-input" type="numeric" placeholder="0" value="{{item.min::input}}" /></div>
+              <div class="u-mb-">max: <input id="max{{indexPlusOne(index)}}" class="text-input" type="numeric" placeholder="0" value="{{item.max::input}}" /></div>
+              <div class="u-mb-">step: <input id="step{{indexPlusOne(index)}}" class="text-input" type="numeric" placeholder="0" value="{{item.step::input}}" /></div>
+              <div class="u-mb-">startValue: <input id="startValue{{indexPlusOne(index)}}" class="text-input" type="numeric" placeholder="0" value="{{item.startValue::input}}" /></div>
+              <div class="u-mb-">endValue: <input id="endValue{{indexPlusOne(index)}}" class="text-input" type="numeric" placeholder="0" value="{{item.endValue::input}}" /></div>
             </div>
 
             <div class="demoContainer u-mr++">
@@ -78,9 +83,8 @@
                       min="{{item.min}}"
                       max="{{item.max}}"
                       step="{{item.step}}"
-                      start-value="{{item.start-value}}"
-                      end-value="{{item.end-value}}"
-                      disabled="{{item.disabled}}">
+                      start-value="{{item.startValue}}"
+                      end-value="{{item.endValue}}">
                     </px-slider>
                   </div>
                 </div>
@@ -129,22 +133,30 @@
 window.addEventListener('WebComponentsReady', function() {
   var template = document.querySelector('template[is=dom-bind]'),
       year = new Date(),
-      value = [50],
-      min = [0],
-      max = [100],
-      step = [5],
-      startValue = [0],
-      endValue = [100];
+
+      value = ["20","20"],
+      min = ["0","0"],
+      max = ["100","100"],
+      step = ["0.01","5"],
+      startValue = ["","20"],
+      endValue = ["","80"];
 
       optionsArray = [
+        {
+          "value":value[1],
+          "min":min[1],
+          "max":max[1],
+          "step":step[1],
+          "startValue":startValue[1],
+          "endValue":endValue[1]
+        },
         {
           "value":value[0],
           "min":min[0],
           "max":max[0],
           "step":step[0],
           "startValue":startValue[0],
-          "endValue":endValue[0],
-          "disabled":false
+          "endValue":endValue[0]
         }
       ],
       indexPlusOne = function(num) {
