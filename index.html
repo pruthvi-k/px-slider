@@ -15,7 +15,11 @@
   <link rel="import" href="../px-demo-snippet/px-demo-snippet.html">
   <link rel="import" href="../polymer-font-awesome/polymer-font-awesome.html">
   <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
-
+  <style >
+    .container{
+      width: 600px;
+    }
+  </style>
   </head>
 
 <body>
@@ -55,16 +59,12 @@
             <!-- Properties -->
             <div class="properties u-ph+ u-pb+ u-mt++ u-mh++">
               <p class="epsilon">Properties</p>
-              <div class="u-mb-">Value: <input id="value{{indexPlusOne(index)}}" class="text-input" type="numeric" placeholder="0" value="{{item.value::input}}" /></div>
+              <!-- <div class="u-mb-">Value: <input id="value{{indexPlusOne(index)}}" class="text-input" type="numeric" placeholder="0" value="{{item.value::input}}" /></div> -->
+              <!-- <div class="u-mb-">Value: <input id="value{{indexPlusOne(index)}}" class="text-input" type="numeric" placeholder="0" value="{{item.value::input}}" /></div> -->
               <div class="flex u-mb-">
-                <input id="striped{{indexPlusOne(index)}}" class="toggle__input toggle__input--small" type="checkbox" checked="{{item.striped::change}}">
-                <label for$="striped{{indexPlusOne(index)}}" class="toggle__label toggle__label--small"></label>
-                <div class="u-ml-">striped</div>
-              </div>
-              <div class="flex u-mb-">
-                <input id="animated{{indexPlusOne(index)}}" class="toggle__input toggle__input--small" type="checkbox" checked="{{item.animated::change}}">
-                <label for$="animated{{indexPlusOne(index)}}" class="toggle__label toggle__label--small"></label>
-                <div class="u-ml-">animated</div>
+                <input id="disabled{{indexPlusOne(index)}}" class="toggle__input toggle__input--small" type="checkbox" checked="{{item.disabled::change}}">
+                <label for$="disabled{{indexPlusOne(index)}}" class="toggle__label toggle__label--small"></label>
+                <div class="u-ml-">disabled</div>
               </div>
             </div>
 
@@ -72,13 +72,17 @@
               <!-- demo -->
               <div class="flex flex--col">
                 <div class="flex__item demo u-ph+ u-pb+ u-mt++">
-                  <br />
-                  <px-slider
-                    id="progress"
-                    value="{{item.value}}"
-                    striped="{{item.striped}}"
-                    animated="{{item.animated}}">
-                  </px-slider>
+                  <div class="container u-mt+ u-ml-">
+                    <px-slider
+                      value="{{item.value}}"
+                      min="{{item.min}}"
+                      max="{{item.max}}"
+                      step="{{item.step}}"
+                      start-value="{{item.start-value}}"
+                      end-value="{{item.end-value}}"
+                      disabled="{{item.disabled}}">
+                    </px-slider>
+                  </div>
                 </div>
                 <div class="flex__item">
                   <px-demo-snippet
@@ -92,7 +96,7 @@
           <div class="apiContainer">
             <div class="flex flex--col api u-mt++" >
               <div>
-                <px-api-viewer source="px-slider"></px-api-viewer>
+                <!-- <px-api-viewer source="px-slider"></px-api-viewer> -->
               </div>
             </div>
           </div>
@@ -125,16 +129,22 @@
 window.addEventListener('WebComponentsReady', function() {
   var template = document.querySelector('template[is=dom-bind]'),
       year = new Date(),
+      value = [50],
+      min = [0],
+      max = [100],
+      step = [5],
+      startValue = [0],
+      endValue = [100];
+
       optionsArray = [
         {
-          "value":50,
-          "striped":false,
-          "animated":false
-        },
-        {
-          "value":100,
-          "striped":true,
-          "animated":true
+          "value":value[0],
+          "min":min[0],
+          "max":max[0],
+          "step":step[0],
+          "startValue":startValue[0],
+          "endValue":endValue[0],
+          "disabled":false
         }
       ],
       indexPlusOne = function(num) {

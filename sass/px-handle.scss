@@ -20,12 +20,12 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
 */
 
 // Settings
-@import "px-colors-design/_settings.colors.scss";
+// @import "px-colors-design/_settings.colors.scss";
+//
+// // Generic
+// @import "px-normalize-design/_generic.normalize.scss";
+// @import "px-box-sizing-design/_generic.box-sizing.scss";
 
-// Generic
-@import "px-normalize-design/_generic.normalize.scss";
-@import "px-box-sizing-design/_generic.box-sizing.scss";
- 
 // Component
 :host {
   position: absolute;
@@ -127,7 +127,7 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
     transform: rotate(180deg);
 
     #handleTarget{
-        transform:translate($inuit-base-spacing-unit--large*(0.03),$inuit-base-spacing-unit--large*(0.13))
+        transform:translate($inuit-base-spacing-unit--large*(0.03),$inuit-base-spacing-unit--large*(0.13));
     }
   }
 }
