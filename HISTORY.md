@@ -1,3 +1,7 @@
+v0.5.3
+=================
+* updated gh-pages script to vulcanize demo
+
 v0.5.2
 =================
 * Enabled api viewer
