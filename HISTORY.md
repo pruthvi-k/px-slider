@@ -1,3 +1,7 @@
+v0.5.5
+=================
+* removed broken example
+
 v0.5.4
 =================
 * added image to readme, removed watch, added view on github
