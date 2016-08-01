@@ -228,12 +228,6 @@ html {
   position: absolute;
   top: -0.4rem;
   display: inline-block; }
-  :host.start {
-    top: 0.5333333333rem;
-    margin-left: -0.64rem; }
-  :host.end {
-    top: -1.3333333333rem;
-    margin-left: -0.64rem; }
 
 #handleTarget {
   height: 1.3333333333rem;
@@ -244,20 +238,6 @@ html {
   background-color: white;
   fill: #b1b1bc;
   cursor: pointer; }
-  #handleTarget .handleLines {
-    stroke: #b1b1bc;
-    fill: none;
-    stroke-miterlimit: 10; }
-  #handleTarget #handleDropShadow {
-    opacity: 0.15;
-    mix-blend-mode: multiply;
-    stroke: black;
-    fill: black;
-    stroke-miterlimit: 10; }
-  #handleTarget #handleBody {
-    fill: white;
-    stroke: #b1b1bc;
-    stroke-miterlimit: 10; }
   #handleTarget:focus {
     outline: 0; }
   #handleTarget:hover {
@@ -265,21 +245,11 @@ html {
     background-color: #b1b1bc; }
     #handleTarget:hover svg {
       stroke: #9999a3; }
-    #handleTarget:hover .handleLines {
-      stroke: #9999a3; }
-    #handleTarget:hover #handleBody {
-      fill: #b1b1bc;
-      stroke: #9999a3; }
   #handleTarget.tracking {
     border-color: #7c7c84;
     background-color: #9999a3;
     box-shadow: none; }
     #handleTarget.tracking svg {
-      stroke: #7c7c84; }
-    #handleTarget.tracking .handleLines {
-      stroke: #7c7c84; }
-    #handleTarget.tracking #handleBody {
-      fill: #9999a3;
       stroke: #7c7c84; }
   #handleTarget.disabled {
     border-color: #d1d0d8;
@@ -287,19 +257,3 @@ html {
     box-shadow: none; }
     #handleTarget.disabled svg {
       stroke: #d1d0d8; }
-    #handleTarget.disabled .handleLines {
-      stroke: #d1d0d8; }
-    #handleTarget.disabled #handleBody {
-      fill: white;
-      stroke: #d1d0d8; }
-
-#multiHandleSVG {
-  height: 1.4666666667rem;
-  width: 1.3333333333rem;
-  -moz-user-select: none; }
-  #multiHandleSVG.start {
-    -webkit-transform: rotate(180deg);
-            transform: rotate(180deg); }
-    #multiHandleSVG.start #handleTarget {
-      -webkit-transform: translate(0.04rem, 0.1733333333rem);
-              transform: translate(0.04rem, 0.1733333333rem); }

@@ -1,8 +1,10 @@
-# Px-Slider [![Build Status](https://travis-ci.org/PredixDev/px-slider.svg?branch=master)](https://travis-ci.org/PredixDev/px-slider)
+# px-slider [![Build Status](https://travis-ci.org/PredixDev/px-slider.svg?branch=master)](https://travis-ci.org/PredixDev/px-slider)
+
+[![px-slider demo](px-slider.png?raw=true)](https://github.com/PredixDev/px-slider)
 
 ## Overview
 
-The px-Slider is a Predix UI component for defining a value in a range or a range of values within set boundaries.
+The px-slider is a Predix UI component for defining a value in a range or a range of values within set boundaries.
 
 ## documentation
 
