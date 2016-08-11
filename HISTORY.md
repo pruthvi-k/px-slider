@@ -1,3 +1,7 @@
+v0.5.6
+=================
+* updated demos-snippets
+
 v0.5.5
 =================
 * removed broken example
