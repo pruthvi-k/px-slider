@@ -21,13 +21,21 @@ module.exports = function (grunt) {
                   bower: true
                 }
             },
-            dist: {
+            slider: {
                 files: {
                   'css/noprefix/px-slider-sketch.css': 'sass/px-slider-sketch.scss',
-                  'css/noprefix/px-slider.css': 'sass/px-slider-predix.scss',
-                  'css/noprefix/px-slider-demo.css': 'sass/px-slider-demo.scss',
-                  'css/noprefix/px-handle.css': 'sass/px-handle.scss'
+                  'css/noprefix/px-slider.css': 'sass/px-slider-predix.scss'
                 }
+            },
+            handle: {
+              files:{
+                  'css/noprefix/px-handle.css': 'sass/px-handle.scss'
+              }
+            },
+            demo: {
+              files:{
+                  'css/noprefix/px-slider-demo.css': 'sass/px-slider-demo.scss'
+              }
             }
         },
 
