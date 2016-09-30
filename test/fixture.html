@@ -25,12 +25,14 @@
     <!-- For some reason px-theme is needed for WCT to run without some errors -->
     <link rel="import" href="../../px-theme/px-theme.html"/>
     <script src="px-slider-base-tests.js"></script>
+    <script src="px-slider-custom-tests.js"></script>
 <body>
 
 <!-- You use the document as a place to set up your fixtures. -->
-<px-slider value="10" id="fixture">
-    &hearts;
-</px-slider>
+<px-slider value="10" id="px_slider_simple"></px-slider>
+<px-slider min="5.00" max="40.00" value="10.00" step=".01" id="px_slider_complex"></px-slider>
+<px-slider range="true" start-value="10" end-value="20" id="px_slider_range"></px-slider>
+<px-slider value="10" disabled="true" id="px_slider_disabled"></px-slider>
 
 </body>
 </html>

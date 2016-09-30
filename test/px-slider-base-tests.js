@@ -181,8 +181,11 @@ function runBaseTests() {
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
-    test('px-slider fixture is created', function() {
-      assert.isTrue(document.getElementById('fixture') !== null);
+    test('px-slider fixtures are created', function() {
+      assert.isTrue(document.getElementById('px_slider_simple') !== null);
+      assert.isTrue(document.getElementById('px_slider_complex') !== null);
+      assert.isTrue(document.getElementById('px_slider_range') !== null);
+      assert.isTrue(document.getElementById('px_slider_disabled') !== null);
     });
 
   });
