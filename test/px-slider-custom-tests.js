@@ -52,4 +52,18 @@ function runCustomTests() {
       done();
     });
   });
+  suite('Custom Automation Tests for a multi-handle (range) px-slider with negative range', function() {
+    test('Check assigned values of range px-slider', function(done){
+      var sliderEl = Polymer.dom(document).querySelector('#px_slider_range_neg'),
+          sliderStartValue = sliderEl.startValue,
+          displayStartValue = Polymer.dom(sliderEl.root).querySelector('#inputStart').value,
+          sliderEndValue = sliderEl.endValue,
+          displayEndValue = Polymer.dom(sliderEl.root).querySelector('#inputEnd').value;
+      assert.equal(sliderStartValue, '-30');
+      assert.equal(displayStartValue, '-30');
+      assert.equal(sliderEndValue, '20');
+      assert.equal(displayEndValue, '20');
+      done();
+    });
+  });
 };
