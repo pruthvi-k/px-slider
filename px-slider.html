@@ -149,6 +149,7 @@ Allow the user to select a value or range of values within a specified min and m
 
         // If so, this is a range.
         this._range = true;
+
         this.value = this.startValue;
 
         // Show the start handle and the end input and end handle
@@ -187,7 +188,8 @@ Allow the user to select a value or range of values within a specified min and m
       } else {
 
         if (!this.value && this.value !== 0) {
-          throw "Oops, I need a starting value. Did you set the 'value' attribute?";
+          // throw "Oops, I need a starting value. Did you set the 'value' attribute?";
+          this.value = this.min;
         }
 
         // Show the single handle
