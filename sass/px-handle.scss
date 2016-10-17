@@ -35,14 +35,16 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
   position: absolute;
   top: -#{calculateRem(6px)};
   display: inline-block;
-  &.start{
-    top: $inuit-base-spacing-unit--large*0.4;
-    margin-left:$inuit-base-spacing-unit--large*-0.48;
-  }
-  &.end{
-    top: -$inuit-base-spacing-unit--large;
-    margin-left:$inuit-base-spacing-unit--large*-0.48;
-  }
+}
+
+:host(.start) {
+  top: $inuit-base-spacing-unit--large*0.05;
+  margin-left:$inuit-base-spacing-unit--large*-0.53;
+  transform: rotate(180deg);
+}
+:host(.end) {
+  top: -$inuit-base-spacing-unit--large;
+  margin-left:$inuit-base-spacing-unit--large*-0.48;
 }
 
 #handleTarget {
@@ -127,11 +129,4 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
   height: $inuit-base-spacing-unit--large*1.1;
   width: $inuit-base-spacing-unit--large;
   -moz-user-select: none;
-  &.start{
-    transform: rotate(180deg);
-
-    #handleTarget{
-        transform:translate($inuit-base-spacing-unit--large*(0.03),$inuit-base-spacing-unit--large*(0.13));
-    }
-  }
 }
