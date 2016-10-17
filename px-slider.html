@@ -136,6 +136,13 @@ Allow the user to select a value or range of values within a specified min and m
         throw "Missing a maximum value (max).";
       }
 
+      if(this.min > this.max){
+        console.warn("Min and Max look reversed. Switching them")
+        var min = this.min;
+        this.min = this.max;
+        this.max = min;
+      }
+
       // Do we have a start value and end value?
       if ( (this.startValue || this.startValue === 0) &&
            (this.endValue || this.endValue === 0) ) {

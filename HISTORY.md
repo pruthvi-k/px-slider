@@ -1,3 +1,7 @@
+v0.6.3
+=================
+* 
+
 v0.6.2
 =================
 * added support for negative values
