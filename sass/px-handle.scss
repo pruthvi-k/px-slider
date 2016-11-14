@@ -71,7 +71,6 @@ $px-handle-black : var(--px-handle-shadow-color, $black);
   }
   #handleDropShadow{
     opacity:0.15;
-    mix-blend-mode:multiply;
     stroke:$px-handle-black;
     fill:$px-handle-black;
     stroke-miterlimit:10;
