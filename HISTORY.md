@@ -1,4 +1,4 @@
-v0.6.6
+v0.6.7
 =================
 * added style variables for theming
 * fixed dependencies

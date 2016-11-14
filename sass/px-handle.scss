@@ -29,6 +29,13 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
 @import "px-colors-design/_settings.colors.scss";
 @import "px-defaults-design/_settings.defaults.scss";
 
+$px-handle-gray4 : var(--px-handle-disabled-border-color, $gray4);
+$px-handle-gray5 : var(--px-handle-border-color, $gray5);
+$px-handle-gray6 : var(--px-handle-stroke-color, $gray6);
+$px-handle-gray7 : var(--px-handle-hover-background-color, $gray7);
+$px-handle-white : var(--px-handle-background-color, $white);
+$px-handle-black : var(--px-handle-shadow-color, $black);
+
 
 // Component
 :host {
@@ -50,28 +57,28 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
 #handleTarget {
   height: $inuit-base-spacing-unit--large;
   width: $inuit-base-spacing-unit--large;
-  border: 1px solid $gray5;
+  border: 1px solid $px-handle-gray5;
   border-radius: 3px;
   box-shadow: 0 1px 1px rgba($black, .15);
-  background-color: $white;
-  fill: $gray5;
+  background-color: $px-handle-white;
+  fill: $px-handle-gray5;
   cursor: pointer;
 
   .handleLines{
-    stroke:$gray5;
+    stroke:$px-handle-gray5;
     fill:none;
     stroke-miterlimit:10;
   }
   #handleDropShadow{
     opacity:0.15;
     mix-blend-mode:multiply;
-    stroke:$black;
-    fill:$black;
+    stroke:$px-handle-black;
+    fill:$px-handle-black;
     stroke-miterlimit:10;
   }
   #handleBody{
-    fill:$white;
-    stroke:$gray5;
+    fill:$px-handle-white;
+    stroke:$px-handle-gray5;
     stroke-miterlimit:10;
   }
 
@@ -80,47 +87,47 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
     outline: 0;
   }
   &:hover {
-    border-color: $gray6;
-    background-color: $gray5;
+    border-color: $px-handle-gray6;
+    background-color: $px-handle-gray5;
     svg {
-      stroke: $gray6;
+      stroke: $px-handle-gray6;
     }
     .handleLines{
-      stroke:$gray6;
+      stroke:$px-handle-gray6;
     }
     #handleBody{
-      fill: $gray5;
-      stroke: $gray6;
+      fill: $px-handle-gray5;
+      stroke: $px-handle-gray6;
     }
   }
   &.tracking {
-    border-color: $gray7;
-    background-color: $gray6;
+    border-color: $px-handle-gray7;
+    background-color: $px-handle-gray6;
     box-shadow: none;
     svg {
-      stroke: $gray7;
+      stroke: $px-handle-gray7;
     }
     .handleLines{
-      stroke:$gray7;
+      stroke:$px-handle-gray7;
     }
     #handleBody{
-      fill:$gray6;
-      stroke:$gray7;
+      fill:$px-handle-gray6;
+      stroke:$px-handle-gray7;
     }
   }
   &.disabled {
-    border-color: $gray4;
-    background-color: $white;
+    border-color: $px-handle-gray4;
+    background-color: $px-handle-white;
     box-shadow: none;
     svg {
-      stroke: $gray4;
+      stroke: $px-handle-gray4;
     }
     .handleLines{
-      stroke:$gray4;
+      stroke:$px-handle-gray4;
     }
     #handleBody{
-      fill:$white;
-      stroke:$gray4;
+      fill:$px-handle-white;
+      stroke:$px-handle-gray4;
     }
   }
 }
