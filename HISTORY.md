@@ -1,4 +1,4 @@
-v0.6.4
+v0.6.5
 =================
 * added style variables for theming
 
