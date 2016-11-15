@@ -1,3 +1,8 @@
+
+v0.7.1
+==================
+* bower updating px-demo-snippet
+
 v0.7.0
 =================
 * fixed display issue with multi-handle
