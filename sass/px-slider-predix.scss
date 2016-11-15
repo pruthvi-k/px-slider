@@ -30,6 +30,6 @@ common/abstract rules go in px-slider-sketch.scss, not in this file.
 }
 
 .slider__selected {
-  border-color: var(--px-slider-selected-border-color, $select-blue-pressed);
-  background-color: var(--px-slider-selected-background-color, $select-blue-default);
+  border-color: var(--px-slider-border-color--selected, $select-blue-pressed);
+  background-color: var(--px-slider-background-color--selected, $select-blue-default);
 }

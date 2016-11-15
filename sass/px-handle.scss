@@ -29,10 +29,10 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
 @import "px-colors-design/_settings.colors.scss";
 @import "px-defaults-design/_settings.defaults.scss";
 
-$px-handle-gray4 : var(--px-handle-disabled-border-color, $gray4);
+$px-handle-gray4 : var(--px-handle-border-color--disabled, $gray4);
 $px-handle-gray5 : var(--px-handle-border-color, $gray5);
 $px-handle-gray6 : var(--px-handle-stroke-color, $gray6);
-$px-handle-gray7 : var(--px-handle-hover-background-color, $gray7);
+$px-handle-gray7 : var(--px-handle-background-color--hover, $gray7);
 $px-handle-white : var(--px-handle-background-color, $white);
 $px-handle-black : var(--px-handle-shadow-color, $black);
 
