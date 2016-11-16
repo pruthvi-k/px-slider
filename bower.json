@@ -1,13 +1,13 @@
 {
     "name": "px-slider",
-    "version": "0.7.2",
+    "version": "0.7.3",
     "main": [
         "px-slider.html"
     ],
     "ignore": [
         ".*",
         "npm-debug.log",
-        "Gruntfile.js",
+        "gulpfile.js",
         "sass",
         "bower_components",
         "node_modules",
