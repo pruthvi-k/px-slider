@@ -44,7 +44,7 @@ Custom property | Description | Default
 <dom-module id="px-slider">
   <template>
     <style include="px-slider-styles"></style>
-    
+
     <div class="flex">
       <input id="inputStart" type="text" class="text-input visuallyhidden" value="{{value}}" on-change="_handleStartChange" tabindex="0" disabled="{{disabled}}"/>
       <div id="sliderContainer" class="slider flex__item" on-click="_jumpToValue">
@@ -144,6 +144,14 @@ Custom property | Description | Default
         type: Boolean,
         value: false,
         observer: '_hideInputsChanged'
+      },
+      /**
+       * The scale by which the slider operates - currently supports "linear" or "logarithmic."
+       */
+      scale: {
+        type: String,
+        value: "linear",
+        observer: '_scaleChanged'
       }
     },
 
@@ -160,8 +168,13 @@ Custom property | Description | Default
         throw "Missing a maximum value (max).";
       }
 
+      if(this.min === 0 && this.scale === "logarithmic") {
+        console.warn("Min of 0 is invalid for logarithmic. Assigning 1 instead.");
+        this.min = 1;
+      }
+
       if(this.min > this.max){
-        console.warn("Min and Max look reversed. Switching them")
+        console.warn("Min and Max look reversed. Switching them.")
         var min = this.min;
         this.min = this.max;
         this.max = min;
@@ -289,7 +302,7 @@ Custom property | Description | Default
               // For the sake of ranges, we keep start value and value in sync
               this.startValue = clean;
               this.value = clean;
-            }, 1);
+            }, 10);
         }
 
     },
@@ -318,7 +331,7 @@ Custom property | Description | Default
 
           // Update endValue with the cleaned value
           this.endValue = clean;
-        }, 1);
+        }, 10);
       }
     },
 
@@ -340,6 +353,11 @@ Custom property | Description | Default
       if (this.min % this.step !== 0) {
         console.warn("WARNING: min value does not match step size.");
         this.min = this.min - (this.min % this.step);
+      }
+
+      if(newValue === "0" && this.scale.toLowerCase() === "logarithmic") {
+        console.warn("Min of 0 is invalid for logarithmic. Assigning 1 instead.");
+        this.min = 1;
       }
 
       // Since we are changing the min, let's go ahead and recheck the start value
@@ -401,6 +419,30 @@ Custom property | Description | Default
       this.max = this._checkStep(this.max);
       if (this._range) {
         this.endValue = this._checkStep(this.endValue);
+      }
+    },
+    /**
+     * Function called when the scale changes
+     * --Ensures the value is valid, matches step size, etc
+     * --Moves single or start handle into position
+     * @method _scaleChanged
+     * @param newValue
+     * @param oldValue
+     */
+    _scaleChanged: function(newValue, oldValue) {
+      if(this.min === 0 && newValue.toLowerCase() === "logarithmic") {
+        console.warn("Min of 0 is invalid for logarithmic. Assigning 1 instead.");
+        this.min = 1;
+      }
+
+      this.value = this._cleanValue(this.value);
+
+      if(this._range) {
+        this._updateHandle(this.$.startHandle, this.value);
+        this._updateHandle(this.$.endHandle, this.endValue);
+      }
+      else {
+        this._updateHandle(this.$.singleHandle, this.value);
       }
     },
     /**
@@ -471,7 +513,14 @@ Custom property | Description | Default
       var cW = this.offsetForHandleWidth;
 
       // What is the ratio of the value to the range?
-      var ratio = (myvalue - this.min) / (this.max - this.min);
+      if(this.scale.toLowerCase() === "logarithmic") {
+        var lMin = Math.log(this.min),
+            lMax = Math.log(this.max),
+            ratio = (Math.log(myvalue) - lMin) / (lMax - lMin);
+      }
+      else { // Scale *should be* linear
+        var ratio = (myvalue - this.min) / (this.max - this.min);
+      }
 
       // Multiple by the width of the container
       return ratio * cW;
@@ -510,7 +559,14 @@ Custom property | Description | Default
       var ratio = mypos / cW;
 
       // Convert to value; have to account min values other than 0
-      var value = ratio * (this.max - this.min) + this.min;
+      if(this.scale.toLowerCase() === "logarithmic") {
+        var lMin = Math.log(this.min),
+            lMax = Math.log(this.max),
+            value = Math.exp(ratio * (lMax - lMin) + lMin);
+      }
+      else { // Scale *should be* linear
+        var value = ratio * (this.max - this.min) + this.min;
+      }
 
       return this._cleanValue(value);
     },
@@ -628,8 +684,7 @@ Custom property | Description | Default
               newValue = this.endValue;
             }
             this.value = newValue;
-          }, 1
-        );
+          }, 10);
       }
     },
 
@@ -660,7 +715,7 @@ Custom property | Description | Default
             } else {
               this.value = newValue;
             }
-          }, 1 );
+          }, 10);
       }
     },
 
@@ -723,8 +778,7 @@ Custom property | Description | Default
                 this.value = newValue;
               }
             }
-          }, 1
-        );
+          }, 1);
       }
     },
     /**
