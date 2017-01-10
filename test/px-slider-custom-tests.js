@@ -8,9 +8,11 @@ function runCustomTests() {
     test('Check assigned value of simple px-slider', function(done){
       var sliderEl = Polymer.dom(document).querySelector('#px_slider_simple'),
           sliderValue = sliderEl.value,
-          displayValue = Polymer.dom(sliderEl.root).querySelector('#inputStart').value;
+          displayValue = Polymer.dom(sliderEl.root).querySelector('#inputStart').value,
+          sliderScale = sliderEl.scale;
       assert.equal(sliderValue, '10');
       assert.equal(displayValue, '10');
+      assert.equal(sliderScale, 'linear');
       done();
     });
   });
@@ -18,9 +20,11 @@ function runCustomTests() {
     test('Check assigned value of complex px-slider', function(done){
       var sliderEl = Polymer.dom(document).querySelector('#px_slider_complex'),
           sliderValue = sliderEl.value,
-          displayValue = Polymer.dom(sliderEl.root).querySelector('#inputStart').value;
+          displayValue = Polymer.dom(sliderEl.root).querySelector('#inputStart').value,
+          sliderScale = sliderEl.scale;
       assert.equal(sliderValue, '10.00');
       assert.equal(displayValue, '10.00');
+      assert.equal(sliderScale, 'linear');
       done();
     });
   });
@@ -63,6 +67,18 @@ function runCustomTests() {
       assert.equal(displayStartValue, '-30');
       assert.equal(sliderEndValue, '20');
       assert.equal(displayEndValue, '20');
+      done();
+    });
+  });
+  suite('Custom Automation Tests for a logarithmic px-slider', function() {
+    test('Check assigned values of log px-slider', function(done){
+      var sliderEl = Polymer.dom(document).querySelector('#px_slider_logarithmic'),
+          sliderValue = sliderEl.value,
+          sliderScale = sliderEl.scale,
+          displayValue = Polymer.dom(sliderEl.root).querySelector('#inputStart').value;
+      assert.equal(sliderValue, '10');
+      assert.equal(displayValue, '10');
+      assert.equal(sliderScale, 'logarithmic');
       done();
     });
   });

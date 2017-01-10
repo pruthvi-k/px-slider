@@ -17,6 +17,7 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon"/>
   <link rel="import" href="../px-demo-snippet/px-demo-snippet.html">
   <link rel="import" href="../px-polymer-font-awesome/polymer-font-awesome.html" />
+  <link rel="import" href="../px-dropdown/px-dropdown.html" />
   <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
   </head>
 
@@ -67,6 +68,13 @@
                 <div class="u-mb-">Step: <input id="step{{indexPlusOne(index)}}" class="text-input" type="numeric" placeholder="0" value="{{item.step::input}}" /></div>
                 <div class="u-mb-">Start Value: <input id="startValue{{indexPlusOne(index)}}" class="text-input" type="numeric" placeholder="0" value="{{item.startValue::input}}" /></div>
                 <div class="u-mb-">End Value: <input id="endValue{{indexPlusOne(index)}}" class="text-input" type="numeric" placeholder="0" value="{{item.endValue::input}}" /></div>
+                <div class="flex">Scale:</div>
+                <div class="flex u-mb-">
+                  <px-dropdown id="scale{{indexPlusOne(index)}}" style="width:100%;" value="{{item.scale}}" display-value="{{item.scale}}">
+                    <px-dropdown-content items='[{"key":"one","val":"linear"},{"key":"two","val":"logarithmic"}]'>
+                  </px-dropdown-content>
+                  </px-dropdown>
+                </div>
                 <div class="flex u-mb-">
                   <input id="disabled{{indexPlusOne(index)}}" class="toggle__input toggle__input--small" type="checkbox" checked="{{item.disabled::change}}">
                   <label for$="disabled{{indexPlusOne(index)}}" class="toggle__label toggle__label--small"></label>
@@ -94,7 +102,8 @@
                         start-value="{{item.startValue}}"
                         end-value="{{item.endValue}}"
                         disabled="{{item.disabled}}"
-                        hide-inputs="{{item.hideInputs}}">
+                        hide-inputs="{{item.hideInputs}}"
+                        scale="{{item.scale}}">
                       </px-slider>
                     </div>
 
@@ -152,7 +161,8 @@ window.addEventListener('WebComponentsReady', function() {
           "startValue":"",
           "endValue":"",
           "disabled":false,
-          "hideInputs":false
+          "hideInputs":false,
+          "scale":"linear"
         },
         {
           "value":20,
@@ -162,7 +172,19 @@ window.addEventListener('WebComponentsReady', function() {
           "startValue":20,
           "endValue":80,
           "disabled":false,
-          "hideInputs":false
+          "hideInputs":false,
+          "scale":"linear"
+        },
+        {
+          "value":10,
+          "min":1,
+          "max":1000,
+          "step":1,
+          "startValue":"",
+          "endValue":"",
+          "disabled":false,
+          "hideInputs":false,
+          "scale":"logarithmic"
         }
       ],
       indexPlusOne = function(num) {
