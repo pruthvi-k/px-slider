@@ -44,7 +44,9 @@ $inuit-enable-validation-states : true;
 }
 
 .text-input {
+  width: calculateRem(65px);
   margin-top: 11px;
+  text-align: center; 
 }
 
 #inputStart {
