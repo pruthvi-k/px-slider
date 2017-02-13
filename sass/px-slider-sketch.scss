@@ -17,7 +17,7 @@
 /*
 THIS FILE SHOULD CONTAIN ONLY ABSTRACT/'SKETCH' THEME RULES, NOT SPECIFIC TO PREDIX BRANDING
 Predix branding rules go in px-slider-predix.scss, not in this file.
-*/ 
+*/
 
 // Generic
 @import "px-normalize-design/_generic.normalize.scss";
@@ -27,48 +27,73 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
 // Base
 @import "px-flexbox-design/_base.flexbox.scss";
 @import "px-viewport-design/_base.viewport.scss";
+
+$inuit-enable-input--tiny : true;
+$inuit-enable-validation-states : true;
 @import "px-forms-design/_base.forms.scss";
 
 // Component
 
-:host {
-  user-select: none;
-  cursor: default;
-  -webkit-tap-highlight-color: transparent;
+.wrapper {
+    width: 100%;
+    height: 100%;
 }
 
-:host(:focus) {
-  outline: none;
-}
-
-.slider {
-  margin: $inuit-base-spacing-unit--small $inuit-base-spacing-unit--tiny;
-  position: relative;
-  height: $inuit-base-spacing-unit--small;
-  border: 1px solid;
-  border-radius: 2px;
-}
-
-.slider__selected {
-  position: absolute;
-  top: -1px;
-  left: 0;
-  height: $inuit-base-spacing-unit--small;
-  border-width: 1px 0 1px 1px;
-  border-style: solid;
-  border-radius: 2px 0 0 2px;
-}
-
-.slider__multi {
-  margin: $inuit-base-spacing-unit--small $inuit-base-spacing-unit--small*1.5;
-
-  .slider__selected{
-    border-radius: 2px 2px 2px 2px;
-    border-width: 1px 1px 1px 1px;
-  }
+.flex__item--no-grow {
+    flex: 0 1 auto;
 }
 
 .text-input {
-  width: calculateRem(65px);
+  margin-top: 11px;
 }
-#sliderContainer {cursor:pointer;}
+
+#inputStart {
+  margin-right: 5px;
+}
+
+#inputEnd {
+  margin-left: 5px;
+}
+
+//
+// :host {
+//   user-select: none;
+//   cursor: default;
+//   -webkit-tap-highlight-color: transparent;
+// }
+//
+// :host(:focus) {
+//   outline: none;
+// }
+//
+// .slider {
+//   margin: $inuit-base-spacing-unit--small $inuit-base-spacing-unit--tiny;
+//   position: relative;
+//   height: $inuit-base-spacing-unit--small;
+//   border: 1px solid;
+//   border-radius: 2px;
+// }
+//
+// .slider__selected {
+//   position: absolute;
+//   top: -1px;
+//   left: 0;
+//   height: $inuit-base-spacing-unit--small;
+//   border-width: 1px 0 1px 1px;
+//   border-style: solid;
+//   border-radius: 2px 0 0 2px;
+// }
+//
+// .slider__multi {
+//   margin: $inuit-base-spacing-unit--small $inuit-base-spacing-unit--small*1.5;
+//
+//   .slider__selected{
+//     border-radius: 2px 2px 2px 2px;
+//     border-width: 1px 1px 1px 1px;
+//   }
+// }
+//
+// .text-input {
+//   width: calculateRem(65px);
+// }
+// #sliderContainer {cursor:pointer;}

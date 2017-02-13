@@ -37,82 +37,46 @@ $px-handle-white : var(--px-handle-background-color, $white);
 $px-handle-black : var(--px-handle-shadow-color, $black);
 
 
-// Component
-:host {
-  position: absolute;
-  top: -#{calculateRem(6px)};
-  display: inline-block;
-}
+// // Component
 
-:host(.start) {
-  top: $inuit-base-spacing-unit--large*0.05;
-  margin-left:$inuit-base-spacing-unit--large*-0.53;
-  transform: rotate(180deg);
-}
-:host(.end) {
-  top: -$inuit-base-spacing-unit--large;
-  margin-left:$inuit-base-spacing-unit--large*-0.48;
-}
-
-#handleTarget {
-  height: $inuit-base-spacing-unit--large;
-  width: $inuit-base-spacing-unit--large;
-  border: 1px solid $px-handle-gray5;
-  border-radius: 3px;
-  box-shadow: 0 1px 1px rgba($black, .15);
-  background-color: $px-handle-white;
-  fill: $px-handle-gray5;
+.handleGroup {
   cursor: pointer;
+
+  .handleDropShadow {
+    opacity: 0.15;
+    stroke:$px-handle-black;
+    fill:$px-handle-black;
+    stroke-miterlimit:10;
+  }
+
+  .handleBody{
+    fill:$px-handle-white;
+    stroke:$px-handle-gray5;
+    stroke-miterlimit:10;
+  }
 
   .handleLines{
     stroke:$px-handle-gray5;
     fill:none;
     stroke-miterlimit:10;
   }
-  #handleDropShadow{
-    opacity:0.15;
-    stroke:$px-handle-black;
-    fill:$px-handle-black;
-    stroke-miterlimit:10;
-  }
-  #handleBody{
-    fill:$px-handle-white;
-    stroke:$px-handle-gray5;
-    stroke-miterlimit:10;
-  }
 
-
-  &:focus {
-    outline: 0;
+  .handleLinesHover {
+    stroke:$px-handle-gray6;
   }
-  &:hover {
-    border-color: $px-handle-gray6;
-    background-color: var(--px-handle-background-color--hover, $gray5);;
-    svg {
-      stroke: $px-handle-gray6;
-    }
-    .handleLines{
-      stroke:$px-handle-gray6;
-    }
-    #handleBody{
-      fill: $px-handle-gray5;
-      stroke: $px-handle-gray6;
-    }
+  .handleBodyHover {
+    fill: $px-handle-gray5;
+    stroke: $px-handle-gray6;
   }
-  &.tracking {
-    border-color: $px-handle-gray7;
-    background-color: $px-handle-gray6;
-    box-shadow: none;
-    svg {
-      stroke: $px-handle-gray7;
-    }
-    .handleLines{
-      stroke:$px-handle-gray7;
-    }
-    #handleBody{
-      fill:$px-handle-gray6;
-      stroke:$px-handle-gray7;
-    }
+  .handleLinesPressed {
+    stroke:$px-handle-gray7;
+  }
+  .handleBodyPressed {
+    fill:$px-handle-gray6;
+    stroke:$px-handle-gray7;
+  }
+  .handleDropShadowPressed {
+    opacity: 0;
   }
   &.disabled {
     border-color: $px-handle-gray4;
@@ -124,7 +88,7 @@ $px-handle-black : var(--px-handle-shadow-color, $black);
     .handleLines{
       stroke:$px-handle-gray4;
     }
-    #handleBody{
+    .handleBody{
       fill:$px-handle-white;
       stroke:$px-handle-gray4;
     }
