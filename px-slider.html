@@ -78,7 +78,7 @@ Custom property | Description | Default
         </g>
         <g id="zoneBars"></g>
         <g id="progressBar">
-          <rect class="progressBar sliderTrack" x$="[[_calcProgressStart(value, _scaleChanged, _isRange)]]" y="0" rx="2" ry="2" width$="[[_calcProgressEnd(value, endValue, _scaleChanged, _isRange)]]" height="10"/>
+          <rect class="progressBar sliderTrack" x$="[[_calcProgressStart(value, _scaleChanged, isRange)]]" y="0" rx="2" ry="2" width$="[[_calcProgressEnd(value, endValue, _scaleChanged, isRange)]]" height="10"/>
         </g>
 
         <g id="handleStart" class="handleGroup">
@@ -229,8 +229,7 @@ Custom property | Description | Default
        */
       hideInputs: {
         type: Boolean,
-        value: false,
-        observer: '_hideInputsChanged'
+        value: false
       },
       /**
        * A boolean specifying if the first input box should be shown
@@ -250,7 +249,7 @@ Custom property | Description | Default
       /**
        * Boolean specifying if we are dealing with a single number or a range
        */
-      _isRange: {
+      isRange: {
         type: Boolean,
         value: false
       },
@@ -289,7 +288,7 @@ Custom property | Description | Default
       },
 
       /**
-       * Holder for the scale function
+       * Holder object for the three scale functions
        */
       _scale: {
         type: Object
@@ -351,8 +350,8 @@ Custom property | Description | Default
       '_endValueChanged(endValue, _scale, _scaleChanged)',
       '_updateFormat(step)',
       '_updateFormat(format)',
-      '_buildHandles(_isRange)',
-      '_checkRange(endValue)'
+      '_buildHandles(isRange)',
+      '_hideInputsChanged(isRange, hideInputs)'
     ],
 
     listeners: {
@@ -361,7 +360,6 @@ Custom property | Description | Default
 
     ready: function() {
       window.requestAnimationFrame(this._animationFrame.bind(this));
-      this._checkRange();
     },
 
     /**
@@ -388,12 +386,22 @@ Custom property | Description | Default
       // setup listeners on the bars to enable click to jump value
       var self = this;
       var interactionRects = Px.d3.selectAll(Polymer.dom(this.$$('#sliderSVG')).querySelectorAll('.sliderTrack'));
+
       interactionRects.on('click', function() {
         var val = d3.mouse(this)[0];
         // TODO vertical: [1]
 
-        if(this._isRange) {
+        if(self.isRange) {
           //check to see which is closer
+          var scaled = self._scale.invert(val),
+              half = (self.endValue - self.value) / 2 + self.value;
+
+          if(scaled > self.endValue || scaled > half) {
+            self._calcSliderValue(val, 'endValue');
+          } else {
+            self._calcSliderValue(val, 'value');
+          }
+
         } else {
           self._calcSliderValue(val, 'value');
         }
@@ -443,7 +451,7 @@ Custom property | Description | Default
      */
     _buildHandles: function() {
       if(this._handleDefinitions) {
-        if(this._isRange) {
+        if(this.isRange) {
 
           this._startHandle.select('.handleDropShadow')
             .attr("d", this._handleDefinitions.up.shadowD);
@@ -515,7 +523,7 @@ Custom property | Description | Default
         this.set('_showEndInput', false);
       } else {
         this.set('_showStartInput', true);
-        this.set('_showEndInput', this._isRange);
+        this.set('_showEndInput', this.isRange);
       }
 
       this.notifyResize();
@@ -532,15 +540,6 @@ Custom property | Description | Default
      */
     _getSvgHeight: function() {
       return this._height + this._margin.top + this._margin.bottom
-    },
-
-
-    _checkRange: function() {
-      if(this.endValue || this.endValue === 0) {
-        this.set('_isRange', true);
-      } else {
-        this.set('_isRange', false);
-      }
     },
 
     /**
@@ -643,12 +642,14 @@ Custom property | Description | Default
     },
 
     _setDomainDebounced: function() {
-      if(this._isRange) {
-        // two scales
-        // one for start one for end
-        this._scale.domain([this.min, this.max]);
-      } else {
-        this._scale.domain([this.min, this.max]);
+      this._scale.domain([this.min, this.max]);
+
+      if(this.isRange) {
+        this._startScale = this._scale.copy();
+        this._endScale = this._scale.copy();
+
+        this._startScale.domain([this.min, this.endValue]);
+        this._endScale.domain([this.value, this.max]);
       }
 
       // force a recalc
@@ -702,14 +703,14 @@ Custom property | Description | Default
     },
 
     _calcProgressStart: function() {
-      if(this._isRange) {
+      if(this.isRange) {
         return this._scale(this.value);
       }
       return 0;
     },
 
     _calcProgressEnd: function() {
-      if(this._isRange) {
+      if(this.isRange) {
         return Math.max(this._scale(this.endValue) - this._scale(this.value), 1);
       }
 

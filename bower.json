@@ -22,7 +22,7 @@
     "px-theme": "^2.0.1",
     "px-vis": "^1.0.0",
     "iron-resizable-behavior": "~v1.0.3",
-    "px-number-formatter": "^2.0.0"
+    "px-number-formatter": "^3.0.0"
   },
   "devDependencies": {
     "px-starter-kit-design": "^0.7.0",
