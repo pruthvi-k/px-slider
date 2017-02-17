@@ -5,10 +5,6 @@
 <link rel="import" href="../px-number-formatter/px-number-formatter-no-display.html" />
 <link rel="import" href="../iron-a11y-keys/iron-a11y-keys.html" />
 
-<link rel="import" href="px-handle.html" />
-<link rel="import" href="px-handle-multi.html" />
-
-
 <!--
 Allow the user to select a value or range of values within a specified min and max.
 
@@ -213,16 +209,14 @@ Custom property | Description | Default
        */
       min: {
         type: Number,
-        value: 1,
-        observer: '_minOrMaxChanged'
+        value: 1
       },
       /**
        * A max value for the slider. The user cannot choose greater than the max.
        */
       max: {
         type: Number,
-        value: 100,
-        observer: '_minOrMaxChanged'
+        value: 100
       },
       /**
        * A trigger that is greater than 0 if the min and max are valid
@@ -246,7 +240,8 @@ Custom property | Description | Default
        */
       disabled: {
         type: Boolean,
-        value: false
+        value: false,
+        observer: '_setupListeners'
       },
 
       /**
@@ -380,14 +375,15 @@ Custom property | Description | Default
     },
 
     observers: [
+      '_minOrMaxChanged(min, max)',
       '_setRange(_scale, _width, _height)',
       '_setDomain(_scale, _minMaxValid)',
       '_valueChanged(value, _scale, _scaleChanged)',
       '_endValueChanged(endValue, _scale, _scaleChanged)',
       '_updateFormat(step)',
       '_updateFormat(format)',
-      '_buildHandles(isRange)',
-      '_hideInputsChanged(isRange, hideInputs)'
+      '_isRangeChanged(isRange)',
+      '_hideInputsChanged(hideInputs)'
     ],
 
     listeners: {
@@ -408,10 +404,6 @@ Custom property | Description | Default
       var startHandle = Px.d3.select(this.$$('#handleStart'));
       var endHandle = Px.d3.select(this.$$('#handleEnd'));
 
-      // create our drag and hover,etc  states
-      this._createHandleListeners(startHandle, 'value');
-      this._createHandleListeners(endHandle, 'endValue');
-
       // save the d3 selected handles
       this.set('_startHandle', startHandle);
       this.set('_endHandle', endHandle);
@@ -419,29 +411,27 @@ Custom property | Description | Default
       // configure our handle paths
       this._buildHandles();
 
-      // setup listeners on the bars to enable click to jump value
-      var self = this;
-      var interactionRects = Px.d3.selectAll(Polymer.dom(this.$$('#sliderSVG')).querySelectorAll('.sliderTrack'));
+      this._setupListeners();
+    },
 
-      interactionRects.on('click', function() {
-        var val = d3.mouse(this)[0];
-        // TODO vertical: [1]
-
-        if(self.isRange) {
-          //check to see which is closer
-          var scaled = self._scale.invert(val),
-              half = (self.endValue - self.value) / 2 + self.value;
-
-          if(scaled > self.endValue || scaled > half) {
-            self._calcSliderValue(val, 'endValue');
-          } else {
-            self._calcSliderValue(val, 'value');
-          }
+    _setupListeners: function() {
+      if(this._startHandle && this._endHandle) {
+        if(this.disabled) {
+          this._removeHandleListeners();
+          this._removeTrackListeners();
 
         } else {
-          self._calcSliderValue(val, 'value');
+          // create our drag and hover,etc  states
+          this._createHandleListeners(this._startHandle, 'value');
+          this._createHandleListeners(this._endHandle, 'endValue');
+
+          // setup click listeners on the track and bars
+          this._createTrackListeners();
         }
-      });
+
+        // add or remove disabled class
+        this._toggleDisabledClass();
+      }
     },
 
     /**
@@ -479,6 +469,43 @@ Custom property | Description | Default
       });
     },
 
+    _createTrackListeners: function() {
+      // setup listeners on the bars to enable click to jump value
+      var self = this;
+      var interactionRects = Px.d3.selectAll(Polymer.dom(this.$$('#sliderSVG')).querySelectorAll('.sliderTrack'));
+
+      interactionRects.on('click', function() {
+        var val = d3.mouse(this)[0];
+        // TODO vertical: [1]
+
+        if(self.isRange) {
+          //check to see which is closer
+          var scaled = self._scale.invert(val),
+              half = (self.endValue - self.value) / 2 + self.value;
+
+          if(scaled > self.endValue || scaled > half) {
+            self._calcSliderValue(val, 'endValue');
+          } else {
+            self._calcSliderValue(val, 'value');
+          }
+
+        } else {
+          self._calcSliderValue(val, 'value');
+        }
+      });
+    },
+
+    _removeHandleListeners: function() {
+      this._startHandle.on(".drag", null);
+      this._endHandle.on(".drag", null);
+    },
+
+    _removeTrackListeners: function() {
+      var interactionRects = Px.d3.selectAll(Polymer.dom(this.$$('#sliderSVG')).querySelectorAll('.sliderTrack'));
+
+      interactionRects.on('click', null );
+    },
+
     /**
      * For flexibility and efficiency, the basic paths and lines are already loaded into the dom.
      * We just need to actually add paths, etc so they are not invisible, which is what this function does.
@@ -486,7 +513,7 @@ Custom property | Description | Default
      * when in single mode and just morph the drawing of the single handle when in range mode.
      */
     _buildHandles: function() {
-      if(this._handleDefinitions) {
+      if(this._handleDefinitions && this._startHandle && this._endHandle) {
         if(this.isRange) {
 
           this._startHandle.select('.handleDropShadow')
@@ -607,28 +634,29 @@ Custom property | Description | Default
      * Validates the the min and max values are valid values
      */
     _minOrMaxChanged: function() {
-      this.debounce('_minOrMaxChanged', function() {
+      // this.debounce('_minOrMaxChanged', function() {
         var min, max;
         //check that min is less than max
         if(this.min === this.max) {
-          this.set('minMaxValid', 0);
+          this.set('_minMaxValid', 0);
           console.warn("Improper configuration: min and max are the same. Increasing max by step size.")
           this.set('max', this.min + this.step);
           return;
         }
 
         if(this.min > this.max) {
-          this.set('minMaxValid', 0);
+          this.set('_minMaxValid', 0);
           console.warn("Improper configuration: min and max are reversed. Swapping them.")
           var temp = this.min;
           this.set('min', this.max);
           this.set('max', temp);
           return;
         }
-
+console.log('min: ' + this.min)
+console.log('max: ' + this.max)
         // validation passes; set domain
         this.set('_minMaxValid', this._minMaxValid + 1);
-      }, 10);
+      // }, 10);
     },
 
     _createScale: function() {
@@ -648,7 +676,7 @@ Custom property | Description | Default
       }
 
       // TODO Quantize etc
-
+console.log("scale")
       this.set('_scale', scale);
     },
 
@@ -686,7 +714,7 @@ Custom property | Description | Default
 
     _setDomainDebounced: function() {
       this._scale.domain([this.min, this.max]);
-
+console.log("domain: " + [this.min, this.max]);
       // force a recalc
       this._scaleChanged = !this._scaleChanged;
     },
@@ -714,7 +742,7 @@ Custom property | Description | Default
 
     _calcStepRounded: function(value) {
       var s = Math.round(value/this.step) * this.step;
-      // TODO if range, then min and max change
+
       // make sure it isnt rounding out of our range; might only do so by one step:
       s = s < this.min ? s + this.step : s;
       s = s > this.max ? s - this.step : s;
@@ -843,6 +871,32 @@ Custom property | Description | Default
       input.blur();
       input.value = formattedVal;
       this.toggleClass('validation-error', false, input);
+    },
+
+    _checkEndValue: function() {
+      var v = this._calcStepRounded(this.endValue);
+      if(v >= this.value && v <= this.max) {
+        this.set('endValue', v);
+      } else {
+        var m = this._calcStepRounded(this.max);
+        this.set('endValue', m);
+      }
+    },
+
+    _isRangeChanged: function() {
+      // make sure the endValue is valid
+      this._checkEndValue();
+
+      // check if we need to change inputs shown
+      this._hideInputsChanged();
+
+      // rebuild the handles
+      this._buildHandles()
+    },
+
+    _toggleDisabledClass: function() {
+      this._startHandle.classed('disabled', this.disabled);
+      this._endHandle.classed('disabled', this.disabled);
     }
 
   });
