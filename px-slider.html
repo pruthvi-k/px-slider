@@ -3,6 +3,7 @@
 <link rel="import" href="../px-vis/px-vis-behavior-d3.html" />
 <link rel="import" href="../px-number-formatter/px-number-formatter-behavior.html" />
 <link rel="import" href="../px-number-formatter/px-number-formatter-no-display.html" />
+<link rel="import" href="../iron-a11y-keys/iron-a11y-keys.html" />
 
 <link rel="import" href="px-handle.html" />
 <link rel="import" href="px-handle-multi.html" />
@@ -53,7 +54,8 @@ Custom property | Description | Default
         value="[[formattedStartValue]]"
         on-change="_inputChangedStart"
         tabindex="0"
-        disabled="{{disabled}}"/>
+        disabled="{{disabled}}"
+      />
     </template>
     <px-number-formatter-no-display
       id="formatterStart"
@@ -64,6 +66,12 @@ Custom property | Description | Default
       culture="[[culture]]"
       zero-format="[[zeroFormat]]">
     </px-number-formatter-no-display>
+    <iron-a11y-keys
+      id="a11yStart"
+      target="[[_inputStart]]"
+      keys="esc"
+      on-keys-pressed="_restoreStartInputValue">
+    </iron-a11y-keys>
 
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -72,7 +80,7 @@ Custom property | Description | Default
       overflow="hidden"
       width$="[[_getSvgWith(_width, _margin.*)]]"
       height$="[[_getSvgHeight(_height, _margin.*)]]">
-      <g id="slider" transform$="[[_calcTransform(_margin.*)]]">
+      <g id="sliderContainer" transform$="[[_calcTransform(_margin.*)]]">
         <g id="backgroundTrack">
           <rect class="backgroundTrack sliderTrack" x="0" y="0" rx="2" ry="2" width$="[[_width]]" height="10"/>
         </g>
@@ -82,9 +90,6 @@ Custom property | Description | Default
         </g>
 
         <g id="handleStart" class="handleGroup">
-          <!-- <rect class="handleDropShadow" width="21" height="21" x="-10.5" y="-4" rx="3" ry="3"/> -->
-          <!-- <rect class="handleBody" width="21" height="21" x="-10.5" y="-5" rx="3" ry="3"/> -->
-
           <path class="handleDropShadow"/>
           <path class="handleBody"/>
           <line class="handleLines" x1="-3.5" x2="-3.5"/>
@@ -104,8 +109,27 @@ Custom property | Description | Default
     <template is="dom-if" if="[[_showEndInput]]">
       <input id="inputEnd"
         type="text"
-        class="text-input input--tiny flex__item--no-grow" value="{{endValue}}" on-change="_handleEndChange" tabindex="0" disabled="{{disabled}}"/>
+        class="text-input input--tiny flex__item--no-grow"
+        value="[[formattedEndValue]]"
+        on-change="_inputChangedEnd"
+        tabindex="0"
+        disabled="{{disabled}}"/>
     </template>
+    <px-number-formatter-no-display
+      id="formatterEnd"
+      value="[[endValue]]"
+      formatted-value="{{formattedEndValue}}"
+      format="[[_format]]"
+      currency="[[currency]]"
+      culture="[[culture]]"
+      zero-format="[[zeroFormat]]">
+    </px-number-formatter-no-display>
+    <iron-a11y-keys
+      id="a11yEnd"
+      target="[[_inputEnd]]"
+      keys="esc"
+      on-keys-pressed="_restoreEndInputValue">
+    </iron-a11y-keys>
   </div>
   </template>
 </dom-module>
@@ -117,7 +141,8 @@ Custom property | Description | Default
 
     behaviors: [
       Polymer.IronResizableBehavior,
-      PxNumberFormatter.commonProperties
+      PxNumberFormatter.commonProperties,
+      Polymer.IronA11yKeysBehavior
     ],
 
     /**
@@ -266,13 +291,6 @@ Custom property | Description | Default
       },
 
       /**
-       * A trigger for changes in the scale range or domain
-       */
-      _scaleChanged: {
-        type: Boolean
-      },
-
-      /**
        * The base number for logarithmic scales
        */
       base: {
@@ -291,7 +309,14 @@ Custom property | Description | Default
        * Holder object for the three scale functions
        */
       _scale: {
-        type: Object
+        type: Function
+      },
+
+      /**
+       * A trigger for changes in the scale range or domain
+       */
+      _scaleChanged: {
+        type: Boolean
       },
 
       /**
@@ -307,6 +332,14 @@ Custom property | Description | Default
         type: Object
       },
 
+      _inputStart: {
+        type: HTMLElement
+      },
+
+      _inputEnd: {
+        type: HTMLElement
+      },
+
       /**
        * Calculated format used to format the input box strings
        */
@@ -315,6 +348,9 @@ Custom property | Description | Default
         value: "0"
       },
 
+      /**
+       * The definitions for the handle types
+       */
       _handleDefinitions: {
         type: Object,
         value: function() {
@@ -479,19 +515,27 @@ Custom property | Description | Default
             .attr("y2", this._handleDefinitions.square.linesY2);
 
           // remove end handle:
-          // this._endHandle.select('.handleDropShadow')
-          //   .attr("d", this._handleDefinitions.up.shadowD);
-          // this._endHandle.select('.handleBody')
-          //   .attr("d", this._handleDefinitions.up.bodyD);
-          // this._endHandle.selectAll('.handleLines')
-          //   .attr("y1", this._handleDefinitions.up.linesY1)
-          //   .attr("y2", this._handleDefinitions.up.linesY2);
+          this._endHandle.select('.handleDropShadow')
+            .attr("d", null);
+          this._endHandle.select('.handleBody')
+            .attr("d", null);
+          this._endHandle.selectAll('.handleLines')
+            .attr("y1", null)
+            .attr("y2", null);
         }
       }
     },
 
+    _assignInputElems: function() {
+      // make  sure those dom-ifs have run
+      Polymer.dom.flush();
+
+      this.set('_inputStart', this.$$('#inputStart'));
+      this.set('_inputEnd', this.$$('#inputEnd'));
+    },
+
     /**
-     * Resizes the slider
+     * Resizes the slider based on parent box size
      */
     _onIronResize: function() {
       if(this.preventResize) {
@@ -501,12 +545,10 @@ Custom property | Description | Default
         // TODO vertical version
         // check if type is vertical; if so set height, otherwise set width
         var wrapperRect = this.$.wrapper.getBoundingClientRect(),
-            startInput = this.$$('#inputStart'),
-            endInput = this.$$('#inputEnd'),
-            startInputSize = startInput ? startInput.getBoundingClientRect().width : 0,
-            startInputMargin = startInput ? Number(window.getComputedStyle(startInput).marginRight.split('px')[0]) : 0,
-            endInputSize = endInput ? endInput.getBoundingClientRect().width : 0,
-            endInputMargin = endInput ? Number(window.getComputedStyle(endInput).marginLeft.split('px')[0]) : 0,
+            startInputSize = this._inputStart ? this._inputStart.getBoundingClientRect().width : 0,
+            startInputMargin = this._inputStart ? Number(window.getComputedStyle(this._inputStart).marginRight.split('px')[0]) : 0,
+            endInputSize = this._inputEnd ? this._inputEnd.getBoundingClientRect().width : 0,
+            endInputMargin = this._inputEnd ? Number(window.getComputedStyle(this._inputEnd).marginLeft.split('px')[0]) : 0,
             w = wrapperRect.width - startInputSize - endInputSize - startInputMargin - endInputMargin - this._margin.left - this._margin.right;
 
         this.set('_width', Math.max(w, 0));
@@ -526,6 +568,7 @@ Custom property | Description | Default
         this.set('_showEndInput', this.isRange);
       }
 
+      this._assignInputElems();
       this.notifyResize();
     },
 
@@ -644,14 +687,6 @@ Custom property | Description | Default
     _setDomainDebounced: function() {
       this._scale.domain([this.min, this.max]);
 
-      if(this.isRange) {
-        this._startScale = this._scale.copy();
-        this._endScale = this._scale.copy();
-
-        this._startScale.domain([this.min, this.endValue]);
-        this._endScale.domain([this.value, this.max]);
-      }
-
       // force a recalc
       this._scaleChanged = !this._scaleChanged;
     },
@@ -665,10 +700,15 @@ Custom property | Description | Default
     _calcSliderValueDebounced: function(mouseVal, valueVar) {
       var val = this._scale.invert(mouseVal),
           stepped = this._calcStepRounded(val),
-          inputId = valueVar === 'value' ?  '#inputStart' : '#inputEnd';
+          inputElem = valueVar === 'value' ?  this._inputStart : this._inputEnd;
 
+      //validate that stepped is not greater than the other handle
+      if(this.isRange) {
+        stepped = (valueVar === 'value' && stepped > this.endValue) ? this.endValue : stepped;
+        stepped = (valueVar === 'endValue' && stepped < this.value) ? this.value : stepped;
+      }
 
-      this.toggleClass('validation-error', false, this.$$(inputId));
+      this.toggleClass('validation-error', false, inputElem);
       this.set(valueVar, stepped);
     },
 
@@ -738,47 +778,71 @@ Custom property | Description | Default
     },
 
     _inputChangedStart: function(evt) {
-      var text = this.$$('#inputStart').value;
+      var text = this._inputStart.value;
 
-      this._inputChanged(text, '#inputStart', '#formatterStart', 'value');
+      this._inputChanged(text, this._inputStart, '#formatterStart', 'value');
     },
 
     _inputChangedEnd: function(evt) {
-      var text = this.$$('#inputEnd').value;
+      var text = this._inputEnd.value;
 
-      this._inputChanged(text, '#inputEnd', '#formatterEnd', 'endValue');
+      this._inputChanged(text, this._inputEnd, '#formatterEnd', 'endValue');
     },
 
-    _inputChanged: function(text, inputId, formatterId, valueVar) {
+    _inputChanged: function(text, inputElem, formatterId, valueVar) {
       var formatter = this.$$(formatterId),
-          value;
+          newVal;
 
       formatter.set('unformat', text);
-      value = formatter.unformattedValue;
+      newVal = formatter.unformattedValue;
 
-      if(!value && value !== 0) {
+      if(!newVal && newVal !== 0) {
         // toggle Error state
-        this.toggleClass('validation-error', true, this.$$(inputId));
-        this.value = null;
+        this.toggleClass('validation-error', true, inputElem);
         return;
       }
 
-      // make sure our value is between our max and min
-      value = Math.max(value, this.min);
-      value = Math.min(value, this.max);
+      // make sure our newVal is between our max and min
+      newVal = Math.max(newVal, this.min);
+      newVal = Math.min(newVal, this.max);
 
       // make sure it matches our step
-      value = this._calcStepRounded(value);
+      newVal = this._calcStepRounded(newVal);
 
-      this.toggleClass('validation-error', false, this.$$(inputId));
+      // make sure it is not above/below the other value if range
+      if(this.isRange) {
+        if((valueVar === 'value' && newVal > this.endValue) ||
+           (valueVar === 'endValue' && newVal < this.value)) {
+
+          this.toggleClass('validation-error', true, inputElem);
+          return;
+        }
+      }
+
+      this.toggleClass('validation-error', false, inputElem);
       /*
         in the case that you have a valid number followed by junk, eg, '25kasdjjhasdj'
         the unformatter is smart enough to throw away the chars and just keep the number
         however, this number can be the same as what was already in the box and wont clear from the box
         so reset value to force a recalc to be safe
       */
-      this.value = null;
-      this.set(valueVar, value);
+      this[valueVar] = null;
+      this.set(valueVar, newVal);
+    },
+
+    _restoreStartInputValue: function(evt) {
+      this._restoreInputValue(this._inputStart, this.formattedStartValue);
+    },
+
+    _restoreEndInputValue: function(evt) {
+      this._restoreInputValue(this._inputEnd, this.formattedEndValue);
+    },
+
+    _restoreInputValue: function(input, formattedVal) {
+      // must blur for FF to reset value
+      input.blur();
+      input.value = formattedVal;
+      this.toggleClass('validation-error', false, input);
     }
 
   });
