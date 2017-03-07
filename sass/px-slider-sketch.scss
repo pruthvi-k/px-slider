@@ -17,7 +17,7 @@
 /*
 THIS FILE SHOULD CONTAIN ONLY ABSTRACT/'SKETCH' THEME RULES, NOT SPECIFIC TO PREDIX BRANDING
 Predix branding rules go in px-slider-predix.scss, not in this file.
-*/ 
+*/
 
 // Generic
 @import "px-normalize-design/_generic.normalize.scss";
@@ -42,7 +42,7 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
 }
 
 .slider {
-  margin: $inuit-base-spacing-unit--small $inuit-base-spacing-unit--tiny;
+  margin: $inuit-base-spacing-unit--small $inuit-base-spacing-unit;
   position: relative;
   height: $inuit-base-spacing-unit--small;
   border: 1px solid;
@@ -60,7 +60,7 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
 }
 
 .slider__multi {
-  margin: $inuit-base-spacing-unit--small $inuit-base-spacing-unit--small*1.5;
+  margin: $inuit-base-spacing-unit--small $inuit-base-spacing-unit;
 
   .slider__selected{
     border-radius: 2px 2px 2px 2px;
