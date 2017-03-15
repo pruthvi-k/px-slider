@@ -14,6 +14,7 @@
   <link rel="import" href="../px-api-viewer/px-api-viewer.html" />
   <link rel="import" href="../px-tabs/px-tab-set.html" />
   <link rel="import" href="px-slider.html"/>
+  <link rel="import" href="px-sliding-gauge.html"/>
   <link rel="icon" href="favicon.ico" type="image/x-icon"/>
   <link rel="import" href="../px-demo-snippet/px-demo-snippet.html">
   <link rel="import" href="../px-polymer-font-awesome/polymer-font-awesome.html" />
@@ -85,6 +86,15 @@
                   <label for$="hideInputs{{indexPlusOne(index)}}" class="toggle__label toggle__label--small"></label>
                   <div class="u-ml-">Hide Inputs</div>
                 </div>
+
+                <div class="u-mb-">Title: <input id="title{{indexPlusOne(index)}}" class="text-input" type="string" placeholder="0" value="{{item.title::input}}" /></div>
+                <div class="u-mb-">Sub Title: <input id="subTitle{{indexPlusOne(index)}}" class="text-input" type="string" placeholder="0" value="{{item.subTitle::input}}" /></div>
+
+                <div class="flex u-mb-">
+                  <input id="hideTitle{{indexPlusOne(index)}}" class="toggle__input toggle__input--small" type="checkbox" checked="{{item.hideTitle::change}}">
+                  <label for$="hideTitle{{indexPlusOne(index)}}" class="toggle__label toggle__label--small"></label>
+                  <div class="u-ml-">Hide Title</div>
+                </div>
               </div>
 
               <div class="demoContainer u-mt+">
@@ -93,8 +103,26 @@
                   <div class="demo u-p+">
 
                     <div class="container">
+                      <px-sliding-gauge
+                        id="gauge_{{indexPlusOne(index)}}"
+                        title="{{item.title}}"
+                        sub-title="{{item.subTitle}}"
+                        value="{{item.value}}"
+                        min="{{item.min}}"
+                        max="{{item.max}}"
+                        step="{{item.step}}"
+                        disabled="{{item.disabled}}"
+                        hide-inputs="{{item.hideInputs}}"
+                        scale="{{item.scale}}"
+                        unit="{{item.unit}}"
+                        bands="{{item.bands}}">
+
+                      </px-sliding-gauge>
+
                       <px-slider
                         id="slider_{{indexPlusOne(index)}}"
+                        title="{{item.title}}"
+                        sub-title="{{item.subTitle}}"
                         value="{{item.value}}"
                         min="{{item.min}}"
                         max="{{item.max}}"
@@ -103,7 +131,10 @@
                         end-value="{{item.endValue}}"
                         disabled="{{item.disabled}}"
                         hide-inputs="{{item.hideInputs}}"
-                        scale="{{item.scale}}">
+                        scale="{{item.scale}}"
+                      unit="{{item.unit}}"
+                      bands="{{item.bands}}"
+                      >
                       </px-slider>
                     </div>
 
@@ -162,7 +193,11 @@ window.addEventListener('WebComponentsReady', function() {
           "endValue":"",
           "disabled":false,
           "hideInputs":false,
-          "scale":"linear"
+          "scale":"linear",
+          "title": "Slider Title",
+          "subTitle": "Sub Heading",
+            "unit":"s/m",
+            "bands" : [{from:0, to: 20, color:"yellow"}, {from:20, to: 80, color:"red"}, {from:80, to: 100, color:"green"}]
         },
         {
           "value":20,

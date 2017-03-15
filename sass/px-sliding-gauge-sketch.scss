@@ -49,26 +49,29 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
   //border-radius: 2px;
 }
 
-.slider__selected {
-  position: absolute;
-  top: -1px;
-  left: 0;
-  height: $inuit-base-spacing-unit--small;
-  border-width: 1px 0 1px 1px;
-  border-style: solid;
-  border-radius: 2px 0 0 2px;
-}
+//.slider__selected {
+//  position: absolute;
+//  top: -1px;
+//  left: 0;
+//  height: $inuit-base-spacing-unit--small;
+//  border-width: 1px 0 1px 1px;
+//  border-style: solid;
+//  //border-radius: 2px 0 0 2px;
+//}
 
-.slider__multi {
-  margin: $inuit-base-spacing-unit--small $inuit-base-spacing-unit;
-
-  .slider__selected{
-    border-radius: 2px 2px 2px 2px;
-    border-width: 1px 1px 1px 1px;
-  }
-}
+//.slider__multi {
+//  margin: $inuit-base-spacing-unit--small $inuit-base-spacing-unit;
+//
+//  .slider__selected{
+//    //border-radius: 2px 2px 2px 2px;
+//    border-width: 1px;
+//  }
+//}
 
 .text-input {
   width: calculateRem(65px);
 }
 #sliderContainer {cursor:pointer;}
+
+
+//remove .slider__selected {
