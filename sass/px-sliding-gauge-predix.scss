@@ -55,6 +55,9 @@ $slider-tags-hover: '.slider-container:active, .slider-container:hover';
   border: 1px solid;
 
   bands {
+    .gauge-alerts{
+
+    }
     .slider__band {
       position: absolute;
       top: -1px;
@@ -92,6 +95,12 @@ $slider-tags-hover: '.slider-container:active, .slider-container:hover';
         font-size: 12px; //$zeta
         color: $black;
       }
+    }
+    .latest-value {
+      width: 2px;
+      background-color: $black;
+      height: 22px;
+      top:-6px;
     }
   }
 }

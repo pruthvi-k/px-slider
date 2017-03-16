@@ -1,7 +1,7 @@
 {
-    "name": "px-slider",
+    "name": "px-sliding-gauge",
     "author": "General Electric",
-    "description": "Predix UI slider component",
+    "description": "Predix sliding Gauge component",
     "version": "0.8.5",
     "private": true,
     "extName": null,

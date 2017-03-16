@@ -1,8 +1,8 @@
 {
-  "name": "px-slider",
+  "name": "px-sliding-gauge",
   "version": "0.8.5",
   "main": [
-    "px-slider.html"
+    "px-sliding-gauge.html"
   ],
   "ignore": [
     ".*",
@@ -21,7 +21,8 @@
     "polymer": "^v1.6.0",
     "px-theme": "^2.0.1",
     "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#~v1.0.3",
-    "px-tooltip": "^0.10.17"
+    "px-tooltip": "^0.10.17",
+    "px-alert-label": "https://github.com/pruthvi-k/px-alert-label/tarball/191239aab9297a7e200f769e2489bdeb9896c664"
   },
   "devDependencies": {
     "px-starter-kit-design": "^0.7.0",

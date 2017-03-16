@@ -1,9 +1,8 @@
 <link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../px-alert-label/px-alert-label.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html"/>
 <link rel="import" href="px-handle.html"/>
 
-
-<!--<link rel="import" href="css/px-slider-styles.html">-->
 <link rel="import" href="css/px-sliding-gauge-styles.html">
 
 <dom-module id="px-sliding-gauge">
@@ -16,6 +15,7 @@
       }
     </style>
     <style include="px-sliding-gauge-styles"></style>
+
     <div class="slider-container">
       <div class="flex flex--col">
 
@@ -49,10 +49,15 @@
       <div id="sliderContainer" class="slider flex__item" on-click="_jumpToValue">
         <bands></bands>
         <ticks>
+          <div id="latestValueTick" class="tick latest-value"></div>
           <div id="minValTick" class="tick"><label>{{_formatTickLabel(min)}}</label></div>
           <div id="midValTick" class="tick"><label>{{_formatTickLabel(mid)}}</label></div>
           <div id="maxValTick" class="tick"><label>{{_formatTickLabel(max)}}</label></div>
         </ticks>
+
+        <div id="gaugeAlerts">
+        </div>
+
         <px-handle id="singleHandle" class="visuallyhidden" on-track="_handleTrackEnd"
                    disabled="{{disabled}}"></px-handle>
       </div>
@@ -169,6 +174,9 @@
       },
       bands: {
         type: Object
+      },
+      labels: {
+        type: Object
       }
     },
 
@@ -177,6 +185,7 @@
     },
 
     ready: function () {
+        console.log(this.latestValue);
       // Must have min and max values
       // FATAL
       if (!this.min && this.min !== 0) {
@@ -212,25 +221,55 @@
         this._updateHandle(this.$.singleHandle, this.value);
         this._renderElements();
       }, 1);
-
     },
     _formatTickLabel: function (num) {
-      return num > 999 ? (num/1000).toFixed(3) + 'k' : num
+      return num > 999 ? (num / 1000).toFixed(3) + 'k' : num
     },
     _calculateMidValue: function (min, max) {
-       return (max - min) / 2;
+      return (max - min) / 2;
     },
     _renderElements: function () {
       this._updateBands();
       this._plotTicks();
+      this._addLabels();
     },
     _plotTicks: function () {
       this.querySelector("#maxValTick").style.left = this._translateValueToPosition(this.max);
+      this.querySelector("#latestValueTick").style.left = this._translateValueToPosition(this.latestValue);
       this.querySelector("#maxValTick label").style.right = "24px";
       this.querySelector("#minValTick label").style.left = "4px";
       this.querySelector("#midValTick").style.left = this._translateValueToPosition(this.mid);
       this.querySelector("#midValTick label").style.right = "6px";
 
+    },
+    _addLabels: function () {
+      var self = this;
+      if (this.labels) {
+        this.labels.forEach(function (label) {
+          if (label.attributes) {
+            var id = (label.attributes['type']).toLowerCase();
+            if (document.querySelectorAll("px-alert-label#" + id).length == 0) {
+              var dynamicLabel = document.createElement("px-alert-label");
+              dynamicLabel.setAttribute("id", id);
+              for (var attr in label.attributes) {
+                dynamicLabel.setAttribute(attr, label.attributes[attr]);
+              }
+              dynamicLabel.setAttribute("style", "position:absolute");
+              Polymer.dom(self.$.gaugeAlerts).appendChild(dynamicLabel);
+              var postion = (self._convertValueToPosition(label.position) - (dynamicLabel.offsetWidth / 2)) + 2;
+              document.querySelector("px-alert-label#" + id).style.left = postion + "px";
+            } else {
+              var el = document.querySelector("px-alert-label#" + id);
+              var postion = (self._convertValueToPosition(label.position) - (el.offsetWidth / 2)) + 2;
+              el.style.left = postion + "px";
+            }
+          }
+        })
+      }
+    },
+    _updateLabelPosition: function (label, positionValue) {
+      //console.log(positionValue, label);
+      //Polymer.dom(this.$.gaugeAlerts).label.style.left = this._translateValueToPosition(positionValue);
     },
     _updateBands: function (myvalue) {
       var self = this;
