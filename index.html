@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>px-slider Demo</title>
+  <title>px-sliding-gauge Demo</title>
   <link rel="stylesheet" type="text/css" href="css/px-sliding-gauge-demo.css"/>
   <!-- Import custom element. Note: see comment about relative paths to dependencies in the *.html file referenced below -->
   <script src="../webcomponentsjs/webcomponents-lite.js"></script>
@@ -32,16 +32,12 @@
     <a class="actionable flex flex--right flex--middle" href="https://github.com/PredixDev/px-slider" target="_blank">
       <iron-icon class="menu__open" icon="fa:fa-github"></iron-icon>
       View on Github</a>
-    <h1 class="delta">px-slider</h1>
+    <h1 class="delta">px-sliding-gague</h1>
     <div class="description-text">
       <p>
         The Slider component allows a user to select a numeric value from a range of acceptable values. The minimum and
         maximum values,
-        step, and default value can all be specified in configuration. When the endValue property is enabled, a second
-        input box appears
-        on the right hand side of the slider, and two thumb controls appear on the slider bar. Note that the slider bar
-        is blue between
-        the two thumb controls to indicate the selected range.
+        step, and default value can all be specified in configuration.
       </p>
     </div>
     <div class="flex">
@@ -129,7 +125,7 @@
                       unit="{{item.unit}}"
                       bands="{{item.bands}}"
                       labels="{{item.labels}}"
-                      latest-value=" {{item.latestValue}}"
+                      latest-value="{{item.latestValue}}"
                     >
 
                     </px-sliding-gauge>
@@ -140,7 +136,7 @@
                 <div>
                   <px-demo-snippet
                     element-properties={{item}}
-                    element-name="px-slider">
+                    element-name="px-sliding-gauge">
                   </px-demo-snippet>
                 </div>
               </div>
@@ -149,7 +145,7 @@
           <div class="apiContainer">
             <div class="flex flex--col api u-mt++">
               <div>
-                <px-api-viewer source="px-slider"></px-api-viewer>
+                <px-api-viewer source="px-sliding-gauge"></px-api-viewer>
               </div>
             </div>
           </div>
@@ -184,9 +180,9 @@
       optionsArray = [
         {
           "value": 20,
-          "min": 0,
+          "min": 30,
           "max": 100,
-          "step": 0.01,
+          "step": 1,
           "startValue": "",
           "endValue": "",
           "disabled": false,
@@ -197,8 +193,8 @@
           "unit": "s/m",
           "latestValue": 40,
           "labels": [
-            {attributes: {label: "caution", type: "Important", "line-height":30, "show-line": true}, position: 50},
-            {attributes: {label: "5", type: "Info", "line-height":60, "show-line": true}, position: 5}
+            {attributes: {label: "50", type: "Important", "line-height":25, "show-line": true}, position: 50},
+            {attributes: {label: "5", type: "Info", "line-height":45, "show-line": true}, position: 5}
               ],
           "bands": [{from: 0, to: 20, color: "yellow"}, {from: 20, to: 80, color: "red"}, {
             from: 80,

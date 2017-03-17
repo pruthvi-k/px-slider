@@ -9,14 +9,14 @@
  */
 
 //
-// Sass for the "sketch" notion of the px-slider component
+// Sass for the "sketch" notion of the px-sliding-gauge component
 //
 // @author
 //
 
 /*
 THIS FILE SHOULD CONTAIN ONLY ABSTRACT/'SKETCH' THEME RULES, NOT SPECIFIC TO PREDIX BRANDING
-Predix branding rules go in px-slider-predix.scss, not in this file.
+Predix branding rules go in px-sliding-gauge-predix.scss, not in this file.
 */
 
 // Generic
@@ -42,36 +42,20 @@ Predix branding rules go in px-slider-predix.scss, not in this file.
 }
 
 .slider {
-  margin: $inuit-base-spacing-unit--small $inuit-base-spacing-unit;
+  margin-top: 6px;
   position: relative;
   height: $inuit-base-spacing-unit--small;
   //border: 1px solid;
   //border-radius: 2px;
 }
 
-//.slider__selected {
-//  position: absolute;
-//  top: -1px;
-//  left: 0;
-//  height: $inuit-base-spacing-unit--small;
-//  border-width: 1px 0 1px 1px;
-//  border-style: solid;
-//  //border-radius: 2px 0 0 2px;
-//}
-
-//.slider__multi {
-//  margin: $inuit-base-spacing-unit--small $inuit-base-spacing-unit;
-//
-//  .slider__selected{
-//    //border-radius: 2px 2px 2px 2px;
-//    border-width: 1px;
-//  }
-//}
-
 .text-input {
-  width: calculateRem(65px);
+  width: calculateRem(40px);
+  padding: 0px!important;
 }
 #sliderContainer {cursor:pointer;}
+
+
 
 
 //remove .slider__selected {

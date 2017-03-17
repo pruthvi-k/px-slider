@@ -8,10 +8,23 @@
 <dom-module id="px-sliding-gauge">
   <template>
     <style>
-      .slider__band {
-        position: absolute;
-        top: -1px;
-        border-width: 1px 0 1px 1px;
+      /*.slider__band {*/
+      /*position: absolute;*/
+      /*top: -1px;*/
+      /*border-width: 1px 0 1px 1px;*/
+      /*}*/
+      /deep/
+      px-alert-label .alertlabel {
+        font-size: 12px !important;
+        padding: 5px !important;
+      }
+
+      /deep/
+      px-handle button.px-handle {
+        padding: 3px 6px;
+        height: 21px !important;
+        width: 21px !important;
+
       }
     </style>
     <style include="px-sliding-gauge-styles"></style>
@@ -37,8 +50,8 @@
               <span>{{unit}}</span>
 
               <a><span class="fa-stack fa-lg">
-                          <i class="fa fa-circle-o fa-stack-2x"></i>
-                          <i class="fa fa-refresh fa-stack-1x"></i>
+                          <i class="fa fa-refresh"></i>
+
                         </span>
               </a>
 
@@ -49,13 +62,13 @@
       <div id="sliderContainer" class="slider flex__item" on-click="_jumpToValue">
         <bands></bands>
         <ticks>
-          <div id="latestValueTick" class="tick latest-value"></div>
+          <div id="latestValueTick" hidden$="{{!latestValue}}" class="tick latest-value"></div>
           <div id="minValTick" class="tick"><label>{{_formatTickLabel(min)}}</label></div>
           <div id="midValTick" class="tick"><label>{{_formatTickLabel(mid)}}</label></div>
           <div id="maxValTick" class="tick"><label>{{_formatTickLabel(max)}}</label></div>
         </ticks>
 
-        <div id="gaugeAlerts">
+        <div id="gaugeAlerts" class="gauge-alerts">
         </div>
 
         <px-handle id="singleHandle" class="visuallyhidden" on-track="_handleTrackEnd"
@@ -177,6 +190,9 @@
       },
       labels: {
         type: Object
+      },
+      latestValue: {
+        type: Number
       }
     },
 
@@ -185,7 +201,10 @@
     },
 
     ready: function () {
-        console.log(this.latestValue);
+      //if latest value is not defined - to hide black tick
+      if (!this.latestValue) {
+        this.latestValue = false;
+      }
       // Must have min and max values
       // FATAL
       if (!this.min && this.min !== 0) {
@@ -226,7 +245,11 @@
       return num > 999 ? (num / 1000).toFixed(3) + 'k' : num
     },
     _calculateMidValue: function (min, max) {
+        if(min > 0){
+          return (max - min) / 2 + min;
+        } else {
       return (max - min) / 2;
+        }
     },
     _renderElements: function () {
       this._updateBands();
@@ -235,11 +258,13 @@
     },
     _plotTicks: function () {
       this.querySelector("#maxValTick").style.left = this._translateValueToPosition(this.max);
-      this.querySelector("#latestValueTick").style.left = this._translateValueToPosition(this.latestValue);
       this.querySelector("#maxValTick label").style.right = "24px";
       this.querySelector("#minValTick label").style.left = "4px";
       this.querySelector("#midValTick").style.left = this._translateValueToPosition(this.mid);
       this.querySelector("#midValTick label").style.right = "6px";
+      if (this.querySelector("#latestValueTick")) {
+        this.querySelector("#latestValueTick").style.left = this._translateValueToPosition(this.latestValue);
+      }
 
     },
     _addLabels: function () {
@@ -275,7 +300,14 @@
       var self = this;
       if (this.bands) {
         //add bands dynamically based on points
-        this.bands.forEach(function (band) {
+        for (bandIndex = 0, numOfBands = this.bands.length; bandIndex < numOfBands; bandIndex++) {
+          var band = this.bands[bandIndex];
+
+//        this.bands.forEach(function (band) {
+          if (band.from < self.min) {
+            this._plotDefaultBand();
+            break;
+          }
           if (document.querySelector('#sliderContainer bands ' + "." + band.color + "-band")) {
             var dynamicBand = document.querySelector('#sliderContainer bands ' + "." + band.color + "-band");
           } else {
@@ -290,12 +322,23 @@
             to = band.from;
             from = band.to;
           }
-          var widthVal = to - from;
 
+          var widthVal = to - from;
           dynamicBand.style.width = self._translateValueToPosition(widthVal);
           dynamicBand.style.left = self._translateValueToPosition(from);
-        })
+        }
+//        })
+      } else {
+        self._plotDefaultBand();
       }
+    },
+    _plotDefaultBand: function () {
+      //create default green band if no band range is given
+      var dynamicBand = document.createElement("div");
+      dynamicBand.setAttribute("class", "slider__band green-band");
+      Polymer.dom(this.querySelector('#sliderContainer bands')).appendChild(dynamicBand);
+      dynamicBand.style.width = this._translateValueToPosition(this.max);
+      dynamicBand.style.left = this._translateValueToPosition(this.min);
     },
     /**
      * This will be called by the parents through the iron-resizable-behavior

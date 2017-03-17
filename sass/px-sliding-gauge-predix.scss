@@ -1,25 +1,12 @@
 ///////////////////
-
 @import "px-colors-design/_settings.colors.scss";
 @import "px-headings-design/_base.headings.scss";
 @import "px-iconography-design/_base.iconography.scss";
-
 // Objects
 @import "px-actionable-text-icons-design/_objects.actionable.scss";
 @import 'px-sliding-gauge-sketch.scss';
 
-
-$regular:15px;
-
-.slider {
-  border-color: var(--px-slider-border-color, $gray5);
-  background-color: var(--px-slider-background-color, $gray1);
-}
-
-.slider__selected {
-  border-color: var(--px-slider-border-color--selected, $select-blue-pressed);
-  background-color: var(--px-slider-background-color--selected, $select-blue-default);
-}
+$regular: 15px;
 
 // Component
 $slider-tags-hover: '.slider-container:active, .slider-container:hover';
@@ -30,16 +17,38 @@ $slider-tags-hover: '.slider-container:active, .slider-container:hover';
 
 .right__container {
   margin-left: auto;
+  span .fa-refresh {
+    border-radius: 14px;
+    border: 1px solid $gray5;
+    font-size: 14px;
+    padding: 6px;
+    background: $white;
+
+    &.disabled {
+      background: $white;
+      color: $gray4;
+      border: 1px solid $gray4;
+    }
+
+    &:active{
+      background: $gray5;
+      color: $primary-blue;
+      border: 1px solid $gray6;
+    }
+
+    &:not(.disabled):hover {
+      background: $gray3;
+      color: $primary-blue;
+      border: 1px solid $gray6;
+      text-shadow: 1px 15% $black;
+    }
+  }
 }
-.px-slider-0 .slider.px-slider {
-  position: relative;
-  height: .66667rem;
-  border: none;
-  border-radius: 0px;
-}
-.flex .px-slider {
+
+.flex .px-sliding-gauge {
   .title, .sub-title {
-    //line-height: 0px;
+    padding: 0 0 $inuit-base-spacing-unit--small;
+    margin: 0px !important;
   }
   .title {
     font-size: $regular;
@@ -50,14 +59,13 @@ $slider-tags-hover: '.slider-container:active, .slider-container:hover';
     color: $gray6;
   }
 }
+
 .slider-container {
-  padding: 8px;
+  padding: $inuit-base-spacing-unit $inuit-base-spacing-unit--large $inuit-base-spacing-unit--tiny;
   border: 1px solid;
+  height: 125px;
 
   bands {
-    .gauge-alerts{
-
-    }
     .slider__band {
       position: absolute;
       top: -1px;
@@ -80,17 +88,17 @@ $slider-tags-hover: '.slider-container:active, .slider-container:hover';
     }
   }
 
-  ticks{
-    .tick{
+  ticks {
+    .tick {
       position: absolute;
       top: -1px;
       left: 0;
-      width:1px;
+      width: 1px;
       height: 15px;
       background-color: $grey7;
       color: $grey7;
-      label{
-        top:14px;
+      label {
+        top: 14px;
         position: relative;
         font-size: 12px; //$zeta
         color: $black;
@@ -100,7 +108,7 @@ $slider-tags-hover: '.slider-container:active, .slider-container:hover';
       width: 2px;
       background-color: $black;
       height: 22px;
-      top:-6px;
+      top: -6px;
     }
   }
 }
@@ -108,3 +116,5 @@ $slider-tags-hover: '.slider-container:active, .slider-container:hover';
 #{$slider-tags-hover} {
   border: 1px solid $select-blue-default;
 }
+
+

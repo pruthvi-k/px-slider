@@ -15,7 +15,7 @@
     "OSS_Notice.pdf",
     "scripts",
     ".github",
-    "px-slider.png"
+    "px-sliding-gauge.png"
   ],
   "dependencies": {
     "polymer": "^v1.6.0",
