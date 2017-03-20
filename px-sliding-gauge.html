@@ -43,8 +43,8 @@
             </template>
           </div>
           <div class="right__container">
-            <div>
-              <input id="inputStart" type="text" class="text-input visuallyhidden" value="{{value}}"
+            <div class="visuallyhidden-inputs visuallyhidden">
+              <input id="inputStart" type="text" class="text-input" value="{{value}}"
                      on-change="_handleStartChange" tabindex="0" disabled="{{disabled}}"/>
 
               <span>{{unit}}</span>
@@ -71,7 +71,7 @@
         <div id="gaugeAlerts" class="gauge-alerts">
         </div>
 
-        <px-handle id="singleHandle" class="visuallyhidden" on-track="_handleTrackEnd"
+        <px-handle id="singleHandle" class="visuallyhidden-inputs2 visuallyhidden" on-track="_handleTrackEnd"
                    disabled="{{disabled}}"></px-handle>
       </div>
       <div>
@@ -231,7 +231,7 @@
       }
 
       // Show the single handle
-      this.toggleClass('visuallyhidden', false, this.$.singleHandle);
+//      this.toggleClass('visuallyhidden', false, this.$.singleHandle);
       this.async(function () {
         // calculate the amount to offset the range on the right for handle width
         this.offsetForHandleWidth = this._calcOffsetWidth(0);
@@ -242,7 +242,7 @@
       }, 1);
     },
     _formatTickLabel: function (num) {
-      return num > 999 ? (num / 1000).toFixed(3) + 'k' : num
+      return num > 999 ? (num / 1000) + 'k' : num
     },
     _calculateMidValue: function (min, max) {
         if(min > 0){
@@ -298,22 +298,23 @@
     },
     _updateBands: function (myvalue) {
       var self = this;
+      var maxWidth= self._convertValueToPosition(self.max+self.min),minBand=0;
+      console.log("maaaaax",maxWidth);
       if (this.bands) {
         //add bands dynamically based on points
         for (bandIndex = 0, numOfBands = this.bands.length; bandIndex < numOfBands; bandIndex++) {
           var band = this.bands[bandIndex];
 
-//        this.bands.forEach(function (band) {
           if (band.from < self.min) {
             this._plotDefaultBand();
             break;
           }
-          if (document.querySelector('#sliderContainer bands ' + "." + band.color + "-band")) {
+          if (document.querySelector("#"+this.id+' #sliderContainer bands ' + "." + band.color + "-band")) {
             var dynamicBand = document.querySelector('#sliderContainer bands ' + "." + band.color + "-band");
           } else {
             var dynamicBand = document.createElement("div");
             dynamicBand.setAttribute("class", "slider__band " + band.color + "-band");
-            Polymer.dom(self.querySelector('#sliderContainer bands')).appendChild(dynamicBand);
+            Polymer.dom(self.querySelector("#"+this.id+' #sliderContainer bands')).appendChild(dynamicBand);
           }
 
           var from = band.from;
@@ -323,11 +324,22 @@
             from = band.to;
           }
 
-          var widthVal = to - from;
-          dynamicBand.style.width = self._translateValueToPosition(widthVal);
-          dynamicBand.style.left = self._translateValueToPosition(from);
+          if(self.min > 0){
+
+            var widthVal = self._convertValueToPosition(to);
+            if(bandIndex > 0) {
+              widthVal = widthVal - minBand;
+            }
+            dynamicBand.style.width = widthVal+'px';
+            dynamicBand.style.left = self._translateValueToPosition(from);
+            minBand+=widthVal
+          } else {
+            var widthVal = to - from;
+            dynamicBand.style.width = self._translateValueToPosition(widthVal);
+            dynamicBand.style.left = self._translateValueToPosition(from);
+          }
         }
-//        })
+
       } else {
         self._plotDefaultBand();
       }
@@ -519,12 +531,16 @@
      */
     _hideInputsChanged: function (newValue, oldValue) {
       if (newValue === true) {
-        this.toggleClass("visuallyhidden", true, this.$.inputStart);
-        if (this._range) this.toggleClass("visuallyhidden", true, this.$.inputEnd);
+//          this.querySelectorAll("#single")
+        this.toggleClass("visuallyhidden", true, this.querySelector(".visuallyhidden-inputs"));
+        this.toggleClass("visuallyhidden", true, this.querySelector(".visuallyhidden-inputs2"));
+//        this.toggleClass("visuallyhidden", true, this.querySelector("#singleHandle"));
       }
       else {
-        this.toggleClass("visuallyhidden", false, this.$.inputStart);
-        if (this._range) this.toggleClass("visuallyhidden", false, this.$.inputEnd);
+        this.toggleClass("visuallyhidden", false, this.querySelector(".visuallyhidden-inputs"));
+        this.toggleClass("visuallyhidden", false, this.querySelector(".visuallyhidden-inputs2"));
+
+//        this.toggleClass("visuallyhidden", false, this.querySelector("#singleHandle"));
       }
     },
     /**

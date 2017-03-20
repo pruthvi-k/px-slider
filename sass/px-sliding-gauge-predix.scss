@@ -13,6 +13,18 @@ $slider-tags-hover: '.slider-container:active, .slider-container:hover';
 
 .left__container {
   margin-right: auto;
+  .title, .sub-title {
+    padding: 0 0 $inuit-base-spacing-unit--small;
+    margin: 0px !important;
+  }
+  .title {
+    font-size: $regular;
+    color: $gray9;
+    font-weight: bold;
+  }
+  .sub-title {
+    color: $gray6;
+  }
 }
 
 .right__container {
@@ -46,18 +58,7 @@ $slider-tags-hover: '.slider-container:active, .slider-container:hover';
 }
 
 .flex .px-sliding-gauge {
-  .title, .sub-title {
-    padding: 0 0 $inuit-base-spacing-unit--small;
-    margin: 0px !important;
-  }
-  .title {
-    font-size: $regular;
-    color: $gray9;
-    font-weight: bold;
-  }
-  .subtitle {
-    color: $gray6;
-  }
+
 }
 
 .slider-container {

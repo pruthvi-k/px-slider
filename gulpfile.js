@@ -70,6 +70,11 @@ gulp.task('watch', function() {
   gulp.watch(['!sass/*-demo.scss', 'sass/*.scss'], ['sass']);
   gulp.watch('sass/*-demo.scss', ['demosass']);
 });
+gulp.task('browser-sync', function() {
+  browserSync.init({
+    proxy: 'http://10.177.109.76:6343'
+  });
+});
 
 gulp.task('serve', function() {
   browserSync.init({
@@ -78,6 +83,7 @@ gulp.task('serve', function() {
     reloadOnRestart: true,
     logPrefix: `${pkg.name}`,
     https: false,
+    // proxy: '10.177.109.76',
     server: ['./', 'bower_components'],
   });
 
