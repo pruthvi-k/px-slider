@@ -20,21 +20,21 @@
          for any URL ending with "/web-component-tester/browser.js"
          when wct is run from the command line -->
     <script src="../web-component-tester/browser.js"></script>
-    <link rel="import" href="../px-slider.html" />
+    <link rel="import" href="../px-sliding-gauge.html" />
     <!-- Retain this link for px-theme.html -->
     <!-- For some reason px-theme is needed for WCT to run without some errors -->
     <link rel="import" href="../../px-theme/px-theme-styles.html">
     <style include="px-theme-styles" is="custom-style"></style>
-    <script src="px-slider-base-tests.js"></script>
-    <script src="px-slider-custom-tests.js"></script>
+    <script src="px-sliding-gauge-base-tests.js"></script>
+    <script src="px-sliding-gauge-custom-tests.js"></script>
 <body>
 
 <!-- You use the document as a place to set up your fixtures. -->
-<px-slider value="10" id="px_slider_simple"></px-slider>
-<px-slider min="5.00" max="40.00" value="10.00" step=".01" id="px_slider_complex"></px-slider>
-<px-slider start-value="10" end-value="20" id="px_slider_range"></px-slider>
-<px-slider value="10" disabled="true" id="px_slider_disabled"></px-slider>
-<px-slider start-value="-30" end-value="20" min="-40" max="100" id="px_slider_range_neg"></px-slider>
-<px-slider value="10" min="1" max="100" scale="logarithmic" id="px_slider_logarithmic"></px-slider>
+<px-sliding-gauge value="10" id="px_sliding_gauge_simple"></px-sliding-gauge>
+<px-sliding-gauge min="5.00" max="40.00" value="10.00" step=".01" id="px_sliding_gauge_complex"></px-sliding-gauge>
+<px-sliding-gauge start-value="10" end-value="20" id="px_sliding_gauge_range"></px-sliding-gauge>
+<px-sliding-gauge value="10" disabled="true" id="px_sliding_gauge_disabled"></px-sliding-gauge>
+<px-sliding-gauge start-value="-30" end-value="20" min="-40" max="100" id="px_sliding_gauge_range_neg"></px-sliding-gauge>
+<!--<px-slider value="10" min="1" max="100" scale="logarithmic" id="px_slider_logarithmic"></px-slider>-->
 </body>
 </html>

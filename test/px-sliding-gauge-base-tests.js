@@ -176,16 +176,16 @@ function testCase(options) {
 function runBaseTests() {
   fixture = document.getElementById('fixture');
 
-  suite('Base Automation Tests for px-slider', function() {
+  suite('Base Automation Tests for px-sliding-gauge', function() {
 
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
-    test('px-slider fixtures are created', function() {
-      assert.isTrue(document.getElementById('px_slider_simple') !== null);
-      assert.isTrue(document.getElementById('px_slider_complex') !== null);
-      assert.isTrue(document.getElementById('px_slider_range') !== null);
-      assert.isTrue(document.getElementById('px_slider_disabled') !== null);
+    test('px-sliding-gauge fixtures are created', function() {
+      assert.isTrue(document.getElementById('px_sliding_gauge_simple') !== null);
+      assert.isTrue(document.getElementById('px_sliding_gauge_complex') !== null);
+      assert.isTrue(document.getElementById('px_sliding_gauge_range') !== null);
+      assert.isTrue(document.getElementById('px_sliding_gauge_disabled') !== null);
     });
 
   });

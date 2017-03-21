@@ -29,6 +29,9 @@ $slider-tags-hover: '.slider-container:active, .slider-container:hover';
 
 .right__container {
   margin-left: auto;
+  .fa-stack{
+    width: 1.3em;
+  }
   span .fa-refresh {
     border-radius: 14px;
     border: 1px solid $gray5;
@@ -64,7 +67,7 @@ $slider-tags-hover: '.slider-container:active, .slider-container:hover';
 .slider-container {
   padding: $inuit-base-spacing-unit $inuit-base-spacing-unit--large $inuit-base-spacing-unit--tiny;
   border: 1px solid;
-  height: 125px;
+  height: 156px;
 
   bands {
     .slider__band {

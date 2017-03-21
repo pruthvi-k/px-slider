@@ -39,7 +39,7 @@
               <label class="regular title">{{title}}</label>
               <px-tooltip for="btn1" delay="50" tooltip-message="{{subTitle}} {{unit}}" orientation="top"
                           tooltip-style="dark"></px-tooltip>
-              <label id="btn1" class="zeta sub-title">{{subTitle}} {{unit}}</label>
+              <label id="btn1" class="zeta sub-title">[[_formatSubTitle()]]</label>
             </template>
           </div>
           <div class="right__container">
@@ -51,7 +51,6 @@
 
               <a><span class="fa-stack fa-lg">
                           <i class="fa fa-refresh"></i>
-
                         </span>
               </a>
 
@@ -241,6 +240,13 @@
         this._renderElements();
       }, 1);
     },
+    _formatSubTitle: function() {
+      if(this.subTitle) {
+          return this.subTitle;
+      }  else {
+          return 'Latest: '+ (this.latestValue || this.value) +' '+ this.unit;
+      }
+    },
     _formatTickLabel: function (num) {
       return num > 999 ? (num / 1000) + 'k' : num
     },
@@ -273,18 +279,20 @@
         this.labels.forEach(function (label) {
           if (label.attributes) {
             var id = (label.attributes['type']).toLowerCase();
-            if (document.querySelectorAll("px-alert-label#" + id).length == 0) {
+            if (document.querySelectorAll("#"+self.id+" #gaugeAlerts px-alert-label#" + id).length == 0) {
               var dynamicLabel = document.createElement("px-alert-label");
               dynamicLabel.setAttribute("id", id);
               for (var attr in label.attributes) {
                 dynamicLabel.setAttribute(attr, label.attributes[attr]);
               }
               dynamicLabel.setAttribute("style", "position:absolute");
-              Polymer.dom(self.$.gaugeAlerts).appendChild(dynamicLabel);
+
+              Polymer.dom(self.querySelector("#"+self.id + " #gaugeAlerts")).appendChild(dynamicLabel);
               var postion = (self._convertValueToPosition(label.position) - (dynamicLabel.offsetWidth / 2)) + 2;
-              document.querySelector("px-alert-label#" + id).style.left = postion + "px";
+              document.querySelector("#"+self.id+" #gaugeAlerts px-alert-label#" + id).style.left = postion + "px";
             } else {
-              var el = document.querySelector("px-alert-label#" + id);
+              var el = document.querySelector("#"+self.id+" #gaugeAlerts px-alert-label#" + id);
+              console.log("el", el);
               var postion = (self._convertValueToPosition(label.position) - (el.offsetWidth / 2)) + 2;
               el.style.left = postion + "px";
             }
