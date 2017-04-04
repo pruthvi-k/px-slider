@@ -1,4 +1,6 @@
 ///////////////////
+
+@import "px-defaults-design/_settings.defaults.scss";
 @import "px-colors-design/_settings.colors.scss";
 @import "px-headings-design/_base.headings.scss";
 @import "px-iconography-design/_base.iconography.scss";
@@ -16,6 +18,7 @@ $slider-tags-hover: '.slider-container:active, .slider-container:hover';
   .title, .sub-title {
     padding: 0 0 $inuit-base-spacing-unit--small;
     margin: 0px !important;
+    line-height: 12px;
   }
   .title {
     font-size: $regular;
@@ -32,12 +35,15 @@ $slider-tags-hover: '.slider-container:active, .slider-container:hover';
   .fa-stack{
     width: 1.3em;
   }
+  span.unit{
+    padding: 10px 10px 10px 5px;
+  }
   span .fa-refresh {
     border-radius: 14px;
     border: 1px solid $gray5;
     font-size: 14px;
-    padding: 6px;
     background: $white;
+    padding: 6px;
 
     &.disabled {
       background: $white;
@@ -59,43 +65,31 @@ $slider-tags-hover: '.slider-container:active, .slider-container:hover';
     }
   }
 }
-
-.flex .px-sliding-gauge {
-
-}
-
 .slider-container {
   padding: $inuit-base-spacing-unit $inuit-base-spacing-unit--large $inuit-base-spacing-unit--tiny;
   border: 1px solid;
-  height: 156px;
+  height: 135px;
 
   bands {
     .slider__band {
       position: absolute;
-      top: -1px;
       left: 0;
-      height: $inuit-base-spacing-unit--small;
-      border-width: 1px;
-      border-style: solid;
+      height: 8px;
     }
     .yellow-band {
       background-color: $dv-light-yellow;
-      color: $dv-light-yellow;;
     }
     .green-band {
       background-color: $dv-light-green;
-      color: $dv-light-green;
     }
     .red-band {
       background-color: $dv-light-red;
-      color: $dv-light-red;
     }
   }
 
   ticks {
     .tick {
       position: absolute;
-      top: -1px;
       left: 0;
       width: 1px;
       height: 15px;

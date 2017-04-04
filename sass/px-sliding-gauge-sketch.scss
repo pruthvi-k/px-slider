@@ -42,9 +42,9 @@ Predix branding rules go in px-sliding-gauge-predix.scss, not in this file.
 }
 
 .slider {
-  margin-top: 6px;
   position: relative;
-  height: $inuit-base-spacing-unit--small;
+  height: 8px;
+  margin-top: 6px;
   //border: 1px solid;
   //border-radius: 2px;
 }

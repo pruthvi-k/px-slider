@@ -28,8 +28,8 @@ function runCustomTests() {
       done();
     });
   });
-  suite('Custom Automation Tests for a disabled px-slider', function() {
-    test('Check assigned value of px-slider', function(done){
+  suite('Custom Automation Tests for a disabled px-sliding-gauge', function() {
+    test('Check assigned value of px-sliding-gauge', function(done){
       var sliderEl = Polymer.dom(document).querySelector('#px_sliding_gauge_disabled'),
           sliderValue = sliderEl.value;
       assert.equal(sliderValue, '10');

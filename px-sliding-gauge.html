@@ -36,10 +36,10 @@
 
           <div class="left__container">
             <template is="dom-if" if="{{!hideTitle}}" class="visuallyhidden" id="sliderTitle">
-              <label class="regular title">{{title}}</label>
+              <div class="regular title">{{title}}</div>
               <px-tooltip for="btn1" delay="50" tooltip-message="{{subTitle}} {{unit}}" orientation="top"
                           tooltip-style="dark"></px-tooltip>
-              <label id="btn1" class="zeta sub-title">[[_formatSubTitle()]]</label>
+              <div id="btn1" class="zeta sub-title">[[_formatSubTitle()]]</div>
             </template>
           </div>
           <div class="right__container">
@@ -47,7 +47,7 @@
               <input id="inputStart" type="text" class="text-input" value="{{value}}"
                      on-change="_handleStartChange" tabindex="0" disabled="{{disabled}}"/>
 
-              <span>{{unit}}</span>
+              <span class="unit">{{unit}}</span>
 
               <a><span class="fa-stack fa-lg">
                           <i class="fa fa-refresh"></i>
