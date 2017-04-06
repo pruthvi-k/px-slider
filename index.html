@@ -120,7 +120,6 @@
                       step="{{item.step}}"
                       disabled="{{item.disabled}}"
                       hide-inputs="{{item.hideInputs}}"
-                      scale="{{item.scale}}"
                       unit="{{item.unit}}"
                       bands="{{item.bands}}"
                       labels="{{item.labels}}"
@@ -174,6 +173,9 @@
   </footer>
 </template>
 <script>
+  window.addEventListener('refreshButtonPressed', function (e,detail,c) {
+    console.log(e,detail,c);
+  })
   window.addEventListener('WebComponentsReady', function () {
     var template = document.querySelector('template[is=dom-bind]'),
       optionsArray = [
@@ -182,11 +184,8 @@
           "min": 0,
           "max": 120,
           "step": 1,
-//          "startValue": "",
-//          "endValue": "",
           "disabled": false,
           "hideInputs": false,
-          "scale": "linear",
           "title": "Slider Title",
           "subTitle": "Sub Heading",
           "unit": "s/m",
@@ -208,9 +207,13 @@
           "step": 5,
           "startValue": 20,
           "endValue": 80,
-          "disabled": false,
+          "disabled": true,
           "hideInputs": false,
-          "scale": "linear"
+          "bands": [{from: 20, to: 40, color: "yellow"}, {from: 40, to: 50, color: "red"},{
+            from: 50,
+            to: 100,
+            color: "green"
+          }]
         },
         {
           "value": 10,
@@ -220,8 +223,7 @@
           "startValue": "",
           "endValue": "",
           "disabled": false,
-          "hideInputs": false,
-          "scale": "logarithmic"
+          "hideInputs": true
         }
       ],
       indexPlusOne = function (num) {

@@ -45,7 +45,7 @@
 
               <span class="unit">{{unit}}</span>
 
-              <a><span class="fa-stack fa-lg">
+              <a on-tap="handleTap"><span class="fa-stack fa-lg">
                           <i class="fa fa-refresh"></i>
                         </span>
               </a>
@@ -192,9 +192,15 @@
     },
 
     listeners: {
-      'iron-resize': '_onIronResize'
+      'iron-resize': '_onIronResize',
+      'handleTap': '_refreshPressed'
     },
-
+    handleTap: function(e, detail) {
+      this.fire('refreshButtonPressed', {id: this.id, value:this.value}, null, {
+        node: this,
+        bubbles: false
+      });
+    },
     ready: function () {
       //if latest value is not defined - to hide black tick
       if (!this.latestValue) {
