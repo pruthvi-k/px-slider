@@ -1,14 +1,14 @@
-# px-slider [![Build Status](https://travis-ci.org/PredixDev/px-slider.svg?branch=master)](https://travis-ci.org/PredixDev/px-slider)
+# px-sliding-gague [![Build Status](https://travis-ci.org/PredixDev/px-sliding-gague.svg?branch=master)](https://travis-ci.org/PredixDev/px-sliding-gague)
 
-[![px-slider demo](px-slider.png?raw=true)](https://github.com/PredixDev/px-slider)
+[![px-sliding-gague demo](px-sliding-gague.png?raw=true)](https://github.com/PredixDev/px-sliding-gague)
 
 ## Overview
 
-The px-slider is a Predix UI component for defining a value in a range or a range of values within set boundaries.
+The px-sliding-gague is a Predix UI component for defining a value in a range or a range of values within set boundaries.
 
 ## documentation
 
-Read the full API and view the demo [here](https://predixdev.github.io/px-slider).
+Read the full API and view the demo [here](https://predixdev.github.io/px-sliding-gague).
 
 ## Usage
 
@@ -25,44 +25,44 @@ Node, npm and bower are necessary to install the component and dependencies. web
 First, install the component via bower on the command line.
 
 ```
-bower install px-slider --save
+bower install px-sliding-gague --save
 ```
 
 Second, import the component to your application with the following tag in your head.
 
 ```
-<link rel="import" href="/bower_components/px-slider/px-slider.html"/>
+<link rel="import" href="/bower_components/px-sliding-gague/px-sliding-gague.html"/>
 ```
 
 Finally, use the component in your application:
 
 Single handled slider
 ```
-<px-slider
+<px-sliding-gague
   value="50"
   min="1"
   max="100">
-</px-slider>
+</px-sliding-gague>
 ```
 
 Multi-handled slider
 ```
-<px-slider
+<px-sliding-gague
   start-value="20"
   end-value="40"
   min="1"
   max="60">
-</px-slider>
+</px-sliding-gague>
 ```
 
 Single-handled slider with step
 ```
-<px-slider
+<px-sliding-gague
   value="250"
   step="50"
   min="0"
   max="500">
-</px-slider>
+</px-sliding-gague>
 ```
 
 ### Layout
@@ -98,4 +98,4 @@ Navigate to the root of that server (e.g. http://localhost:8080/) in a browser t
 
 ## Known Issues
 
-Please use [Github Issues](https://github.com/PredixDev/px-slider/issues) to submit any bugs you might find.
+Please use [Github Issues](https://github.com/PredixDev/px-sliding-gague/issues) to submit any bugs you might find.
