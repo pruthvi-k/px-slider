@@ -181,7 +181,8 @@
         value: ""
       },
       bands: {
-        type: Object
+        type: Object,
+        observer: '_bandsChanged'
       },
       labels: {
         type: Object,
@@ -201,13 +202,17 @@
         this._addLabels();
       }
     },
-    handleTap: function(e, detail) {
-      this.fire('refreshButtonPressed', {id: this.id, value:this.value}, null, {
+    _bandsChanged: function () {
+      this._updateBands();
+    },
+    handleTap: function (e, detail) {
+      this.fire('refreshButtonPressed', {id: this.id, value: this.value}, null, {
         node: this,
         bubbles: false
       });
     },
     ready: function () {
+
       //if latest value is not defined - to hide black tick
       if (!this.latestValue) {
         this.latestValue = false;
@@ -245,29 +250,29 @@
 
         // move handle into initial position
         this._updateHandle(this.$.singleHandle, this.value);
-        this._renderElements();
       }, 1);
-    },
-    _formatSubTitle: function() {
-      if(this.subTitle) {
-          return this.subTitle;
-      }  else {
-          return 'Latest: '+ (this.latestValue || this.value) +' '+ this.unit;
+  },
+    _formatSubTitle: function () {
+      if (this.subTitle) {
+        return this.subTitle;
+      } else {
+        return 'Latest: ' + (this.latestValue || this.value) + ' ' + this.unit;
       }
     },
     _formatTickLabel: function (num) {
       return num > 999 ? (num / 1000) + 'k' : num
     },
     _calculateMidValue: function (min, max) {
-        if(min > 0){
-          return (max - min) / 2 + min;
-        } else {
-      return (max - min) / 2;
-        }
+      if (min > 0) {
+        return (max - min) / 2 + min;
+      } else {
+        return (max - min) / 2;
+      }
     },
     _renderElements: function () {
       this._updateBands();
       this._plotTicks();
+      this._addLabels();
     },
     _plotTicks: function () {
       this.querySelector("#maxValTick").style.left = this._translateValueToPosition(this.max);
@@ -278,7 +283,6 @@
       if (this.querySelector("#latestValueTick")) {
         this.querySelector("#latestValueTick").style.left = this._translateValueToPosition(this.latestValue);
       }
-      this._addLabels();
     },
     _addLabels: function () {
       var self = this;
@@ -286,7 +290,7 @@
         this.labels.forEach(function (label) {
           if (label.attributes) {
             var id = (label.attributes['type']).toLowerCase();
-            if (document.querySelectorAll("#"+self.id+" #gaugeAlerts px-alert-label#" + id).length == 0) {
+            if (document.querySelectorAll("#" + self.id + " #gaugeAlerts px-alert-label#" + id).length == 0) {
               var dynamicLabel = document.createElement("px-alert-label");
               dynamicLabel.setAttribute("id", id);
               for (var attr in label.attributes) {
@@ -294,11 +298,11 @@
               }
               dynamicLabel.setAttribute("style", "position:absolute");
 
-              Polymer.dom(self.querySelector("#"+self.id + " #gaugeAlerts")).appendChild(dynamicLabel);
+              Polymer.dom(self.querySelector("#" + self.id + " #gaugeAlerts")).appendChild(dynamicLabel);
               var postion = (self._convertValueToPosition(label.position) - (dynamicLabel.offsetWidth / 2)) + 2;
-              document.querySelector("#"+self.id+" #gaugeAlerts px-alert-label#" + id).style.left = postion + "px";
+              document.querySelector("#" + self.id + " #gaugeAlerts px-alert-label#" + id).style.left = postion + "px";
             } else {
-              var el = document.querySelector("#"+self.id+" #gaugeAlerts px-alert-label#" + id);
+              var el = document.querySelector("#" + self.id + " #gaugeAlerts px-alert-label#" + id);
               var postion = (self._convertValueToPosition(label.position) - (el.offsetWidth / 2)) + 2;
               el.style.left = postion + "px";
             }
@@ -309,23 +313,23 @@
 
     _updateBands: function (myvalue) {
       var self = this;
-      var maxWidth= self._convertValueToPosition(self.max+self.min),minBand=0;
+      var maxWidth = self._convertValueToPosition(self.max + self.min), minBand = 0;
 
       if (this.bands) {
         //add bands dynamically based on points
         for (bandIndex = 0, numOfBands = this.bands.length; bandIndex < numOfBands; bandIndex++) {
           var band = this.bands[bandIndex];
 
-          if (band.from < self.min) {
-            this._plotDefaultBand();
-            break;
-          }
-          if (document.querySelector("#"+this.id+' #sliderContainer bands ' + "." + band.color + "-band")) {
+//          if (band.from < self.min) {
+//            this._plotDefaultBand();
+//            break;
+//          }
+          if (document.querySelector("#" + this.id + ' #sliderContainer bands ' + "." + band.color + "-band")) {
             var dynamicBand = document.querySelector('#sliderContainer bands ' + "." + band.color + "-band");
           } else {
             var dynamicBand = document.createElement("div");
             dynamicBand.setAttribute("class", "slider__band " + band.color + "-band");
-            Polymer.dom(self.querySelector("#"+this.id+' #sliderContainer bands')).appendChild(dynamicBand);
+            Polymer.dom(self.querySelector("#" + this.id + ' #sliderContainer bands')).appendChild(dynamicBand);
           }
 
           var from = band.from;
@@ -335,15 +339,15 @@
             from = band.to;
           }
 
-          if(self.min > 0){
+          if (self.min > 0) {
 
             var widthVal = self._convertValueToPosition(to);
-            if(bandIndex > 0) {
+            if (bandIndex > 0) {
               widthVal = widthVal - minBand;
             }
-            dynamicBand.style.width = widthVal+'px';
+            dynamicBand.style.width = widthVal + 'px';
             dynamicBand.style.left = self._translateValueToPosition(from);
-            minBand+=widthVal
+            minBand += widthVal
           } else {
             var widthVal = to - from;
             dynamicBand.style.width = self._translateValueToPosition(widthVal);
