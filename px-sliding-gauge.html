@@ -184,7 +184,8 @@
         type: Object
       },
       labels: {
-        type: Object
+        type: Object,
+        observer: '_labelsChanged'
       },
       latestValue: {
         type: Number
@@ -194,6 +195,11 @@
     listeners: {
       'iron-resize': '_onIronResize',
       'handleTap': '_refreshPressed'
+    },
+    _labelsChanged: function (d) {
+      if (document.querySelectorAll("#" + this.id + ' #sliderContainer bands').length > 0) {
+        this._addLabels();
+      }
     },
     handleTap: function(e, detail) {
       this.fire('refreshButtonPressed', {id: this.id, value:this.value}, null, {
@@ -262,7 +268,6 @@
     _renderElements: function () {
       this._updateBands();
       this._plotTicks();
-      this._addLabels();
     },
     _plotTicks: function () {
       this.querySelector("#maxValTick").style.left = this._translateValueToPosition(this.max);
@@ -273,7 +278,7 @@
       if (this.querySelector("#latestValueTick")) {
         this.querySelector("#latestValueTick").style.left = this._translateValueToPosition(this.latestValue);
       }
-
+      this._addLabels();
     },
     _addLabels: function () {
       var self = this;
@@ -294,7 +299,6 @@
               document.querySelector("#"+self.id+" #gaugeAlerts px-alert-label#" + id).style.left = postion + "px";
             } else {
               var el = document.querySelector("#"+self.id+" #gaugeAlerts px-alert-label#" + id);
-              console.log("el", el);
               var postion = (self._convertValueToPosition(label.position) - (el.offsetWidth / 2)) + 2;
               el.style.left = postion + "px";
             }
@@ -302,14 +306,11 @@
         })
       }
     },
-    _updateLabelPosition: function (label, positionValue) {
-      //console.log(positionValue, label);
-      //Polymer.dom(this.$.gaugeAlerts).label.style.left = this._translateValueToPosition(positionValue);
-    },
+
     _updateBands: function (myvalue) {
       var self = this;
       var maxWidth= self._convertValueToPosition(self.max+self.min),minBand=0;
-      console.log("maaaaax",maxWidth);
+
       if (this.bands) {
         //add bands dynamically based on points
         for (bandIndex = 0, numOfBands = this.bands.length; bandIndex < numOfBands; bandIndex++) {
@@ -709,7 +710,6 @@
       var cL = this.$.sliderContainer.getBoundingClientRect().left;
       var cR = this.$.sliderContainer.getBoundingClientRect().right;
       var cW = this.offsetForHandleWidth;
-      console.log('width', cW, cL, cR);
       var position = 0;
 
       // Check to make sure Mouse is on the screen.
@@ -744,7 +744,7 @@
       if (slider.disabled) {
         return false;
       }
-//console.log("handle track end")
+
       if (slider.debounce) {
         slider.debounce(
           'slider_track_end', function () {

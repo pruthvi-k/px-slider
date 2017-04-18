@@ -174,7 +174,7 @@
 </template>
 <script>
   window.addEventListener('refreshButtonPressed', function (e,detail,c) {
-    console.log(e,detail,c);
+    console.log('refreshButtonPressed', e.detail);
   })
   window.addEventListener('WebComponentsReady', function () {
     var template = document.querySelector('template[is=dom-bind]'),
