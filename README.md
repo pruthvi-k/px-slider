@@ -1,6 +1,6 @@
 # px-sliding-gague [![Build Status](https://travis-ci.org/PredixDev/px-sliding-gague.svg?branch=master)](https://travis-ci.org/PredixDev/px-sliding-gague)
 
-[![px-sliding-gague demo](px-sliding-gauge.png?raw=true)](https://github.com/PredixDev/px-sliding-gague)
+[![px-sliding-gague demo](px-sliding-gauge12.png?raw=true)](https://github.com/PredixDev/px-sliding-gague)
 
 ## Overview
 
