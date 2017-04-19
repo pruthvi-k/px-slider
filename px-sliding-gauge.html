@@ -325,7 +325,7 @@
 //            break;
 //          }
           if (document.querySelector("#" + this.id + ' #sliderContainer bands ' + "." + band.color + "-band")) {
-            var dynamicBand = document.querySelector('#sliderContainer bands ' + "." + band.color + "-band");
+            var dynamicBand = document.querySelector("#" + this.id + ' #sliderContainer bands ' + "." + band.color + "-band");
           } else {
             var dynamicBand = document.createElement("div");
             dynamicBand.setAttribute("class", "slider__band " + band.color + "-band");
