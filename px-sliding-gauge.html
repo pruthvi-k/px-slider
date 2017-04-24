@@ -6,821 +6,868 @@
 <link rel="import" href="css/px-sliding-gauge-styles.html">
 
 <dom-module id="px-sliding-gauge">
-  <template>
-    <style>
+    <template strip-whitespace>
+        <style>
 
-      /deep/
-      px-alert-label .alertlabel {
-        font-size: 12px !important;
-        padding: 5px !important;
-      }
+            /deep/
+            px-alert-label .alertlabel {
+                font-size: 12px !important;
+                padding: 5px !important;
+            }
 
-      /deep/
-      px-handle button.px-handle {
-        padding: 3px 6px;
-        height: 21px !important;
-        width: 21px !important;
+            /deep/
+            px-handle button.px-handle {
+                padding: 3px 6px;
+                height: 21px !important;
+                width: 21px !important;
 
-      }
-    </style>
-    <style include="px-sliding-gauge-styles"></style>
+            }
+        </style>
+        <style include="px-sliding-gauge-styles"></style>
 
-    <div class="slider-container">
-      <div class="flex flex--col">
+        <div class="slider-container">
+            <div class="flex flex--col">
 
-        <div class="flex flex--row">
+                <div class="flex flex--row">
 
-          <div class="left__container">
-            <template is="dom-if" if="{{!hideTitle}}" class="visuallyhidden" id="sliderTitle">
-              <div class="regular title">{{title}}</div>
-              <px-tooltip for="btn1" delay="50" tooltip-message="{{subTitle}} {{unit}}" orientation="top"
-                          tooltip-style="dark"></px-tooltip>
-              <div id="btn1" class="zeta sub-title">[[_formatSubTitle()]]</div>
-            </template>
-          </div>
-          <div class="right__container">
-            <div class="visuallyhidden-inputs visuallyhidden">
-              <input id="inputStart" type="text" class="text-input" value="{{value}}"
-                     on-change="_handleStartChange" tabindex="0" disabled="{{disabled}}"/>
+                    <div class="left__container">
+                        <template is="dom-if" if="{{!hideTitle}}" class="visuallyhidden" id="sliderTitle">
+                            <div class="regular title">{{title}}</div>
+                            <px-tooltip for="btn1" delay="50" tooltip-message="{{subTitle}}" orientation="top"
+                                        tooltip-style="dark"></px-tooltip>
+                            <div id="btn1" class="zeta sub-title">{{_formattedSubTitle}}</div>
+                        </template>
+                    </div>
+                    <div class="right__container">
+                        <div class="visuallyhidden-inputs visuallyhidden">
+                            <input id="inputStart" type="text" class="text-input" value="{{value}}"
+                                   on-change="_handleStartChange" tabindex="0" disabled="{{disabled}}"/>
 
-              <span class="unit">{{unit}}</span>
+                            <span class="unit">{{unit}}</span>
 
-              <a on-tap="handleTap"><span class="fa-stack fa-lg">
-                          <i class="fa fa-refresh"></i>
+                            <a on-tap="handleTap"><span class="fa-stack fa-lg">
+                          <i class="fa fa-refresh disabled"></i>
                         </span>
-              </a>
+                            </a>
 
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
+            <div id="sliderContainer" class="slider flex__item" on-click="_jumpToValue">
+                <bands></bands>
+                <ticks>
+                    <div id="latestValueTick" hidden$="{{!latestValue}}" class="tick latest-value"></div>
+                    <div id="minValTick" class="tick"><label>{{_formatTickLabel(min)}}</label></div>
+                    <div id="midValTick" class="tick"><label>{{_formatTickLabel(mid)}}</label></div>
+                    <div id="maxValTick" class="tick"><label>{{_formatTickLabel(max)}}</label></div>
+                </ticks>
+
+                <div id="gaugeAlerts" class="gauge-alerts">
+                </div>
+
+                <px-handle id="singleHandle" class="visuallyhidden-inputs2 visuallyhidden" on-track="_handleTrackEnd"
+                           disabled="{{disabled}}"></px-handle>
+            </div>
+            <div>
+                <input id="inputEnd" type="text" class="text-input visuallyhidden" value="{{endValue}}"
+                       on-change="_handleEndChange" tabindex="0" disabled="{{disabled}}"/>
+            </div>
         </div>
-      </div>
-      <div id="sliderContainer" class="slider flex__item" on-click="_jumpToValue">
-        <bands></bands>
-        <ticks>
-          <div id="latestValueTick" hidden$="{{!latestValue}}" class="tick latest-value"></div>
-          <div id="minValTick" class="tick"><label>{{_formatTickLabel(min)}}</label></div>
-          <div id="midValTick" class="tick"><label>{{_formatTickLabel(mid)}}</label></div>
-          <div id="maxValTick" class="tick"><label>{{_formatTickLabel(max)}}</label></div>
-        </ticks>
 
-        <div id="gaugeAlerts" class="gauge-alerts">
         </div>
-
-        <px-handle id="singleHandle" class="visuallyhidden-inputs2 visuallyhidden" on-track="_handleTrackEnd"
-                   disabled="{{disabled}}"></px-handle>
-      </div>
-      <div>
-        <input id="inputEnd" type="text" class="text-input visuallyhidden" value="{{endValue}}"
-               on-change="_handleEndChange" tabindex="0" disabled="{{disabled}}"/>
-      </div>
-    </div>
-
-    </div>
-  </template>
+    </template>
 </dom-module>
 
 <script>
-  Polymer({
+    Polymer({
 
-    is: 'px-sliding-gauge',
+        is: 'px-sliding-gauge',
 
-    behaviors: [
-      Polymer.IronResizableBehavior
-    ],
+        behaviors: [
+            Polymer.IronResizableBehavior
+        ],
 
-    /**
-     * Properties block, expose attribute values to the DOM via 'reflect'
-     *
-     * @property properties
-     * @type Object
-     */
-    properties: {
-      /**
-       * The starting value for the slider's handle.
-       */
-      value: {
-        type: Number,
-        notify: true,
-        observer: '_valueChanged'
-      },
-      /**
-       * A min value for the slider. The user cannot choose less than the min.
-       */
-      min: {
-        type: Number,
-        value: 1,
-        observer: '_minChanged'
-      },
-      /**
-       * A max value for the slider. The user cannot choose greater than the max.
-       */
-      max: {
-        type: Number,
-        value: 100,
-        observer: '_maxChanged',
-      },
-      /**
-       * Computed class names that correspond to each label type.
-       *
-       * @property mid
-       * @type Number
-       * @computed _calculateMidValue(min,max)
-       */
-      mid: {
-        type: Number,
-        value: 0,
-        computed: "_calculateMidValue(min,max)"
-      },
-      /**
-       * All allowed values will be a multiple of the step.
-       * So if you want the user only to be able to select 10, 20, 30, 40, etc. you would set the step to 10.
-       * The default is 1, which ensures that you only get integers for your value.
-       */
-      step: {
-        type: Number,
-        value: 1,
-        observer: '_stepChanged'
-      },
-      /**
-       * A boolean reflecting whether the slider is disabled or not.
-       */
-      disabled: {
-        type: Boolean,
-        value: false
-      },
-      /**
-       * A boolean reflecting whether the text input fields should be hidden.
-       */
-      hideInputs: {
-        type: Boolean,
-        value: false,
-        observer: '_hideInputsChanged'
-      },
-      /**
-       * The scale by which the slider operates - currently supports "linear" or "logarithmic."
-       */
-      scale: {
-        type: String,
-        value: "linear",
-        observer: '_scaleChanged'
-      },
-      /**
-       * A boolean reflecting whether the title should be hidden.
-       */
-      hideTitle: {
-        type: Boolean,
-        value: false,
-        observer: '_hideTitleChanged'
-      },
-      title: {
-        type: String,
-        value: ""
-      },
-      subTitle: {
-        type: String,
-        value: ""
-      },
-      bands: {
-        type: Object,
-        observer: '_bandsChanged'
-      },
-      labels: {
-        type: Object,
-        observer: '_labelsChanged'
-      },
-      latestValue: {
-        type: Number
-      }
-    },
-
-    listeners: {
-      'iron-resize': '_onIronResize',
-      'handleTap': '_refreshPressed'
-    },
-    _labelsChanged: function (d) {
-      if (document.querySelectorAll("#" + this.id + ' #sliderContainer bands').length > 0) {
-        this._addLabels();
-      }
-    },
-    _bandsChanged: function () {
-      this._updateBands();
-    },
-    handleTap: function (e, detail) {
-      this.fire('refreshButtonPressed', {id: this.id, value: this.value}, null, {
-        node: this,
-        bubbles: false
-      });
-    },
-    ready: function () {
-
-      //if latest value is not defined - to hide black tick
-      if (!this.latestValue) {
-        this.latestValue = false;
-      }
-      // Must have min and max values
-      // FATAL
-      if (!this.min && this.min !== 0) {
-        throw "Missing a minimum value (min).";
-      } else if (!this.max && this.max !== 0) {
-        throw "Missing a maximum value (max).";
-      }
-
-      if (this.min === 0 && this.scale === "logarithmic") {
-        console.warn("Min of 0 is invalid for logarithmic. Assigning 1 instead.");
-        this.min = 1;
-      }
-
-      if (this.min > this.max) {
-        console.warn("Min and Max look reversed. Switching them.")
-        var min = this.min;
-        this.min = this.max;
-        this.max = min;
-      }
-
-      if (!this.value && this.value !== 0) {
-        // throw "Oops, I need a starting value. Did you set the 'value' attribute?";
-        this.value = this.min;
-      }
-
-      // Show the single handle
-//      this.toggleClass('visuallyhidden', false, this.$.singleHandle);
-      this.async(function () {
-        // calculate the amount to offset the range on the right for handle width
-        this.offsetForHandleWidth = this._calcOffsetWidth(0);
-
-        // move handle into initial position
-        this._updateHandle(this.$.singleHandle, this.value);
-      }, 1);
-  },
-    _formatSubTitle: function () {
-      if (this.subTitle) {
-        return this.subTitle;
-      } else {
-        return 'Latest: ' + (this.latestValue || this.value) + ' ' + this.unit;
-      }
-    },
-    _formatTickLabel: function (num) {
-      return num > 999 ? (num / 1000) + 'k' : num
-    },
-    _calculateMidValue: function (min, max) {
-      if (min > 0) {
-        return (max - min) / 2 + min;
-      } else {
-        return (max - min) / 2;
-      }
-    },
-    _renderElements: function () {
-      this._updateBands();
-      this._plotTicks();
-      this._addLabels();
-    },
-    _plotTicks: function () {
-      this.querySelector("#maxValTick").style.left = this._translateValueToPosition(this.max);
-      this.querySelector("#maxValTick label").style.right = "24px";
-      this.querySelector("#minValTick label").style.left = "4px";
-      this.querySelector("#midValTick").style.left = this._translateValueToPosition(this.mid);
-      this.querySelector("#midValTick label").style.right = "6px";
-      if (this.querySelector("#latestValueTick")) {
-        this.querySelector("#latestValueTick").style.left = this._translateValueToPosition(this.latestValue);
-      }
-    },
-    _addLabels: function () {
-      var self = this;
-      if (this.labels) {
-        this.labels.forEach(function (label) {
-          if (label.attributes) {
-            var id = (label.attributes['type']).toLowerCase();
-            if (document.querySelectorAll("#" + self.id + " #gaugeAlerts px-alert-label#" + id).length == 0) {
-              var dynamicLabel = document.createElement("px-alert-label");
-              dynamicLabel.setAttribute("id", id);
-              for (var attr in label.attributes) {
-                dynamicLabel.setAttribute(attr, label.attributes[attr]);
-              }
-              dynamicLabel.setAttribute("style", "position:absolute");
-
-              Polymer.dom(self.querySelector("#" + self.id + " #gaugeAlerts")).appendChild(dynamicLabel);
-              var postion = (self._convertValueToPosition(label.position) - (dynamicLabel.offsetWidth / 2)) + 2;
-              document.querySelector("#" + self.id + " #gaugeAlerts px-alert-label#" + id).style.left = postion + "px";
-            } else {
-              var el = document.querySelector("#" + self.id + " #gaugeAlerts px-alert-label#" + id);
-              var postion = (self._convertValueToPosition(label.position) - (el.offsetWidth / 2)) + 2;
-              el.style.left = postion + "px";
+        /**
+         * Properties block, expose attribute values to the DOM via 'reflect'
+         *
+         * @property properties
+         * @type Object
+         */
+        properties: {
+            /**
+             * The starting value for the slider's handle.
+             */
+            value: {
+                type: Number,
+                notify: true,
+                observer: '_valueChanged'
+            },
+            /**
+             * A min value for the slider. The user cannot choose less than the min.
+             */
+            min: {
+                type: Number,
+                value: 1,
+                observer: '_minChanged'
+            },
+            /**
+             * A max value for the slider. The user cannot choose greater than the max.
+             */
+            max: {
+                type: Number,
+                value: 100,
+                observer: '_maxChanged',
+            },
+            /**
+             * Computed class names that correspond to each label type.
+             *
+             * @property mid
+             * @type Number
+             * @computed _calculateMidValue(min,max)
+             */
+            mid: {
+                type: Number,
+                value: 0,
+                computed: "_calculateMidValue(min,max)"
+            },
+            /**
+             * All allowed values will be a multiple of the step.
+             * So if you want the user only to be able to select 10, 20, 30, 40, etc. you would set the step to 10.
+             * The default is 1, which ensures that you only get integers for your value.
+             */
+            step: {
+                type: Number,
+                value: 1,
+                observer: '_stepChanged'
+            },
+            /**
+             * A boolean reflecting whether the slider is disabled or not.
+             */
+            disabled: {
+                type: Boolean,
+                value: false
+            },
+            /**
+             * A boolean reflecting whether the text input fields should be hidden.
+             */
+            hideInputs: {
+                type: Boolean,
+                value: false,
+                observer: '_hideInputsChanged'
+            },
+            /**
+             * The scale by which the slider operates - currently supports "linear" or "logarithmic."
+             */
+            scale: {
+                type: String,
+                value: "linear",
+                observer: '_scaleChanged'
+            },
+            /**
+             * A boolean reflecting whether the title should be hidden.
+             */
+            hideTitle: {
+                type: Boolean,
+                value: false,
+                observer: '_hideTitleChanged'
+            },
+            title: {
+                type: String,
+                value: ""
+            },
+            subTitle: {
+                type: String,
+                value: ""
+            },
+            bands: {
+                type: Object,
+                observer: '_bandsChanged'
+            },
+            labels: {
+                type: Object,
+                observer: '_labelsChanged'
+            },
+            latestValue: {
+                type: Number,
+                observer: '_adjustLatestValueStrip'
+            },
+            _formattedSubTitle: {
+                type: String,
+                computed: '_formatSubTitle(latestValue, value, unit)'
+            },
+            '_allowRefresh': {
+                type: Boolean,
+                value: function () {
+                    return false;
+                }
             }
-          }
-        })
-      }
-    },
+        },
 
-    _updateBands: function (myvalue) {
-      var self = this;
-      var maxWidth = self._convertValueToPosition(self.max + self.min), minBand = 0;
+        listeners: {
+            'iron-resize': '_onIronResize',
+            'handleTap': '_refreshPressed'
+        },
+        _labelsChanged: function (d) {
+            if (this.id != "" && document.querySelectorAll("#" + this.id + ' #sliderContainer bands').length > 0) {
+                this._addLabels();
+            }
+        },
+        _bandsChanged: function () {
+            if (this.id != "") {
+                this._updateBands();
+            }
+        },
+        handleTap: function (e, detail) {
+            if (this._allowRefresh == true) {
+                this.fire('refreshButtonPressed', {id: this.id, value: this.value}, null, {
+                    node: this,
+                    bubbles: false
+                });
+                this._changeResetButtonState("disable");
+            }
+        },
+        ready: function () {
 
-      if (this.bands) {
-        //add bands dynamically based on points
-        for (bandIndex = 0, numOfBands = this.bands.length; bandIndex < numOfBands; bandIndex++) {
-          var band = this.bands[bandIndex];
+            //if latest value is not defined - to hide black tick
+            if (!this.latestValue) {
+                this.latestValue = false;
+            }
+            // Must have min and max values
+            // FATAL
+            if (!this.min && this.min !== 0) {
+                throw "Missing a minimum value (min).";
+            } else if (!this.max && this.max !== 0) {
+                throw "Missing a maximum value (max).";
+            }
+
+            if (this.min === 0 && this.scale === "logarithmic") {
+                console.warn("Min of 0 is invalid for logarithmic. Assigning 1 instead.");
+                this.min = 1;
+            }
+
+            if (this.min > this.max) {
+                console.warn("Min and Max look reversed. Switching them.")
+                var min = this.min;
+                this.min = this.max;
+                this.max = min;
+            }
+
+            if (!this.value && this.value !== 0) {
+                // throw "Oops, I need a starting value. Did you set the 'value' attribute?";
+                this.value = this.min;
+            }
+
+            // Show the single handle
+//      this.toggleClass('visuallyhidden', false, this.$.singleHandle);
+            this.async(function () {
+                // calculate the amount to offset the range on the right for handle width
+                this.offsetForHandleWidth = this._calcOffsetWidth(0);
+
+                // move handle into initial position
+                this._updateHandle(this.$.singleHandle, this.value);
+            }, 1);
+        },
+        //Todo: calculate min and max value from latest value
+        _getExtent: function (value) {
+            var min = Math.log(value) / Math.log(10);
+            this.min = Math.pow(parseInt(min));
+            console.log("calculated vals", this.min);
+        },
+
+        _formatSubTitle: function (latestValue, value, unit) {
+            return 'Latest: ' + (latestValue || value) + ' ' + unit;
+        },
+        _formatTickLabel: function (num) {
+            return num > 999 ? (num / 1000) + 'k' : num
+        },
+        _calculateMidValue: function (min, max) {
+            if (min > 0) {
+                return (max - min) / 2 + min;
+            } else {
+                return (max - min) / 2;
+            }
+        },
+        _renderElements: function () {
+            this._updateBands();
+            this._plotTicks();
+            this._addLabels();
+        },
+        _plotTicks: function () {
+            this.querySelector("#maxValTick").style.left = this._translateValueToPosition(this.max);
+            this.querySelector("#maxValTick label").style.right = "24px";
+            this.querySelector("#minValTick label").style.left = "4px";
+            this.querySelector("#midValTick").style.left = this._translateValueToPosition(this.mid);
+            this.querySelector("#midValTick label").style.right = "6px";
+            this._adjustLatestValueStrip();
+        },
+        _adjustLatestValueStrip: function () {
+            if (this.querySelector("#latestValueTick")) {
+                this.querySelector("#latestValueTick").style.left = this._translateValueToPosition(this.latestValue);
+            }
+        },
+        _addLabels: function () {
+            var self = this;
+            if (this.labels && this.labels.length > 0) {
+                this.labels.forEach(function (label) {
+                    if (label.attributes) {
+                        var id = (label.attributes['type']).toLowerCase();
+                        if (document.querySelectorAll("#" + self.id + " #gaugeAlerts px-alert-label#" + id).length == 0) {
+                            var dynamicLabel = document.createElement("px-alert-label");
+                            dynamicLabel.setAttribute("id", id);
+                            for (var attr in label.attributes) {
+                                dynamicLabel.setAttribute(attr, label.attributes[attr]);
+                            }
+                            dynamicLabel.setAttribute("style", "position:absolute");
+
+                            Polymer.dom(self.querySelector("#" + self.id + " #gaugeAlerts")).appendChild(dynamicLabel);
+                            var postion = (self._convertValueToPosition(label.position) - (dynamicLabel.offsetWidth / 2));
+                            document.querySelector("#" + self.id + " #gaugeAlerts px-alert-label#" + id).style.left = postion + "px";
+                        } else {
+                            var el = document.querySelector("#" + self.id + " #gaugeAlerts px-alert-label#" + id);
+                            var postion = (self._convertValueToPosition(label.position) - (el.offsetWidth / 2));
+                            el.style.left = postion + "px";
+                        }
+                    }
+                })
+            } else {
+                var nodes = Polymer.dom(self.querySelector("#" + this.id + " #gaugeAlerts")).childNodes;
+                for (nodeIndex = 0, noOfNodes = nodes.length; nodeIndex < noOfNodes; nodeIndex++) {
+                    Polymer.dom(self.querySelector("#" + this.id + " #gaugeAlerts")).removeChild(nodes[nodeIndex]);
+                }
+            }
+        },
+
+        _updateBands: function (myvalue) {
+            var self = this;
+            var maxWidth = self._convertValueToPosition(self.max + self.min), minBand = 0;
+
+            if (this.bands) {
+                //add bands dynamically based on points
+                for (bandIndex = 0, numOfBands = this.bands.length; bandIndex < numOfBands; bandIndex++) {
+                    var band = this.bands[bandIndex];
 
 //          if (band.from < self.min) {
 //            this._plotDefaultBand();
 //            break;
 //          }
-          if (document.querySelector("#" + this.id + ' #sliderContainer bands ' + "." + band.color + "-band")) {
-            var dynamicBand = document.querySelector("#" + this.id + ' #sliderContainer bands ' + "." + band.color + "-band");
-          } else {
-            var dynamicBand = document.createElement("div");
-            dynamicBand.setAttribute("class", "slider__band " + band.color + "-band");
-            Polymer.dom(self.querySelector("#" + this.id + ' #sliderContainer bands')).appendChild(dynamicBand);
-          }
+                    if (document.querySelector("#" + this.id + ' #sliderContainer bands ' + "." + band.color + "-band")) {
+                        var dynamicBand = document.querySelector("#" + this.id + ' #sliderContainer bands ' + "." + band.color + "-band");
+                    } else {
+                        var dynamicBand = document.createElement("div");
+                        dynamicBand.setAttribute("class", "slider__band " + band.color + "-band");
+                        Polymer.dom(self.querySelector("#" + this.id + ' #sliderContainer bands')).appendChild(dynamicBand);
+                    }
 
-          var from = band.from;
-          var to = band.to;
-          if (band.from > band.to) {
-            to = band.from;
-            from = band.to;
-          }
+                    var from = band.from;
+                    var to = band.to;
+                    if (band.from > band.to) {
+                        to = band.from;
+                        from = band.to;
+                    }
 
-          if (self.min > 0) {
+                    if (self.min > 0) {
 
-            var widthVal = self._convertValueToPosition(to);
-            if (bandIndex > 0) {
-              widthVal = widthVal - minBand;
+                        var widthVal = self._convertValueToPosition(to);
+                        if (bandIndex > 0) {
+                            widthVal = widthVal - minBand;
+                        }
+                        dynamicBand.style.width = widthVal + 'px';
+                        dynamicBand.style.left = self._translateValueToPosition(from);
+                        minBand += widthVal
+                    } else {
+                        var widthVal = to - from;
+                        dynamicBand.style.width = self._translateValueToPosition(widthVal);
+                        dynamicBand.style.left = self._translateValueToPosition(from);
+                    }
+                }
+
+            } else {
+                self._plotDefaultBand();
             }
-            dynamicBand.style.width = widthVal + 'px';
-            dynamicBand.style.left = self._translateValueToPosition(from);
-            minBand += widthVal
-          } else {
-            var widthVal = to - from;
-            dynamicBand.style.width = self._translateValueToPosition(widthVal);
-            dynamicBand.style.left = self._translateValueToPosition(from);
-          }
-        }
+        },
+        _plotDefaultBand: function () {
+            //create default green band if no band range is given
+            var dynamicBand = document.createElement("div");
+            dynamicBand.setAttribute("class", "slider__band green-band");
+            Polymer.dom(this.querySelector('#sliderContainer bands')).appendChild(dynamicBand);
+            dynamicBand.style.width = this._translateValueToPosition(this.max);
+            dynamicBand.style.left = this._translateValueToPosition(this.min);
+        },
+        /**
+         * This will be called by the parents through the iron-resizable-behavior
+         * when they know the slider has been resized or made visible.
+         * @method _onIronResize
+         */
+        _onIronResize: function () {
+            var slider = this;
 
-      } else {
-        self._plotDefaultBand();
-      }
-    },
-    _plotDefaultBand: function () {
-      //create default green band if no band range is given
-      var dynamicBand = document.createElement("div");
-      dynamicBand.setAttribute("class", "slider__band green-band");
-      Polymer.dom(this.querySelector('#sliderContainer bands')).appendChild(dynamicBand);
-      dynamicBand.style.width = this._translateValueToPosition(this.max);
-      dynamicBand.style.left = this._translateValueToPosition(this.min);
-    },
-    /**
-     * This will be called by the parents through the iron-resizable-behavior
-     * when they know the slider has been resized or made visible.
-     * @method _onIronResize
-     */
-    _onIronResize: function () {
-      var slider = this;
+            //debounce resize events
+            if (slider.debounce) {
+                slider.debounce(
+                    'slider_resize', function () {
+                        var handleWidth = 0;//this._range ? 2 : 22;
+                        this.offsetForHandleWidth = this._calcOffsetWidth(handleWidth);
+                        this._updateHandle(this.$.singleHandle, this.value);
+                        this._renderElements();
+                    }, 50);
+            }
+        },
 
-      //debounce resize events
-      if (slider.debounce) {
-        slider.debounce(
-          'slider_resize', function () {
-            var handleWidth = 0;//this._range ? 2 : 22;
-            this.offsetForHandleWidth = this._calcOffsetWidth(handleWidth);
-            this._updateHandle(this.$.singleHandle, this.value);
-            this._renderElements();
-          }, 50);
-      }
-    },
+        /**
+         * Function called when a value changes
+         * --Ensures the value is valid, matches step size, etc
+         * --Moves single or start handle into position
+         * @method _valueChanged
+         * @param newValue
+         * @param oldValue
+         */
+        _valueChanged: function (newValue, oldValue) {
+            var slider = this;
 
-    /**
-     * Function called when a value changes
-     * --Ensures the value is valid, matches step size, etc
-     * --Moves single or start handle into position
-     * @method _valueChanged
-     * @param newValue
-     * @param oldValue
-     */
-    _valueChanged: function (newValue, oldValue) {
-      var slider = this;
-      //this is here to ensure that when we get many consecutive jumps, we debounce them, instead of calculating each one.
-      if (slider.debounce) {
-        slider.debounce(
-          'slider_move', function () {
-            var clean = this._cleanValue(newValue);
+            //this is here to ensure that when we get many consecutive jumps, we debounce them, instead of calculating each one.
+            if (slider.debounce) {
+                slider.debounce(
+                    'slider_move', function () {
+                        var clean = this._cleanValue(newValue);
 
-            //update the single handle
-            var handle = this.$.singleHandle;
-            this._updateHandle(handle, this.value);
+                        //update the single handle
+                        var handle = this.$.singleHandle;
+                        this._updateHandle(handle, this.value);
 
-            this.value = clean;
-          }, 10);
-      }
+                        this.value = clean;
+                    }, 10);
+            }
 
-    },
-    /**
-     * Similar to _valueChanged but affects end handle:
-     * --Ensures the value is valid, matches step size, etc
-     * --Moves single or end handle into position
-     * @method _endValueChanged
-     * @param newValue
-     * @param oldValue
-     */
-    _endValueChanged: function (newValue, oldValue) {
-      var slider = this;
-      //this is here to ensure that when we get many consecutive jumps, we debounce them, instead of calculating each one.
-      if (slider.debounce) {
-        slider.debounce('slider_move_end', function () {
-          var clean = this._cleanValue(newValue);
+        },
 
-          // If it's a range, we update the end handle; otherwise update the single handle
-          var handle = this.$.singleHandle;
-          this._updateHandle(handle, clean);
+        _changeResetButtonState: function (state) {
 
-          // Update endValue with the cleaned value
+            if (this.id) {
+
+                var refreshButton = document.querySelector("#" + this.id + '  .slider-container i.fa-refresh');
+                if(refreshButton) {
+                    if (state === "enable") {
+                        refreshButton.classList.remove("disabled");
+                        refreshButton.classList.add('enabled');
+                        this._allowRefresh = true;
+                    } else if(state === "disable") {
+                        refreshButton.classList.remove("enabled");
+                        refreshButton.classList.add('disabled');
+                        this._allowRefresh = false;
+                    }
+                }
+            }
+        },
+        /**
+         * Similar to _valueChanged but affects end handle:
+         * --Ensures the value is valid, matches step size, etc
+         * --Moves single or end handle into position
+         * @method _endValueChanged
+         * @param newValue
+         * @param oldValue
+         */
+        _endValueChanged: function (newValue, oldValue) {
+            var slider = this;
+            //this is here to ensure that when we get many consecutive jumps, we debounce them, instead of calculating each one.
+            if (slider.debounce) {
+                slider.debounce('slider_move_end', function () {
+                    var clean = this._cleanValue(newValue);
+
+                    // If it's a range, we update the end handle; otherwise update the single handle
+                    var handle = this.$.singleHandle;
+                    this._updateHandle(handle, clean);
+
+                    // Update endValue with the cleaned value
 //          this.endValue = clean;
-        }, 10);
-      }
-    },
+                }, 10);
+            }
+        },
 
-    /**
-     * Function that is called if the min attribute on px-slider is changed
-     * --Ensures the value is valid, matches step size, etc
-     * @method _minChanged
-     * @param newValue
-     * @param oldValue
-     */
-    _minChanged: function (newValue, oldValue) {
-      // Step not always defined at load?
-      if (!this.step) {
-        return;
-      }
+        /**
+         * Function that is called if the min attribute on px-slider is changed
+         * --Ensures the value is valid, matches step size, etc
+         * @method _minChanged
+         * @param newValue
+         * @param oldValue
+         */
+        _minChanged: function (newValue, oldValue) {
+            // Step not always defined at load?
+            if (!this.step) {
+                return;
+            }
 
-      // Do the values match the step size?
-      // Just warn, don't throw an exception
-      if (this.min % this.step !== 0) {
-        console.warn("WARNING: min value does not match step size.");
-        this.min = this.min - (this.min % this.step);
-      }
+            // Do the values match the step size?
+            // Just warn, don't throw an exception
+            if (this.min % this.step !== 0) {
+                console.warn("WARNING: min value does not match step size.");
+                this.min = this.min - (this.min % this.step);
+            }
 
-      if (newValue === "0" && this.scale.toLowerCase() === "logarithmic") {
-        console.warn("Min of 0 is invalid for logarithmic. Assigning 1 instead.");
-        this.min = 1;
-      }
+            if (newValue === "0" && this.scale.toLowerCase() === "logarithmic") {
+                console.warn("Min of 0 is invalid for logarithmic. Assigning 1 instead.");
+                this.min = 1;
+            }
 
-      // Since we are changing the min, let's go ahead and recheck the start value
-      this.value = this._cleanValue(this.value);
-    },
-    /**
-     * Function that is called if the max attr on px-slider is changed
-     * --Ensures the value is valid, matches step size, etc
-     * @method _maxChanged
-     * @param newValue
-     * @param oldValue
-     */
-    _maxChanged: function (newValue, oldValue) {
-      // if no step attr, we dont need to check anything
-      if (!this.step) {
-        return;
-      }
+            // Since we are changing the min, let's go ahead and recheck the start value
+            this.value = this._cleanValue(this.value);
+        },
+        /**
+         * Function that is called if the max attr on px-slider is changed
+         * --Ensures the value is valid, matches step size, etc
+         * @method _maxChanged
+         * @param newValue
+         * @param oldValue
+         */
+        _maxChanged: function (newValue, oldValue) {
+            // if no step attr, we dont need to check anything
+            if (!this.step) {
+                return;
+            }
 
-      // make sure max is a number and not string
-      this.max = Number(this.max);
+            // make sure max is a number and not string
+            this.max = Number(this.max);
 
-      var tempMax, tempStep;
-      var decimalPlaces = 0;
+            var tempMax, tempStep;
+            var decimalPlaces = 0;
 
-      //if step is a float, get the number of decimals
-      if (this.step.toString().indexOf(".") > -1) {
-        decimalPlaces = this.step.toString().split(".")[1].length;
-      }
+            //if step is a float, get the number of decimals
+            if (this.step.toString().indexOf(".") > -1) {
+                decimalPlaces = this.step.toString().split(".")[1].length;
+            }
 
-      // Convert floats to ints
-      tempMax = this.max * Math.pow(10, decimalPlaces);
-      tempStep = this.step * Math.pow(10, decimalPlaces);
+            // Convert floats to ints
+            tempMax = this.max * Math.pow(10, decimalPlaces);
+            tempStep = this.step * Math.pow(10, decimalPlaces);
 
-      // Do the values match the step size?
-      // Just warn, don't throw an exception
-      if (tempMax % tempStep !== 0) {
-        console.warn("WARNING: max value does not match step size.");
-        this.max = (tempMax - (tempMax % tempStep)) / Math.pow(10, decimalPlaces);
-      }
+            // Do the values match the step size?
+            // Just warn, don't throw an exception
+            if (tempMax % tempStep !== 0) {
+                console.warn("WARNING: max value does not match step size.");
+                this.max = (tempMax - (tempMax % tempStep)) / Math.pow(10, decimalPlaces);
+            }
 
-      // Since we are changing the max, let's go ahead and recheck the end value
+            // Since we are changing the max, let's go ahead and recheck the end value
 //      if (this._range) {
 //        this.endValue = this._cleanValue(this.endValue);
 //      } else {
-      this.value = this._cleanValue(this.value);
+            this.value = this._cleanValue(this.value);
 //      }
-    },
-    /**
-     * Function that is called if the step size attr on px-slider is changed
-     * --Ensures the value is valid, matches step size, etc
-     * @method _stepChanged
-     * @param newValue
-     * @param oldValue
-     */
-    _stepChanged: function (newValue, oldValue) {
-      // When the step changes, recheck EVERYTHING!
-      this.value = this._checkStep(this.value);
-      this.min = this._checkStep(this.min);
-      this.max = this._checkStep(this.max);
-    },
-    /**
-     * Function called when the scale changes
-     * --Ensures the value is valid, matches step size, etc
-     * --Moves single or start handle into position
-     * @method _scaleChanged
-     * @param newValue
-     * @param oldValue
-     */
-    _scaleChanged: function (newValue, oldValue) {
-      if (this.min === 0 && newValue.toLowerCase() === "logarithmic") {
-        console.warn("Min of 0 is invalid for logarithmic. Assigning 1 instead.");
-        this.min = 1;
-      }
+        },
+        /**
+         * Function that is called if the step size attr on px-slider is changed
+         * --Ensures the value is valid, matches step size, etc
+         * @method _stepChanged
+         * @param newValue
+         * @param oldValue
+         */
+        _stepChanged: function (newValue, oldValue) {
+            // When the step changes, recheck EVERYTHING!
+            this.value = this._checkStep(this.value);
+            this.min = this._checkStep(this.min);
+            this.max = this._checkStep(this.max);
+        },
+        /**
+         * Function called when the scale changes
+         * --Ensures the value is valid, matches step size, etc
+         * --Moves single or start handle into position
+         * @method _scaleChanged
+         * @param newValue
+         * @param oldValue
+         */
+        _scaleChanged: function (newValue, oldValue) {
+            if (this.min === 0 && newValue.toLowerCase() === "logarithmic") {
+                console.warn("Min of 0 is invalid for logarithmic. Assigning 1 instead.");
+                this.min = 1;
+            }
 
-      this.value = this._cleanValue(this.value);
+            this.value = this._cleanValue(this.value);
 
 
-      this._updateHandle(this.$.singleHandle, this.value);
+            this._updateHandle(this.$.singleHandle, this.value);
 
-    },
-    /**
-     * Function that is called if the hide-inputs property is changed.
-     * @method _hideInputsChanged
-     */
-    _hideInputsChanged: function (newValue, oldValue) {
-      if (newValue === true) {
+        },
+        /**
+         * Function that is called if the hide-inputs property is changed.
+         * @method _hideInputsChanged
+         */
+        _hideInputsChanged: function (newValue, oldValue) {
+            if (newValue === true) {
 //          this.querySelectorAll("#single")
-        this.toggleClass("visuallyhidden", true, this.querySelector(".visuallyhidden-inputs"));
-        this.toggleClass("visuallyhidden", true, this.querySelector(".visuallyhidden-inputs2"));
+                this.toggleClass("visuallyhidden", true, this.querySelector(".visuallyhidden-inputs"));
+                this.toggleClass("visuallyhidden", true, this.querySelector(".visuallyhidden-inputs2"));
 //        this.toggleClass("visuallyhidden", true, this.querySelector("#singleHandle"));
-      }
-      else {
-        this.toggleClass("visuallyhidden", false, this.querySelector(".visuallyhidden-inputs"));
-        this.toggleClass("visuallyhidden", false, this.querySelector(".visuallyhidden-inputs2"));
+            }
+            else {
+                this.toggleClass("visuallyhidden", false, this.querySelector(".visuallyhidden-inputs"));
+                this.toggleClass("visuallyhidden", false, this.querySelector(".visuallyhidden-inputs2"));
 
 //        this.toggleClass("visuallyhidden", false, this.querySelector("#singleHandle"));
-      }
-    },
-    /**
-     * Function that is called if the hide-title property is changed.
-     * @method _hideTitleChanged
-     */
-    _hideTitleChanged: function (newValue, oldValue) {
-      if (newValue === true) {
-        this.toggleClass("visuallyhidden", true, this.$.sliderTitle);
-      }
-      else {
-        this.toggleClass("visuallyhidden", false, this.$.sliderTitle);
-      }
-    },
-    /**
-     * Helper function that calls checkStep and makes sure the new value
-     * is within bounds.
-     * - Sets to max or min if not.
-     * @method _cleanValue
-     * @param dirty
-     */
-    _cleanValue: function (dirty) {
-      var clean = dirty;
+            }
+        },
+        /**
+         * Function that is called if the hide-title property is changed.
+         * @method _hideTitleChanged
+         */
+        _hideTitleChanged: function (newValue, oldValue) {
+            if (newValue === true) {
+                this.toggleClass("visuallyhidden", true, this.$.sliderTitle);
+            }
+            else {
+                this.toggleClass("visuallyhidden", false, this.$.sliderTitle);
+            }
+        },
+        /**
+         * Helper function that calls checkStep and makes sure the new value
+         * is within bounds.
+         * - Sets to max or min if not.
+         * @method _cleanValue
+         * @param dirty
+         */
+        _cleanValue: function (dirty) {
+            var clean = dirty;
 
-      // Account for 'steps'
-      clean = this._checkStep(clean);
+            // Account for 'steps'
+            clean = this._checkStep(clean);
 
-      // Check against min and max values
-      if (clean > this.max) {
-        clean = this.max;
-      } else if (clean < this.min) {
-        clean = this.min;
-      }
+            // Check against min and max values
+            if (clean > this.max) {
+                clean = this.max;
+            } else if (clean < this.min) {
+                clean = this.min;
+            }
 
-      return clean;
-    },
-    /**
-     * Helper function that makes sure the new value matches the
-     * specified step size.
-     *  - Rounds value if not
-     *  - Also sets val to number of decimal places as step size
-     * @method _checkStep
-     * @param dirty
-     */
-    _checkStep: function (dirty) {
-      // Bad values on start
-      if (!dirty && dirty !== 0) {
-        return;
-      }
+            return clean;
+        },
+        /**
+         * Helper function that makes sure the new value matches the
+         * specified step size.
+         *  - Rounds value if not
+         *  - Also sets val to number of decimal places as step size
+         * @method _checkStep
+         * @param dirty
+         */
+        _checkStep: function (dirty) {
+            // Bad values on start
+            if (!dirty && dirty !== 0) {
+                return;
+            }
 
-      var clean = dirty;
-      var decimalPlaces = 0;
+            var clean = dirty;
+            var decimalPlaces = 0;
 
-      clean = (Math.round(dirty / this.step) * this.step);
+            clean = (Math.round(dirty / this.step) * this.step);
 
-      if (this.step.toString().indexOf(".") > -1) {
-        decimalPlaces = this.step.toString().split(".")[1].length;
-        clean = clean.toFixed(decimalPlaces);
-      }
+            if (this.step.toString().indexOf(".") > -1) {
+                decimalPlaces = this.step.toString().split(".")[1].length;
+                clean = clean.toFixed(decimalPlaces);
+            }
 
-      return clean;
-    },
+            return clean;
+        },
 
-    _convertValueToPosition: function (myvalue) {
-      // add offset so end handle stops at end of tracking
-      var cW = this.offsetForHandleWidth;
+        _convertValueToPosition: function (myvalue) {
+            // add offset so end handle stops at end of tracking
+            var cW = this.offsetForHandleWidth;
 
-      // What is the ratio of the value to the range?
-      if (this.scale.toLowerCase() === "logarithmic") {
-        var lMin = Math.log(this.min),
-          lMax = Math.log(this.max),
-          ratio = (Math.log(myvalue) - lMin) / (lMax - lMin);
-      }
-      else { // Scale *should be* linear
-        var ratio = (myvalue - this.min) / (this.max - this.min);
-      }
+            // What is the ratio of the value to the range?
+            if (this.scale.toLowerCase() === "logarithmic") {
+                var lMin = Math.log(this.min),
+                    lMax = Math.log(this.max),
+                    ratio = (Math.log(myvalue) - lMin) / (lMax - lMin);
+            }
+            else { // Scale *should be* linear
+                var ratio = (myvalue - this.min) / (this.max - this.min);
+            }
 
-      // Multiple by the width of the container
-      return ratio * cW;
+            // Multiple by the width of the container
+            return ratio * cW;
 
-    },
-    /**
-     * Helper func to calc the "left:Xpx" style used to moving the handle and progress bar
-     * - Progress bar for multi-handle needs add a bit to make minor alignment adjustments.
-     * @method _translateValueToPosition
-     * @param myvalue
-     * @param extra
-     */
-    _translateValueToPosition: function (myvalue, extra) {
-      // if extra was passed in, use it, otherwise it is 0.
-      extra = extra || 0;
+        },
+        /**
+         * Helper func to calc the "left:Xpx" style used to moving the handle and progress bar
+         * - Progress bar for multi-handle needs add a bit to make minor alignment adjustments.
+         * @method _translateValueToPosition
+         * @param myvalue
+         * @param extra
+         */
+        _translateValueToPosition: function (myvalue, extra) {
+            // if extra was passed in, use it, otherwise it is 0.
+            extra = extra || 0;
 
-      var position = this._convertValueToPosition(myvalue);
+            var position = this._convertValueToPosition(myvalue);
 
-      return position + extra + 'px';
-    },
-    /**
-     * Helper function to calc a value from a handle position
-     * @method _translatePositionToValue
-     * @param mypos
-     */
-    _translatePositionToValue: function (mypos) {
-      // add offset so end handle stops at end of tracking
-      var cW = this.offsetForHandleWidth;
+            return position + extra + 'px';
+        },
+        /**
+         * Helper function to calc a value from a handle position
+         * @method _translatePositionToValue
+         * @param mypos
+         */
+        _translatePositionToValue: function (mypos) {
+            // add offset so end handle stops at end of tracking
+            var cW = this.offsetForHandleWidth;
 
-      // Have we loaded the container?
-      if (cW === 0) {
-        return;
-      }
+            // Have we loaded the container?
+            if (cW === 0) {
+                return;
+            }
 
-      // What is the ratio of my position to the container?
-      var ratio = mypos / cW;
+            // What is the ratio of my position to the container?
+            var ratio = mypos / cW;
 
-      // Convert to value; have to account min values other than 0
-      if (this.scale.toLowerCase() === "logarithmic") {
-        var lMin = Math.log(this.min),
-          lMax = Math.log(this.max),
-          value = Math.exp(ratio * (lMax - lMin) + lMin);
-      }
-      else { // Scale *should be* linear
-        var value = ratio * (this.max - this.min) + this.min;
-      }
+            // Convert to value; have to account min values other than 0
+            if (this.scale.toLowerCase() === "logarithmic") {
+                var lMin = Math.log(this.min),
+                    lMax = Math.log(this.max),
+                    value = Math.exp(ratio * (lMax - lMin) + lMin);
+            }
+            else { // Scale *should be* linear
+                var value = ratio * (this.max - this.min) + this.min;
+            }
 
-      return this._cleanValue(value);
-    },
-    /**
-     * Function updates the position of a handle by setting it's left style
-     * - calls function to update progress bar
-     * @method _updateHandle
-     * @param handle
-     * @param value
-     */
-    _updateHandle: function (handle, value) {
-      // Determine new x position from value
-      var newPos = this._translateValueToPosition(value);
+            return this._cleanValue(value);
+        },
+        /**
+         * Function updates the position of a handle by setting it's left style
+         * - calls function to update progress bar
+         * @method _updateHandle
+         * @param handle
+         * @param value
+         */
+        _updateHandle: function (handle, value) {
+            // Determine new x position from value
+            var newPos = this._translateValueToPosition(value);
 //
 //            // Set px value of left position
-      if (handle) {
-        handle.style.left = newPos;
-      }
+            if (handle) {
+                handle.style.left = newPos;
+            }
 //
 //            // Update the progress bar, too
 //            this._updateProgressBar();
-    },
+        },
 
-    /**
-     * Where is the mouse in relation to the slider? Keep it in bounds.
-     *
-     * @method _findPosition
-     * @param event
-     */
-    _findPosition: function (event) {
-      // Is this a drag or a click?
-      var mX = (event.detail.x) ? event.detail.x : event.clientX;
-      // add offset so end handle stops at end of tracking
-      var cL = this.$.sliderContainer.getBoundingClientRect().left;
-      var cR = this.$.sliderContainer.getBoundingClientRect().right;
-      var cW = this.offsetForHandleWidth;
-      var position = 0;
+        /**
+         * Where is the mouse in relation to the slider? Keep it in bounds.
+         *
+         * @method _findPosition
+         * @param event
+         */
+        _findPosition: function (event) {
+            // Is this a drag or a click?
+            var mX = (event.detail.x) ? event.detail.x : event.clientX;
+            // add offset so end handle stops at end of tracking
+            var cL = this.$.sliderContainer.getBoundingClientRect().left;
+            var cR = this.$.sliderContainer.getBoundingClientRect().right;
+            var cW = this.offsetForHandleWidth;
+            var position = 0;
 
-      // Check to make sure Mouse is on the screen.
-      if (isNaN(mX)) {
-        mX = 0;
-      }
+            // Check to make sure Mouse is on the screen.
+            if (isNaN(mX)) {
+                mX = 0;
+            }
 
-      if (mX > cR) {
-        // Is the mouse passed the right of our container?
-        // If so, set the position to the width of the container
-        position = cW;
-      } else if (mX < cL) {
-        // Is the mouse passed the left of our container?
-        // If so, set the position to zero
-        position = 0;
-      } else {
-        // Otherwise, position is based on the mouseX minus the offset
-        position = mX - cL;
-      }
+            if (mX > cR) {
+                // Is the mouse passed the right of our container?
+                // If so, set the position to the width of the container
+                position = cW;
+            } else if (mX < cL) {
+                // Is the mouse passed the left of our container?
+                // If so, set the position to zero
+                position = 0;
+            } else {
+                // Otherwise, position is based on the mouseX minus the offset
+                position = mX - cL;
+            }
 
-      return position;
-    },
+            return position;
+        },
 
-    /**
-     * Handles updating the value when the END handle is moved
-     *
-     * @method _handleEndChange
-     * @param event
-     */
-    _handleTrackEnd: function (event) {
-      var slider = this;
-      if (slider.disabled) {
-        return false;
-      }
+        /**
+         * Handles updating the value when the END handle is moved
+         *
+         * @method _handleEndChange
+         * @param event
+         */
+        _handleTrackEnd: function (event) {
+            var slider = this;
+            if (slider.disabled) {
+                return false;
+            }
 
-      if (slider.debounce) {
-        slider.debounce(
-          'slider_track_end', function () {
-            var newPos = this._findPosition(event);
+            if (slider.debounce) {
+                slider.debounce(
+                    'slider_track_end', function () {
+                        var newPos = this._findPosition(event);
 
-            // Update the value based on the new position
-            var newValue = this._translatePositionToValue(newPos);
+                        // Update the value based on the new position
+                        var newValue = this._translatePositionToValue(newPos);
+                        this._changeResetButtonState("enable");
+                        this.value = newValue;
 
-            this.value = newValue;
+                    }, 10);
+            }
+        },
 
-          }, 10);
-      }
-    },
+        /**
+         * Handles updating the value when the START input textbox is changed
+         *
+         * @method _handleStartChange
+         * @param event
+         */
+        _handleStartChange: function (event) {
+            // Two way data binding not working?
+            this.value = this.$.inputStart.value;
+        },
 
-    /**
-     * Handles updating the value when the START input textbox is changed
-     *
-     * @method _handleStartChange
-     * @param event
-     */
-    _handleStartChange: function (event) {
-      // Two way data binding not working?
-      this.value = this.$.inputStart.value;
-    },
-
-    /**
-     * Handles updating the value when the END input textbox is changed
-     *
-     * @method _handleEndChange
-     * @param event
-     */
+        /**
+         * Handles updating the value when the END input textbox is changed
+         *
+         * @method _handleEndChange
+         * @param event
+         */
 //    _handleEndChange: function (event) {
 //      // Two way data binding not working?
 //      this.endValue = this.$.inputEnd.value;
 //    },
 
-    /**
-     * When the user clicks on the slider itself, jump to the corresponding value.
-     *
-     * @method _jumpToValue
-     * @param event
-     */
-    _jumpToValue: function (event) {
-      var slider = this;
-      if (slider.disabled) {
-        return false;
-      }
-      if (slider.debounce) {
-        slider.debounce(
-          'slider_jump', function () {
-            // if the user clicks on the slider bar (not just clicking the handles), jump the value
-            if (event.target.id === 'sliderContainer' || event.target.id === 'sliderSelected') {
-              var newPos = this._findPosition(event);
-              // Update the value based on the new position
-              var newValue = this._translatePositionToValue(newPos);
-
-              // Move the only handle
-              this.value = newValue;
-
+        /**
+         * When the user clicks on the slider itself, jump to the corresponding value.
+         *
+         * @method _jumpToValue
+         * @param event
+         */
+        _jumpToValue: function (event) {
+            var slider = this;
+            if (slider.disabled) {
+                return false;
             }
-          }, 1);
-      }
-    },
-    /**
-     * Helper function to calculate the amount of space that is left on the slider
-     * to accomodate the handle width.
-     * @method _calcOffsetWidth
-     * @param cO
-     *
-     */
-    _calcOffsetWidth: function (cO) {
-      return this.$.sliderContainer.offsetWidth - cO;
-    }
-  });
+            if (slider.debounce) {
+                slider.debounce(
+                    'slider_jump', function () {
+                        // if the user clicks on the slider bar (not just clicking the handles), jump the value
+                        if (event.target.id === 'sliderContainer' || event.target.id === 'sliderSelected') {
+                            var newPos = this._findPosition(event);
+                            // Update the value based on the new position
+                            var newValue = this._translatePositionToValue(newPos);
+
+                            // Move the only handle
+                            this.value = newValue;
+
+                        }
+                    }, 1);
+            }
+        },
+        /**
+         * Helper function to calculate the amount of space that is left on the slider
+         * to accomodate the handle width.
+         * @method _calcOffsetWidth
+         * @param cO
+         *
+         */
+        _calcOffsetWidth: function (cO) {
+            return this.$.sliderContainer.offsetWidth - cO;
+        }
+    });
 </script>
