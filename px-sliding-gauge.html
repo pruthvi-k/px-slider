@@ -1,7 +1,8 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="../px-alert-label/px-alert-label.html">
+<link rel="import" href="px-alert-label.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html"/>
 <link rel="import" href="px-handle.html"/>
+<link rel="import" href="px-sliding-gauge.html"/>
 
 <link rel="import" href="css/px-sliding-gauge-styles.html">
 
@@ -40,7 +41,7 @@
                     </div>
                     <div class="right__container">
                         <div class="visuallyhidden-inputs visuallyhidden">
-                            <input id="inputStart" type="text" class="text-input" value="{{value}}"
+                            <input  id="inputStart" type="text" class="text-input" value="{{value}}"
                                    on-change="_handleStartChange" tabindex="0" disabled="{{disabled}}"/>
 
                             <span class="unit">{{unit}}</span>
@@ -196,7 +197,7 @@
                 type: String,
                 computed: '_formatSubTitle(latestValue, value, unit)'
             },
-            '_allowRefresh': {
+            _allowRefresh: {
                 type: Boolean,
                 value: function () {
                     return false;
@@ -294,16 +295,18 @@
             this._addLabels();
         },
         _plotTicks: function () {
-            this.querySelector("#maxValTick").style.left = this._translateValueToPosition(this.max);
-            this.querySelector("#maxValTick label").style.right = "24px";
-            this.querySelector("#minValTick label").style.left = "4px";
-            this.querySelector("#midValTick").style.left = this._translateValueToPosition(this.mid);
-            this.querySelector("#midValTick label").style.right = "6px";
+            this.querySelector("#" + this.id + " #maxValTick").style.left = this._translateValueToPosition(this.max);
+            var noOfChar = this.querySelector("#" + this.id + " #maxValTick label").innerHTML.length;
+            console.log(this.id, noOfChar);
+            this.querySelector("#" + this.id + " #maxValTick label").style.right = noOfChar*6+"px";
+            this.querySelector("#" + this.id + " #minValTick label").style.left = "0px";
+            this.querySelector("#" + this.id + " #midValTick").style.left = this._translateValueToPosition(this.mid);
+            this.querySelector("#" + this.id + " #midValTick label").style.right = "6px";
             this._adjustLatestValueStrip();
         },
         _adjustLatestValueStrip: function () {
-            if (this.querySelector("#latestValueTick")) {
-                this.querySelector("#latestValueTick").style.left = this._translateValueToPosition(this.latestValue);
+            if (this.id && this.querySelector("#" + this.id + " #latestValueTick")) {
+                this.querySelector("#" + this.id + " #latestValueTick").style.left = this._translateValueToPosition(this.latestValue);
             }
         },
         _addLabels: function () {
@@ -347,10 +350,6 @@
                 for (bandIndex = 0, numOfBands = this.bands.length; bandIndex < numOfBands; bandIndex++) {
                     var band = this.bands[bandIndex];
 
-//          if (band.from < self.min) {
-//            this._plotDefaultBand();
-//            break;
-//          }
                     if (document.querySelector("#" + this.id + ' #sliderContainer bands ' + "." + band.color + "-band")) {
                         var dynamicBand = document.querySelector("#" + this.id + ' #sliderContainer bands ' + "." + band.color + "-band");
                     } else {
@@ -389,8 +388,17 @@
         _plotDefaultBand: function () {
             //create default green band if no band range is given
             var dynamicBand = document.createElement("div");
+
+          if (document.querySelector("#" + this.id + ' #sliderContainer bands ' + ".green-band")) {
+            var dynamicBand = document.querySelector("#" + this.id + ' #sliderContainer bands .green-band');
+          } else {
+            var dynamicBand = document.createElement("div");
             dynamicBand.setAttribute("class", "slider__band green-band");
-            Polymer.dom(this.querySelector('#sliderContainer bands')).appendChild(dynamicBand);
+            Polymer.dom(this.querySelector("#" + this.id + ' #sliderContainer bands ')).appendChild(dynamicBand);
+          }
+
+//            dynamicBand.setAttribute("class", "slider__band green-band");
+//            Polymer.dom(this.querySelector('#sliderContainer bands')).appendChild(dynamicBand);
             dynamicBand.style.width = this._translateValueToPosition(this.max);
             dynamicBand.style.left = this._translateValueToPosition(this.min);
         },

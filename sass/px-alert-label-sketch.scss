@@ -9,14 +9,14 @@
  */
 
 //
-// Sass for the "sketch" notion of the px-sliding-gauge component
+// Sass for the "sketch" notion of the px-alert-label component
 //
 // @author
 //
 
 /*
 THIS FILE SHOULD CONTAIN ONLY ABSTRACT/'SKETCH' THEME RULES, NOT SPECIFIC TO PREDIX BRANDING
-Predix branding rules go in px-sliding-gauge-predix.scss, not in this file.
+Predix branding rules go in px-alert-label-predix.scss, not in this file.
 */
 
 // Generic
@@ -27,35 +27,22 @@ Predix branding rules go in px-sliding-gauge-predix.scss, not in this file.
 // Base
 @import "px-flexbox-design/_base.flexbox.scss";
 @import "px-viewport-design/_base.viewport.scss";
-@import "px-forms-design/_base.forms.scss";
 
 // Component
-
-:host {
-  user-select: none;
-  cursor: default;
-  -webkit-tap-highlight-color: transparent;
+.alertlabel {
+  display: inline-block;
+  overflow: visible;
+  padding: 6px 6px 4px 6px;
+  font: inherit;
+  -webkit-font-smoothing: antialiased;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-weight: bold;
 }
 
-:host(:focus) {
-  outline: none;
-}
-
-.slider {
-  position: relative;
-  height: 8px;
-  margin-top: 6px;
-  //border: 1px solid;
-  //border-radius: 2px;
-}
-
-.text-input {
-  width: calculateRem(60px);
-  padding: 0 2px!important;
-}
-#sliderContainer {cursor:pointer;}
-
-
-
-
-//remove .slider__selected {
+// Trumps
+@import "inuit-clearfix/_trumps.clearfix.scss";
+@import "px-spacing-responsive-design/_trumps.spacing-responsive.scss";
+@import "px-widths-responsive-design/_trumps.widths-responsive.scss";
