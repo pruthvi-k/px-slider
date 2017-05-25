@@ -30,11 +30,13 @@ common/abstract rules go in px-alert-label-sketch.scss, not in this file.
 .alertlabel--important {
   background-color: var(--px-alert-label-background-color--alert, $alert-red);
   color: var(--px-alert-label-text-color--alert, $white);
+  z-index: 1;
 }
 
 .alertlabel--warning {
   background-color: var(--px-alert-label-background-color--warning, $alert-orange);
   color: var(--px-alert-label-text-color--warning, $white);
+  z-index: 1;
 }
 
 .alertlabel--error {

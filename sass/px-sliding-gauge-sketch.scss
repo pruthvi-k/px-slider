@@ -45,17 +45,11 @@ Predix branding rules go in px-sliding-gauge-predix.scss, not in this file.
   position: relative;
   height: 8px;
   margin-top: 6px;
-  //border: 1px solid;
-  //border-radius: 2px;
 }
 
 .text-input {
-  width: calculateRem(60px);
+  width: calculateRem(48px);
   padding: 0 2px!important;
 }
-#sliderContainer {cursor:pointer;}
-
-
-
 
 //remove .slider__selected {

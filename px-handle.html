@@ -23,7 +23,7 @@ Handle element for the single handle for px-slider
 <link rel="import" href="css/px-handle-styles.html">
 
 <dom-module id="px-handle">
-  <template>
+  <template strip-whitespace>
     <style include="px-handle-styles"></style>
 
     <button id="handleTarget" on-down="handleDown" on-up="handleUp" on-track="handleTrack" tabindex="-1">

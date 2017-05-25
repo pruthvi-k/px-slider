@@ -8,22 +8,6 @@
 
 <dom-module id="px-sliding-gauge">
     <template strip-whitespace>
-        <style>
-
-            /deep/
-            px-alert-label .alertlabel {
-                font-size: 12px !important;
-                padding: 5px !important;
-            }
-
-            /deep/
-            px-handle button.px-handle {
-                padding: 3px 6px;
-                height: 21px !important;
-                width: 21px !important;
-
-            }
-        </style>
         <style include="px-sliding-gauge-styles"></style>
 
         <div class="slider-container">
@@ -41,13 +25,14 @@
                     </div>
                     <div class="right__container">
                         <div class="visuallyhidden-inputs visuallyhidden">
-                            <input  id="inputStart" type="text" class="text-input" value="{{value}}"
-                                   on-change="_handleStartChange" tabindex="0" disabled="{{disabled}}"/>
+                            <input id="inputStart" type="text" class="text-input" value="{{value}}"
+                                   on-change="_handleStartChange" tabindex="0" disabled="{{disabled}}"
+                                   on-blur="_changeInput"/>
 
                             <span class="unit">{{unit}}</span>
 
                             <a on-tap="handleTap"><span class="fa-stack fa-lg">
-                          <i class="fa fa-refresh disabled"></i>
+                          <i class$="fa fa-refresh {{refreshButton}}"></i>
                         </span>
                             </a>
 
@@ -58,7 +43,7 @@
             <div id="sliderContainer" class="slider flex__item" on-click="_jumpToValue">
                 <bands></bands>
                 <ticks>
-                    <div id="latestValueTick" hidden$="{{!latestValue}}" class="tick latest-value"></div>
+                    <div id="latestValueTick" class="tick latest-value"></div>
                     <div id="minValTick" class="tick"><label>{{_formatTickLabel(min)}}</label></div>
                     <div id="midValTick" class="tick"><label>{{_formatTickLabel(mid)}}</label></div>
                     <div id="maxValTick" class="tick"><label>{{_formatTickLabel(max)}}</label></div>
@@ -72,7 +57,7 @@
             </div>
             <div>
                 <input id="inputEnd" type="text" class="text-input visuallyhidden" value="{{endValue}}"
-                       on-change="_handleEndChange" tabindex="0" disabled="{{disabled}}"/>
+                       on-change="_handleEndChange" on-blur="_changeInput" tabindex="0" disabled="{{disabled}}"/>
             </div>
         </div>
 
@@ -82,13 +67,10 @@
 
 <script>
     Polymer({
-
         is: 'px-sliding-gauge',
-
         behaviors: [
             Polymer.IronResizableBehavior
         ],
-
         /**
          * Properties block, expose attribute values to the DOM via 'reflect'
          *
@@ -147,7 +129,8 @@
              */
             disabled: {
                 type: Boolean,
-                value: false
+                value: false,
+                observer: '_disableChanged'
             },
             /**
              * A boolean reflecting whether the text input fields should be hidden.
@@ -202,12 +185,24 @@
                 value: function () {
                     return false;
                 }
-            }
+            },
+            refreshButton: {
+                type: String,
+                value: 'disabled',
+                observer: '_refreshButtonChanged'
+            },
+            _oldValue: {type: Number, value: 0},
+            _newValue: {type: Number, value: 0}
         },
 
         listeners: {
             'iron-resize': '_onIronResize',
             'handleTap': '_refreshPressed'
+        },
+        _changeInput: function () {
+            if (this.value != this.latestValue) {
+                this.fire('value-changed', {id: this.id, value: this.value});
+            }
         },
         _labelsChanged: function (d) {
             if (this.id != "" && document.querySelectorAll("#" + this.id + ' #sliderContainer bands').length > 0) {
@@ -225,7 +220,7 @@
                     node: this,
                     bubbles: false
                 });
-                this._changeResetButtonState("disable");
+
             }
         },
         ready: function () {
@@ -260,7 +255,6 @@
             }
 
             // Show the single handle
-//      this.toggleClass('visuallyhidden', false, this.$.singleHandle);
             this.async(function () {
                 // calculate the amount to offset the range on the right for handle width
                 this.offsetForHandleWidth = this._calcOffsetWidth(0);
@@ -269,15 +263,40 @@
                 this._updateHandle(this.$.singleHandle, this.value);
             }, 1);
         },
+        _refreshButtonChanged: function () {
+            if (this.refreshButton === 'enabled') {
+                this._allowRefresh = true;
+            } else {
+                this._allowRefresh = false;
+            }
+        },
+        _disableChanged: function () {
+            if (this.disabled == true) {
+                this.refreshButton = 'disabled';
+                this.querySelector(".slider-container").classList.add('disabled');
+            } else {
+                if (this.querySelector(".slider-container.disabled")) {
+                    this.querySelector(".slider-container").classList.remove('disabled');
+                }
+            }
+        },
+
+        _changeResetButtonState: function (state) {
+            if (this.id) {
+                if (this.value != this.latestValue && this.value > 0) {
+                    this.refreshButton = 'enabled';
+                } else {
+                    this.refreshButton = 'disabled';
+                }
+            }
+        },
         //Todo: calculate min and max value from latest value
         _getExtent: function (value) {
             var min = Math.log(value) / Math.log(10);
             this.min = Math.pow(parseInt(min));
-            console.log("calculated vals", this.min);
         },
-
         _formatSubTitle: function (latestValue, value, unit) {
-            return 'Latest: ' + (latestValue || value) + ' ' + unit;
+            return 'Latest: ' + (latestValue || 0) + ' ' + unit;
         },
         _formatTickLabel: function (num) {
             return num > 999 ? (num / 1000) + 'k' : num
@@ -297,8 +316,7 @@
         _plotTicks: function () {
             this.querySelector("#" + this.id + " #maxValTick").style.left = this._translateValueToPosition(this.max);
             var noOfChar = this.querySelector("#" + this.id + " #maxValTick label").innerHTML.length;
-            console.log(this.id, noOfChar);
-            this.querySelector("#" + this.id + " #maxValTick label").style.right = noOfChar*6+"px";
+            this.querySelector("#" + this.id + " #maxValTick label").style.right = noOfChar * 6 + "px";
             this.querySelector("#" + this.id + " #minValTick label").style.left = "0px";
             this.querySelector("#" + this.id + " #midValTick").style.left = this._translateValueToPosition(this.mid);
             this.querySelector("#" + this.id + " #midValTick label").style.right = "6px";
@@ -321,16 +339,22 @@
                             for (var attr in label.attributes) {
                                 dynamicLabel.setAttribute(attr, label.attributes[attr]);
                             }
-                            dynamicLabel.setAttribute("style", "position:absolute");
-
+                            //Todo: Add z-index based on line height
+                            if (id == 'warning') {
+                                dynamicLabel.setAttribute("style", "z-index:1;position:absolute");
+                            } else {
+                                dynamicLabel.setAttribute("style", "position:absolute");
+                            }
                             Polymer.dom(self.querySelector("#" + self.id + " #gaugeAlerts")).appendChild(dynamicLabel);
                             var postion = (self._convertValueToPosition(label.position) - (dynamicLabel.offsetWidth / 2));
                             document.querySelector("#" + self.id + " #gaugeAlerts px-alert-label#" + id).style.left = postion + "px";
                         } else {
-                            var el = document.querySelector("#" + self.id + " #gaugeAlerts px-alert-label#" + id);
-                            var postion = (self._convertValueToPosition(label.position) - (el.offsetWidth / 2));
-                            el.style.left = postion + "px";
+                            var dynamicLabel = document.querySelector("#" + self.id + " #gaugeAlerts px-alert-label#" + id);
+                            //deduct 1 from offset width as it is taking up bound when calculating width on resizing
+                            var postion = (self._convertValueToPosition(label.position) - ((dynamicLabel.offsetWidth / 2) - 1));
+                            dynamicLabel.style.left = postion + "px";
                         }
+
                     }
                 })
             } else {
@@ -389,18 +413,16 @@
             //create default green band if no band range is given
             var dynamicBand = document.createElement("div");
 
-          if (document.querySelector("#" + this.id + ' #sliderContainer bands ' + ".green-band")) {
-            var dynamicBand = document.querySelector("#" + this.id + ' #sliderContainer bands .green-band');
-          } else {
-            var dynamicBand = document.createElement("div");
-            dynamicBand.setAttribute("class", "slider__band green-band");
-            Polymer.dom(this.querySelector("#" + this.id + ' #sliderContainer bands ')).appendChild(dynamicBand);
-          }
+            if (document.querySelector("#" + this.id + ' #sliderContainer bands ' + ".green-band")) {
+                var dynamicBand = document.querySelector("#" + this.id + ' #sliderContainer bands .green-band');
+            } else {
+                var dynamicBand = document.createElement("div");
+                dynamicBand.setAttribute("class", "slider__band green-band");
+                Polymer.dom(this.querySelector("#" + this.id + ' #sliderContainer bands ')).appendChild(dynamicBand);
+            }
 
-//            dynamicBand.setAttribute("class", "slider__band green-band");
-//            Polymer.dom(this.querySelector('#sliderContainer bands')).appendChild(dynamicBand);
-            dynamicBand.style.width = this._translateValueToPosition(this.max);
-            dynamicBand.style.left = this._translateValueToPosition(this.min);
+            dynamicBand.style.width = this._convertValueToPosition(this.max) + "px";
+            dynamicBand.style.left = this._convertValueToPosition(this.min) + "px";
         },
         /**
          * This will be called by the parents through the iron-resizable-behavior
@@ -442,29 +464,8 @@
                         //update the single handle
                         var handle = this.$.singleHandle;
                         this._updateHandle(handle, this.value);
-
                         this.value = clean;
                     }, 10);
-            }
-
-        },
-
-        _changeResetButtonState: function (state) {
-
-            if (this.id) {
-
-                var refreshButton = document.querySelector("#" + this.id + '  .slider-container i.fa-refresh');
-                if(refreshButton) {
-                    if (state === "enable") {
-                        refreshButton.classList.remove("disabled");
-                        refreshButton.classList.add('enabled');
-                        this._allowRefresh = true;
-                    } else if(state === "disable") {
-                        refreshButton.classList.remove("enabled");
-                        refreshButton.classList.add('disabled');
-                        this._allowRefresh = false;
-                    }
-                }
             }
         },
         /**
@@ -486,8 +487,6 @@
                     var handle = this.$.singleHandle;
                     this._updateHandle(handle, clean);
 
-                    // Update endValue with the cleaned value
-//          this.endValue = clean;
                 }, 10);
             }
         },
@@ -528,14 +527,13 @@
          * @param oldValue
          */
         _maxChanged: function (newValue, oldValue) {
-            // if no step attr, we dont need to check anything
+            // if no step attr, we don't need to check anything
             if (!this.step) {
                 return;
             }
 
             // make sure max is a number and not string
             this.max = Number(this.max);
-
             var tempMax, tempStep;
             var decimalPlaces = 0;
 
@@ -556,11 +554,7 @@
             }
 
             // Since we are changing the max, let's go ahead and recheck the end value
-//      if (this._range) {
-//        this.endValue = this._cleanValue(this.endValue);
-//      } else {
             this.value = this._cleanValue(this.value);
-//      }
         },
         /**
          * Function that is called if the step size attr on px-slider is changed
@@ -590,10 +584,7 @@
             }
 
             this.value = this._cleanValue(this.value);
-
-
             this._updateHandle(this.$.singleHandle, this.value);
-
         },
         /**
          * Function that is called if the hide-inputs property is changed.
@@ -601,16 +592,14 @@
          */
         _hideInputsChanged: function (newValue, oldValue) {
             if (newValue === true) {
-//          this.querySelectorAll("#single")
                 this.toggleClass("visuallyhidden", true, this.querySelector(".visuallyhidden-inputs"));
                 this.toggleClass("visuallyhidden", true, this.querySelector(".visuallyhidden-inputs2"));
-//        this.toggleClass("visuallyhidden", true, this.querySelector("#singleHandle"));
+                this.querySelector(".slider-container").classList.add('hidden-inputs');
             }
             else {
                 this.toggleClass("visuallyhidden", false, this.querySelector(".visuallyhidden-inputs"));
                 this.toggleClass("visuallyhidden", false, this.querySelector(".visuallyhidden-inputs2"));
-
-//        this.toggleClass("visuallyhidden", false, this.querySelector("#singleHandle"));
+                this.querySelector(".slider-container").classList.remove('hidden-inputs');
             }
         },
         /**
@@ -690,7 +679,6 @@
 
             // Multiple by the width of the container
             return ratio * cW;
-
         },
         /**
          * Helper func to calc the "left:Xpx" style used to moving the handle and progress bar
@@ -746,14 +734,12 @@
         _updateHandle: function (handle, value) {
             // Determine new x position from value
             var newPos = this._translateValueToPosition(value);
-//
-//            // Set px value of left position
+
+            // Set px value of left position
             if (handle) {
                 handle.style.left = newPos;
+
             }
-//
-//            // Update the progress bar, too
-//            this._updateProgressBar();
         },
 
         /**
@@ -811,7 +797,8 @@
 
                         // Update the value based on the new position
                         var newValue = this._translatePositionToValue(newPos);
-                        this._changeResetButtonState("enable");
+                        this._changeResetButtonState('handle track end');
+                        this._changeInput();
                         this.value = newValue;
 
                     }, 10);
@@ -827,18 +814,8 @@
         _handleStartChange: function (event) {
             // Two way data binding not working?
             this.value = this.$.inputStart.value;
+            this._changeResetButtonState();
         },
-
-        /**
-         * Handles updating the value when the END input textbox is changed
-         *
-         * @method _handleEndChange
-         * @param event
-         */
-//    _handleEndChange: function (event) {
-//      // Two way data binding not working?
-//      this.endValue = this.$.inputEnd.value;
-//    },
 
         /**
          * When the user clicks on the slider itself, jump to the corresponding value.

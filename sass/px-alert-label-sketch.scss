@@ -30,10 +30,10 @@ Predix branding rules go in px-alert-label-predix.scss, not in this file.
 
 // Component
 .alertlabel {
-  display: inline-block;
+  font-size: 12px;
+  padding: $inuit-base-spacing-unit--tiny;
+  display: inline;
   overflow: visible;
-  padding: 6px 6px 4px 6px;
-  font: inherit;
   -webkit-font-smoothing: antialiased;
   text-align: center;
   text-decoration: none;

@@ -11,7 +11,6 @@
 $regular: 15px;
 
 // Component
-$slider-tags-hover: '.slider-container:active, .slider-container:hover';
 
 .left__container {
   margin-right: auto;
@@ -33,7 +32,8 @@ $slider-tags-hover: '.slider-container:active, .slider-container:hover';
 .right__container {
   margin-left: auto;
   .fa-stack{
-    width: 1.3em;
+    width: 21px;
+    height: 24px;
   }
   span.unit{
     padding: 10px 10px 10px 5px;
@@ -41,14 +41,19 @@ $slider-tags-hover: '.slider-container:active, .slider-container:hover';
   span .fa-refresh {
     border-radius: 14px;
     border: 1px solid $gray5;
-    font-size: 14px;
+    font-size: 12px;
     background: $white;
-    padding: 6px;
+    padding: 4px;
+    position: absolute;
 
     &.disabled {
       background: $white;
       color: $gray4;
       border: 1px solid $gray4;
+    }
+    &.enabled{
+      color: $primary-blue;
+      border: 1px solid $gray5;
     }
 
     &:active{
@@ -67,8 +72,23 @@ $slider-tags-hover: '.slider-container:active, .slider-container:hover';
 }
 .slider-container {
   padding: $inuit-base-spacing-unit $inuit-base-spacing-unit--large $inuit-base-spacing-unit--tiny;
-  height: 140px;
+  height: 146px;
   border: solid 1px transparent;
+
+  &.disabled:hover {
+    border: 1px solid $gray4;
+    cursor:not-allowed;
+    color: $gray4;
+
+  }
+
+  &:active{
+    border: 1px solid $gray6;
+  }
+
+  &:not(.disabled):not(.hidden-inputs):hover {
+    border: 1px solid $select-blue-default;
+  }
 
   bands {
     .slider__band {
@@ -111,8 +131,5 @@ $slider-tags-hover: '.slider-container:active, .slider-container:hover';
   }
 }
 
-#{$slider-tags-hover} {
-  border: 1px solid $select-blue-default;
-}
 
 

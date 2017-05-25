@@ -42,6 +42,7 @@ $px-handle-black : var(--px-handle-shadow-color, $black);
   position: absolute;
   top: -#{calculateRem(6px)};
   display: inline-block;
+  z-index: 1;
 }
 
 :host(.start) {
@@ -55,14 +56,15 @@ $px-handle-black : var(--px-handle-shadow-color, $black);
 }
 
 #handleTarget {
-  height: $inuit-base-spacing-unit--large;
-  width: $inuit-base-spacing-unit--large;
+  height: 21px;
+  width: 21px;
+  padding: 3px 6px !important;
   border: 1px solid $px-handle-gray5;
   border-radius: 3px;
   box-shadow: 0 1px 1px rgba($black, .15);
   background-color: $px-handle-white;
   fill: $px-handle-gray5;
-  cursor: pointer;
+
 
   .handleLines{
     stroke:$px-handle-gray5;
@@ -85,7 +87,11 @@ $px-handle-black : var(--px-handle-shadow-color, $black);
   &:focus {
     outline: 0;
   }
-  &:hover {
+  &.disabled:hover {
+    cursor: not-allowed;
+  }
+  &:not(.disabled):hover {
+    cursor: pointer;
     border-color: $px-handle-gray6;
     background-color: var(--px-handle-background-color--hover, $gray5);;
     svg {

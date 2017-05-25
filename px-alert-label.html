@@ -46,7 +46,7 @@ Custom property | Description | Default
 <link rel="import" href="css/px-alert-label-line-styles.html">
 
 <dom-module id="px-alert-label">
-  <template>
+  <template strip-whitespace>
     <style include="px-alert-label-styles"></style>
     <style include="px-alert-label-line-styles"></style>
     <div style="display: inline-block; position: relative;">
@@ -116,9 +116,6 @@ Custom property | Description | Default
         value: false,
         observer: '_showLineChanged'
       }
-    },
-    attached: function () {
-      console.log("offset", this.offsetWidth);
     },
     /**
      * Function to define height of line that is to be shown above label.
